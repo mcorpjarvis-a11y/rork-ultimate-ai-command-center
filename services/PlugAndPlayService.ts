@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from '@/types';
-import { FREE_AI_MODELS } from '@/config/api.config';
+import { FREE_AI_MODELS, AI_CONFIG } from '@/config/api.config';
 
 export interface IntegrationConfig {
   id: string;
@@ -467,6 +467,9 @@ class PlugAndPlayService {
       return true;
     }
     if (lowerKeyName.includes('replicate') && FREE_AI_MODELS.replicate.apiKey) {
+      return true;
+    }
+    if (lowerKeyName.includes('gemini') && AI_CONFIG.gemini.apiKey) {
       return true;
     }
     
