@@ -14,7 +14,6 @@ import PersonaBuilder from '@/components/pages/PersonaBuilder';
 import MediaGenerator from '@/components/pages/MediaGenerator';
 import MediaStudio from '@/components/pages/MediaStudio';
 import APIKeys from '@/components/pages/APIKeys';
-import APITester from '@/components/pages/APITester';
 import SocialConnect from '@/components/pages/SocialConnect';
 import DataSources from '@/components/pages/DataSources';
 import Scheduler from '@/components/pages/Scheduler';
@@ -99,7 +98,6 @@ export default function Index() {
       'ai-media-generator': { title: 'AI Influencer', section: 'AI Modules / Media Generator' },
       'ai-media-studio': { title: 'AI Influencer', section: 'AI Modules / Media Studio' },
       'integrations-api-keys': { title: 'AI Influencer', section: 'Integrations / API Keys' },
-      'integrations-api-tester': { title: 'AI Influencer', section: 'Integrations / API Tester' },
       'integrations-social-connect': { title: 'AI Influencer', section: 'Integrations / Social Connect' },
       'integrations-data-sources': { title: 'AI Influencer', section: 'Integrations / Data Sources' },
       'automation-scheduler': { title: 'AI Influencer', section: 'Automation / Scheduler' },
@@ -140,8 +138,6 @@ export default function Index() {
         return <MediaStudio />;
       case 'integrations-api-keys':
         return <APIKeys />;
-      case 'integrations-api-tester':
-        return <APITester />;
       case 'integrations-social-connect':
         return <SocialConnect />;
       case 'integrations-data-sources':
