@@ -109,7 +109,7 @@ export const AI_CONFIG = {
   gemini: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta',
     model: 'gemini-pro',
-    apiKey: 'gen-lang-client-0842676384',
+    apiKey: '',
     tier: 'free',
   },
   toolkit: {

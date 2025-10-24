@@ -3,10 +3,9 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --clear",
-    "start-tunnel": "expo start --tunnel --clear",
-    "android": "expo start --android",
-    "web": "expo start --web",
+    "start": "bunx rork start -p iwor6jnskhcx5cg2w1o64 --tunnel",
+    "start-web": "bunx rork start -p iwor6jnskhcx5cg2w1o64 --web --tunnel",
+    "start-web-dev": "DEBUG=expo* bunx rork start -p iwor6jnskhcx5cg2w1o64 --web --tunnel",
     "lint": "expo lint"
   },
   "dependencies": {
@@ -15,7 +14,6 @@
     "@hono/trpc-server": "^0.4.0",
     "@nkzw/create-context-hook": "^1.1.0",
     "@react-native-async-storage/async-storage": "2.1.2",
-    "@react-native-community/netinfo": "11.4.1",
     "@react-native-picker/picker": "2.11.1",
     "@react-navigation/native": "^7.1.6",
     "@stardazed/streams-text-encoding": "^1.0.2",
