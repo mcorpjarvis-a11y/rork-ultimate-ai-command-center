@@ -65,6 +65,6 @@
       ],
       [
         "expo-document-picker",
-    "experiments": {
-      "typedRoutes": true
+      ]
     }
+  }
