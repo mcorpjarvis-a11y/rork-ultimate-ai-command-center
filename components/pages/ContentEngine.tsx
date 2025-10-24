@@ -1,9 +1,8 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch, Image, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Switch } from 'react-native';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/contexts/AppContext';
-import { Sparkles, FileText, Image as ImageIcon, Video, Mic, Hash, TrendingUp, Target, Calendar, Clock, Globe, Users, Heart, Share2, Eye, Edit3, Trash2, Copy, Download, Save, Zap, Brain, Lightbulb, Settings, BarChart3, DollarSign, Filter, Search, BookOpen, BookMarked, Layers, Grid, List, Check, ChevronRight, ChevronDown, ChevronUp, Star, CheckCircle, ArrowUpRight, Upload } from 'lucide-react-native';
+import { Sparkles, FileText, Image as ImageIcon, Video, Mic, Hash, TrendingUp, Target, Calendar, Clock, Globe, Users, Heart, Share2, Eye, Edit3, Trash2, Copy, Download, Save, Zap, Brain, Lightbulb, Settings, BarChart3, DollarSign, Filter, Search, BookOpen, BookMarked, Layers, Grid, List, Check, ChevronRight, ChevronDown, ChevronUp, Star, CheckCircle, ArrowUpRight } from 'lucide-react-native';
 
 export default function ContentEngine() {
   const { state, addContentItem } = useApp();
@@ -39,8 +38,6 @@ export default function ContentEngine() {
   const [filterSearch, setFilterSearch] = useState('');
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
-
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
   const contentTemplates = [
     { id: '1', name: 'Product Launch', category: 'Marketing', uses: 1250, rating: 4.8 },
@@ -141,12 +138,6 @@ export default function ContentEngine() {
     }
   };
 
-  const handleUploadImage = () => {
-    Alert.alert('Upload Image', 'Image upload feature coming soon!', [
-      { text: 'OK' }
-    ]);
-  };
-
   const renderGenerateTab = () => (
     <View style={styles.tabContent}>
       <View style={styles.generatorCard}>
@@ -184,135 +175,104 @@ export default function ContentEngine() {
         <View style={styles.optionsGrid}>
           <View style={styles.option}>
             <Text style={styles.optionLabel}>Content Type</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={contentType}
-                onValueChange={(itemValue) => setContentType(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#00E5FF"
-              >
-                <Picker.Item label="Post" value="post" color="#fff" />
-                <Picker.Item label="Video" value="video" color="#fff" />
-                <Picker.Item label="Story" value="story" color="#fff" />
-                <Picker.Item label="Reel" value="reel" color="#fff" />
-                <Picker.Item label="Blog" value="blog" color="#fff" />
-                <Picker.Item label="Email" value="email" color="#fff" />
-                <Picker.Item label="Ad" value="ad" color="#fff" />
-              </Picker>
-            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {(['post', 'video', 'story', 'reel', 'blog', 'email', 'ad'] as const).map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  style={[styles.optionButton, contentType === type && styles.optionButtonActive]}
+                  onPress={() => setContentType(type)}
+                >
+                  <Text style={[styles.optionText, contentType === type && styles.optionTextActive]}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
 
           <View style={styles.option}>
             <Text style={styles.optionLabel}>Platform</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={platform}
-                onValueChange={(itemValue) => setPlatform(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#00E5FF"
-              >
-                <Picker.Item label="All" value="all" color="#fff" />
-                <Picker.Item label="Instagram" value="instagram" color="#fff" />
-                <Picker.Item label="TikTok" value="tiktok" color="#fff" />
-                <Picker.Item label="YouTube" value="youtube" color="#fff" />
-                <Picker.Item label="Twitter" value="twitter" color="#fff" />
-                <Picker.Item label="Facebook" value="facebook" color="#fff" />
-                <Picker.Item label="LinkedIn" value="linkedin" color="#fff" />
-              </Picker>
-            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {(['all', 'instagram', 'tiktok', 'youtube', 'twitter', 'facebook', 'linkedin'] as const).map((p) => (
+                <TouchableOpacity
+                  key={p}
+                  style={[styles.optionButton, platform === p && styles.optionButtonActive]}
+                  onPress={() => setPlatform(p)}
+                >
+                  <Text style={[styles.optionText, platform === p && styles.optionTextActive]}>
+                    {p.charAt(0).toUpperCase() + p.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
 
           <View style={styles.option}>
             <Text style={styles.optionLabel}>Tone</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={tone}
-                onValueChange={(itemValue) => setTone(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#00E5FF"
-              >
-                <Picker.Item label="Casual" value="casual" color="#fff" />
-                <Picker.Item label="Professional" value="professional" color="#fff" />
-                <Picker.Item label="Funny" value="funny" color="#fff" />
-                <Picker.Item label="Inspirational" value="inspirational" color="#fff" />
-                <Picker.Item label="Sales" value="sales" color="#fff" />
-              </Picker>
-            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {(['casual', 'professional', 'funny', 'inspirational', 'sales'] as const).map((t) => (
+                <TouchableOpacity
+                  key={t}
+                  style={[styles.optionButton, tone === t && styles.optionButtonActive]}
+                  onPress={() => setTone(t)}
+                >
+                  <Text style={[styles.optionText, tone === t && styles.optionTextActive]}>
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
 
           <View style={styles.option}>
             <Text style={styles.optionLabel}>Length</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={length}
-                onValueChange={(itemValue) => setLength(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#00E5FF"
-              >
-                <Picker.Item label="Short" value="short" color="#fff" />
-                <Picker.Item label="Medium" value="medium" color="#fff" />
-                <Picker.Item label="Long" value="long" color="#fff" />
-              </Picker>
+            <View style={styles.optionRow}>
+              {(['short', 'medium', 'long'] as const).map((l) => (
+                <TouchableOpacity
+                  key={l}
+                  style={[styles.optionButton, length === l && styles.optionButtonActive]}
+                  onPress={() => setLength(l)}
+                >
+                  <Text style={[styles.optionText, length === l && styles.optionTextActive]}>
+                    {l.charAt(0).toUpperCase() + l.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
           <View style={styles.option}>
             <Text style={styles.optionLabel}>Target Audience</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={targetAudience}
-                onValueChange={(itemValue) => setTargetAudience(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#00E5FF"
-              >
-                <Picker.Item label="All" value="all" color="#fff" />
-                <Picker.Item label="Teens" value="teens" color="#fff" />
-                <Picker.Item label="Young Adults" value="young-adults" color="#fff" />
-                <Picker.Item label="Adults" value="adults" color="#fff" />
-                <Picker.Item label="Seniors" value="seniors" color="#fff" />
-              </Picker>
-            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {(['all', 'teens', 'young-adults', 'adults', 'seniors'] as const).map((a) => (
+                <TouchableOpacity
+                  key={a}
+                  style={[styles.optionButton, targetAudience === a && styles.optionButtonActive]}
+                  onPress={() => setTargetAudience(a)}
+                >
+                  <Text style={[styles.optionText, targetAudience === a && styles.optionTextActive]}>
+                    {a.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
 
           <View style={styles.option}>
             <Text style={styles.optionLabel}>Content Goal</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={contentGoal}
-                onValueChange={(itemValue) => setContentGoal(itemValue)}
-                style={styles.picker}
-                dropdownIconColor="#00E5FF"
-              >
-                <Picker.Item label="Engagement" value="engagement" color="#fff" />
-                <Picker.Item label="Sales" value="sales" color="#fff" />
-                <Picker.Item label="Awareness" value="awareness" color="#fff" />
-                <Picker.Item label="Education" value="education" color="#fff" />
-                <Picker.Item label="Entertainment" value="entertainment" color="#fff" />
-              </Picker>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.imageSection}>
-          <Text style={styles.sectionLabel}>Media Upload</Text>
-          <View style={styles.uploadContainer}>
-            <TouchableOpacity style={styles.uploadButton} onPress={handleUploadImage}>
-              <Upload size={24} color="#00E5FF" />
-              <Text style={styles.uploadButtonText}>Upload Image</Text>
-            </TouchableOpacity>
-            {uploadedImage && (
-              <View style={styles.previewContainer}>
-                <Text style={styles.previewLabel}>Preview</Text>
-                <Image source={{ uri: uploadedImage }} style={styles.previewImage} />
-                <TouchableOpacity 
-                  style={styles.removeImageButton} 
-                  onPress={() => setUploadedImage(null)}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {(['engagement', 'sales', 'awareness', 'education', 'entertainment'] as const).map((g) => (
+                <TouchableOpacity
+                  key={g}
+                  style={[styles.optionButton, contentGoal === g && styles.optionButtonActive]}
+                  onPress={() => setContentGoal(g)}
                 >
-                  <Trash2 size={16} color="#EF4444" />
-                  <Text style={styles.removeImageText}>Remove</Text>
+                  <Text style={[styles.optionText, contentGoal === g && styles.optionTextActive]}>
+                    {g.charAt(0).toUpperCase() + g.slice(1)}
+                  </Text>
                 </TouchableOpacity>
-              </View>
-            )}
+              ))}
+            </ScrollView>
           </View>
         </View>
 
@@ -431,20 +391,19 @@ export default function ContentEngine() {
             {includeImages && (
               <View style={styles.option}>
                 <Text style={styles.optionLabel}>Image Style</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={imageStyle}
-                    onValueChange={(itemValue) => setImageStyle(itemValue)}
-                    style={styles.picker}
-                    dropdownIconColor="#00E5FF"
-                  >
-                    <Picker.Item label="Realistic" value="realistic" color="#fff" />
-                    <Picker.Item label="Artistic" value="artistic" color="#fff" />
-                    <Picker.Item label="Minimal" value="minimal" color="#fff" />
-                    <Picker.Item label="Cartoon" value="cartoon" color="#fff" />
-                    <Picker.Item label="Photo" value="photo" color="#fff" />
-                  </Picker>
-                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {(['realistic', 'artistic', 'minimal', 'cartoon', 'photo'] as const).map((style) => (
+                    <TouchableOpacity
+                      key={style}
+                      style={[styles.optionButton, imageStyle === style && styles.optionButtonActive]}
+                      onPress={() => setImageStyle(style)}
+                    >
+                      <Text style={[styles.optionText, imageStyle === style && styles.optionTextActive]}>
+                        {style.charAt(0).toUpperCase() + style.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
               </View>
             )}
             <View style={styles.toggleRow}>
@@ -1031,15 +990,14 @@ const styles = StyleSheet.create({
   },
   chip: {
     backgroundColor: '#1a1a1a',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 16,
     marginRight: 8,
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#00E5FF',
-    whiteSpace: 'nowrap' as const,
   },
   optionsGrid: {
     gap: 16,
@@ -1057,72 +1015,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
-  pickerContainer: {
+  optionButton: {
     backgroundColor: '#111',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 8,
+    marginRight: 8,
     borderWidth: 1,
     borderColor: '#222',
-    overflow: 'hidden',
   },
-  picker: {
-    color: '#fff',
-    backgroundColor: '#111',
-  },
-  imageSection: {
-    marginBottom: 20,
-  },
-  uploadContainer: {
-    gap: 16,
-  },
-  uploadButton: {
-    backgroundColor: '#111',
-    borderRadius: 8,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    borderWidth: 1,
+  optionButtonActive: {
+    backgroundColor: '#00E5FF20',
     borderColor: '#00E5FF',
-    borderStyle: 'dashed',
   },
-  uploadButtonText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
+  optionText: {
+    fontSize: 12,
+    color: '#888',
+    fontWeight: '500' as const,
+  },
+  optionTextActive: {
     color: '#00E5FF',
-  },
-  previewContainer: {
-    backgroundColor: '#111',
-    borderRadius: 8,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#222',
-  },
-  previewLabel: {
-    fontSize: 13,
-    fontWeight: '600' as const,
-    color: '#ccc',
-    marginBottom: 8,
-  },
-  previewImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  removeImageButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: '#EF444420',
-    padding: 10,
-    borderRadius: 8,
-  },
-  removeImageText: {
-    fontSize: 13,
-    fontWeight: '600' as const,
-    color: '#EF4444',
   },
   togglesSection: {
     gap: 12,

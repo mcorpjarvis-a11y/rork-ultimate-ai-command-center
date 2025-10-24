@@ -25,7 +25,6 @@ import {
   Cloud,
   Shield,
   Cpu,
-  TestTube,
 } from 'lucide-react-native';
 
 interface MenuItem {
@@ -64,7 +63,6 @@ const menuItems: MenuItem[] = [
     icon: Link,
     submenu: [
       { id: 'integrations-api-keys', label: 'API Keys', icon: Link },
-      { id: 'integrations-api-tester', label: 'API Tester', icon: TestTube },
       { id: 'integrations-social-connect', label: 'Social Connect', icon: Users },
       { id: 'integrations-data-sources', label: 'Data Sources', icon: FileText },
     ],
