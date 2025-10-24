@@ -41,9 +41,6 @@ class JarvisVoiceService {
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: false,
           playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
         });
       }
     } catch (error) {
@@ -53,51 +50,31 @@ class JarvisVoiceService {
 
   async speak(text: string, options?: Partial<VoiceSettings>): Promise<void> {
     if (!this.settings.enabled && !options?.enabled) {
-      console.log('[JARVIS] Voice disabled, not speaking');
       return;
     }
 
     try {
-      if (Platform.OS !== 'web') {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
-        });
-      }
-
       const isSpeaking = await Speech.isSpeakingAsync();
       if (isSpeaking) {
-        console.log('[JARVIS] Stopping current speech');
         await Speech.stop();
-        await new Promise(resolve => setTimeout(resolve, 200));
       }
-
-      console.log('[JARVIS] Starting to speak:', text.substring(0, 100));
 
       const voiceOptions: Speech.SpeechOptions = {
         language: options?.language || this.settings.language,
         pitch: options?.pitch || this.settings.pitch,
         rate: options?.rate || this.settings.rate,
-        volume: 1.0,
         voice: Platform.OS === 'ios' ? (options?.voice || this.settings.voice) : undefined,
         onDone: () => {
-          console.log('[JARVIS] ===== Speech completed =====');
-        },
-        onStopped: () => {
-          console.log('[JARVIS] Speech stopped');
+          console.log('[JARVIS] Finished speaking');
         },
         onError: (error) => {
-          console.error('[JARVIS] ===== Speech error =====', error);
+          console.error('[JARVIS] Speech error:', error);
         },
       };
 
-      await Speech.speak(text, voiceOptions);
-      console.log('[JARVIS] Speech.speak() executed');
+      Speech.speak(text, voiceOptions);
     } catch (error) {
-      console.error('[JARVIS] Failed to speak:', error);
+      console.error('Failed to speak:', error);
     }
   }
 

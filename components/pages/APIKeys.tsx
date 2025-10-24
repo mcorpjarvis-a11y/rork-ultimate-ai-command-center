@@ -1,11 +1,9 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking, RefreshControl, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Linking } from 'react-native';
 import { useState, useEffect, useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/contexts/AppContext';
-import { Key, Plus, Trash2, ChevronDown, ChevronUp, HelpCircle, CheckCircle, AlertCircle, ExternalLink, TestTube, Wifi, WifiOff } from 'lucide-react-native';
+import { Key, Plus, Trash2, ChevronDown, ChevronUp, HelpCircle, CheckCircle, AlertCircle, ExternalLink, TestTube } from 'lucide-react-native';
 import PlugAndPlayService, { IntegrationConfig } from '@/services/PlugAndPlayService';
-import { useHapticFeedback, useConfirmation, useOfflineDetection, useErrorHandler } from '@/hooks/useUXHelpers';
-import { ListSkeleton } from '@/components/SkeletonLoader';
 
 export default function APIKeys() {
   const { state, addAPIKey, deleteAPIKey } = useApp();
@@ -17,171 +15,55 @@ export default function APIKeys() {
   const [testingIntegration, setTestingIntegration] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [integrationKeys, setIntegrationKeys] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  const [isAddingKey, setIsAddingKey] = useState<boolean>(false);
-  
-  const { trigger: haptic } = useHapticFeedback();
-  const { confirm } = useConfirmation();
-  const { isOnline, checkConnection } = useOfflineDetection();
-  const { handleError } = useErrorHandler();
 
-  const loadIntegrations = useCallback(async (silent = false) => {
-    try {
-      if (!silent) setIsLoading(true);
-      
-      const online = await checkConnection();
-      if (!online) {
-        Alert.alert(
-          '📡 Offline Mode',
-          'You are currently offline. Some features may be limited.',
-          [{ text: 'OK' }]
-        );
-      }
-      
-      await PlugAndPlayService.detectMissingConfigurations(state);
-      const allIntegrations = PlugAndPlayService.getAllIntegrations();
-      setIntegrations(allIntegrations);
-      
-      if (!silent) haptic('success');
-    } catch (error) {
-      const errorMsg = handleError(error, 'Load Integrations');
-      Alert.alert('Error', errorMsg);
-      haptic('error');
-    } finally {
-      if (!silent) setIsLoading(false);
-    }
-  }, [state, haptic, handleError, checkConnection]);
+  const loadIntegrations = useCallback(async () => {
+    await PlugAndPlayService.detectMissingConfigurations(state);
+    const allIntegrations = PlugAndPlayService.getAllIntegrations();
+    setIntegrations(allIntegrations);
+  }, [state]);
 
   useEffect(() => {
     loadIntegrations();
-  }, []);
+  }, [loadIntegrations]);
 
-  const onRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    haptic('light');
-    await loadIntegrations(true);
-    setIsRefreshing(false);
-  }, [loadIntegrations, haptic]);
-
-  const handleAdd = async () => {
-    if (!name.trim() || !key.trim()) {
-      haptic('warning');
-      Alert.alert('Validation Error', 'Please enter both service name and API key.');
-      return;
-    }
-
-    setIsAddingKey(true);
-    haptic('light');
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 300));
+  const handleAdd = () => {
+    if (name.trim() && key.trim()) {
       addAPIKey(name, key);
       setName('');
       setKey('');
-      await loadIntegrations(true);
-      haptic('success');
-      Alert.alert('✅ Success', `API key for ${name} has been added successfully!`);
-    } catch (error) {
-      const errorMsg = handleError(error, 'Add API Key');
-      Alert.alert('Error', errorMsg);
-      haptic('error');
-    } finally {
-      setIsAddingKey(false);
+      loadIntegrations();
     }
   };
 
-  const handleIntegrationKeyAdd = async (integrationId: string, integrationName: string) => {
+  const handleIntegrationKeyAdd = (integrationId: string, integrationName: string) => {
     const keyValue = integrationKeys[integrationId];
-    if (!keyValue || !keyValue.trim()) {
-      haptic('warning');
-      Alert.alert('Validation Error', 'Please enter an API key.');
-      return;
-    }
-
-    haptic('light');
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 300));
+    if (keyValue && keyValue.trim()) {
       addAPIKey(integrationName, keyValue);
       setIntegrationKeys({ ...integrationKeys, [integrationId]: '' });
-      await loadIntegrations(true);
-      haptic('success');
-      Alert.alert('✅ Success', `API key for ${integrationName} has been added!`);
-    } catch (error) {
-      const errorMsg = handleError(error, 'Add Integration Key');
-      Alert.alert('Error', errorMsg);
-      haptic('error');
+      loadIntegrations();
     }
   };
 
   const toggleTutorial = (integrationId: string) => {
-    haptic('light');
     setExpandedTutorial(expandedTutorial === integrationId ? null : integrationId);
   };
 
   const testIntegration = async (integrationId: string) => {
-    const online = await checkConnection();
-    if (!online) {
-      haptic('error');
-      Alert.alert('📡 Offline', 'Cannot test connection while offline. Please check your internet connection.');
-      return;
-    }
-
     setTestingIntegration(integrationId);
-    haptic('light');
-    
     try {
       await PlugAndPlayService.checkIntegration(integrationId, state);
       const result = await PlugAndPlayService.testConnection(integrationId, state);
-      
-      if (result.success) {
-        haptic('success');
-        Alert.alert(
-          '✅ Connection Successful',
-          `${result.message}\n\nLatency: ${result.latency}ms`,
-          [{ text: 'Great!' }]
-        );
-      } else {
-        haptic('error');
-        Alert.alert(
-          '❌ Connection Failed',
-          result.details || result.message,
-          [{ text: 'OK' }]
-        );
-      }
-      
-      await loadIntegrations(true);
+      alert(result.success ? '✅ ' + result.message : '❌ ' + result.message);
+      await loadIntegrations();
     } catch (error: any) {
-      haptic('error');
-      const errorMsg = handleError(error, 'Test Integration');
-      Alert.alert('❌ Test Failed', errorMsg);
+      alert('❌ Test failed: ' + error.message);
     } finally {
       setTestingIntegration(null);
     }
   };
 
   const openLink = (url: string) => {
-    haptic('light');
-    Linking.openURL(url).catch(err => {
-      console.error('Failed to open URL:', err);
-      haptic('error');
-      Alert.alert('Error', 'Failed to open link. Please try again.');
-    });
-  };
-
-  const handleDelete = (id: string, name: string) => {
-    haptic('warning');
-    confirm(
-      'Delete API Key',
-      `Are you sure you want to delete the API key for "${name}"? This action cannot be undone.`,
-      () => {
-        deleteAPIKey(id);
-        haptic('success');
-        loadIntegrations(true);
-        Alert.alert('🗑️ Deleted', `API key for ${name} has been removed.`);
-      }
-    );
+    Linking.openURL(url).catch(err => console.error('Failed to open URL:', err));
   };
 
   const filteredIntegrations = integrations.filter(integration => 
@@ -211,45 +93,11 @@ export default function APIKeys() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-          <Text style={styles.pageTitle}>API Keys</Text>
-          <Text style={styles.subtitle}>Loading integrations...</Text>
-          <ListSkeleton count={5} />
-        </ScrollView>
-      </View>
-    );
-  }
-
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-      <ScrollView 
-        style={styles.scrollView} 
-        contentContainerStyle={styles.content}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-            tintColor="#00E5FF"
-            colors={['#00E5FF']}
-          />
-        }
-      >
-        <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.pageTitle}>API Keys</Text>
-            <Text style={styles.subtitle}>Manage your API integrations</Text>
-          </View>
-          <View style={styles.statusBadge}>
-            {isOnline ? (
-              <Wifi size={16} color="#10B981" />
-            ) : (
-              <WifiOff size={16} color="#EF4444" />
-            )}
-          </View>
-        </View>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+        <Text style={styles.pageTitle}>API Keys</Text>
+        <Text style={styles.subtitle}>Manage your API integrations</Text>
 
         <View style={styles.searchContainer}>
           <TextInput
@@ -281,19 +129,9 @@ export default function APIKeys() {
             onChangeText={setKey}
             secureTextEntry
           />
-          <TouchableOpacity 
-            style={[styles.addButton, isAddingKey && styles.addButtonDisabled]} 
-            onPress={handleAdd}
-            disabled={isAddingKey}
-          >
-            {isAddingKey ? (
-              <ActivityIndicator size="small" color="#000" />
-            ) : (
-              <Plus size={20} color="#000" />
-            )}
-            <Text style={styles.addButtonText}>
-              {isAddingKey ? 'Adding...' : 'Add Key'}
-            </Text>
+          <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
+            <Plus size={20} color="#000" />
+            <Text style={styles.addButtonText}>Add Key</Text>
           </TouchableOpacity>
         </View>
 
@@ -447,7 +285,7 @@ export default function APIKeys() {
                 </View>
                 <TouchableOpacity
                   style={styles.deleteButton}
-                  onPress={() => handleDelete(apiKey.id, apiKey.name)}
+                  onPress={() => deleteAPIKey(apiKey.id)}
                 >
                   <Trash2 color="#EF4444" size={20} />
                 </TouchableOpacity>
@@ -743,21 +581,5 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  statusBadge: {
-    backgroundColor: '#0a0a0a',
-    borderRadius: 8,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#1a1a1a',
-  },
-  addButtonDisabled: {
-    opacity: 0.6,
   },
 });
