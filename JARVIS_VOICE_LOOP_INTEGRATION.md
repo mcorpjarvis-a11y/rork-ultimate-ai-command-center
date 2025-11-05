@@ -205,7 +205,7 @@ promptUser();
 ## 🔊 Audio Transcription Setup
 
 The service is configured to use:
-- **Endpoint:** `https://toolkit.rork.com/stt/transcribe/`
+- **Endpoint:** `https://toolkit.jarvis.ai/stt/transcribe/`
 - **Format:** FormData with audio file
 - **Language:** Configurable (default: en-US)
 

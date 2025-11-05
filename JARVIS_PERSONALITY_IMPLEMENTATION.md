@@ -184,7 +184,7 @@ This document outlines the complete implementation of JARVIS's personality syste
 
 **New Tools to Add**:
 ```typescript
-configurePersonality: createRorkTool({
+configurePersonality: createJarvisTool({
   description: 'Configure JARVIS personality traits and behavior',
   zodSchema: z.object({
     trait: z.string(),
@@ -195,7 +195,7 @@ configurePersonality: createRorkTool({
   },
 })
 
-generateCode: createRorkTool({
+generateCode: createJarvisTool({
   description: 'Generate or modify application code',
   zodSchema: z.object({
     task: z.string(),
@@ -207,7 +207,7 @@ generateCode: createRorkTool({
   },
 })
 
-debugSystem: createRorkTool({
+debugSystem: createJarvisTool({
   description: 'Run system diagnostics and debug issues',
   zodSchema: z.object({
     focus: z.enum(['all', 'performance', 'errors', 'memory']),
@@ -217,7 +217,7 @@ debugSystem: createRorkTool({
   },
 })
 
-optimizeSystem: createRorkTool({
+optimizeSystem: createJarvisTool({
   description: 'Identify and implement optimizations',
   zodSchema: z.object({
     automatic: z.boolean(),

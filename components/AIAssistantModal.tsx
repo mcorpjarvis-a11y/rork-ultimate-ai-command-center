@@ -2,13 +2,14 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Modal,
 import { useState, useRef, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, Send, Bot, User, Zap, Target, Mic, MicOff, Volume2, VolumeX, Settings } from 'lucide-react-native';
-import { useRorkAgent, createRorkTool } from '@rork/toolkit-sdk';
+import { useJarvisAgent, createJarvisTool } from '@jarvis/toolkit';
 import { useApp } from '@/contexts/AppContext';
 import { z } from 'zod';
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import { IronManTheme } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
+import { AI_CONFIG } from '@/config/api.config';
 
 interface AIAssistantModalProps {
   visible: boolean;
@@ -28,9 +29,9 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
   const recordingRef = useRef<Audio.Recording | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const { messages, sendMessage } = useRorkAgent({
+  const { messages, sendMessage } = useJarvisAgent({
     tools: {
-      generateContent: createRorkTool({
+      generateContent: createJarvisTool({
         description: 'Generate social media content based on trends and persona',
         zodSchema: z.object({
           platform: z.string().describe('Target platform (Instagram, TikTok, YouTube, etc)'),
@@ -51,7 +52,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
       
-      analyzeTrends: createRorkTool({
+      analyzeTrends: createJarvisTool({
         description: 'Analyze current trends and provide insights',
         zodSchema: z.object({
           platform: z.string().describe('Platform to analyze'),
@@ -68,7 +69,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      schedulePost: createRorkTool({
+      schedulePost: createJarvisTool({
         description: 'Schedule content to be posted at optimal time',
         zodSchema: z.object({
           title: z.string().describe('Post title'),
@@ -85,7 +86,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      optimizeMonetization: createRorkTool({
+      optimizeMonetization: createJarvisTool({
         description: 'Analyze and optimize revenue streams',
         zodSchema: z.object({
           currentRevenue: z.number().describe('Current monthly revenue'),
@@ -106,7 +107,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      connectPlatform: createRorkTool({
+      connectPlatform: createJarvisTool({
         description: 'Connect a new social media or e-commerce platform',
         zodSchema: z.object({
           platform: z.string().describe('Platform name'),
@@ -121,7 +122,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      generateMedia: createRorkTool({
+      generateMedia: createJarvisTool({
         description: 'Generate images, videos, or other media using AI',
         zodSchema: z.object({
           type: z.enum(['image', 'video', 'audio']).describe('Media type'),
@@ -137,7 +138,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      createRevenueStream: createRorkTool({
+      createRevenueStream: createJarvisTool({
         description: 'Set up a new revenue stream',
         zodSchema: z.object({
           name: z.string().describe('Revenue stream name'),
@@ -153,7 +154,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      createPersona: createRorkTool({
+      createPersona: createJarvisTool({
         description: 'Create a new content persona for different audience segments',
         zodSchema: z.object({
           name: z.string().describe('Persona name'),
@@ -170,7 +171,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      updateMetrics: createRorkTool({
+      updateMetrics: createJarvisTool({
         description: 'Update performance metrics based on analysis',
         zodSchema: z.object({
           followers: z.number().optional(),
@@ -185,7 +186,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         },
       }),
 
-      automateWorkflow: createRorkTool({
+      automateWorkflow: createJarvisTool({
         description: 'Create automated workflows for routine tasks',
         zodSchema: z.object({
           taskType: z.string().describe('Type of task to automate'),
@@ -384,7 +385,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
 
-      const response = await fetch('https://toolkit.rork.com/stt/transcribe/', {
+      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
         method: 'POST',
         body: formData,
       });
@@ -417,7 +418,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         type: `audio/${fileType}`,
       } as any);
 
-      const response = await fetch('https://toolkit.rork.com/stt/transcribe/', {
+      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
         method: 'POST',
         body: formData,
       });

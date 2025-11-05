@@ -1,82 +1,5 @@
 {
   "expo": {
-  "permissions": [
-    "CAMERA",
-    "MICROPHONE",
-    "READ_EXTERNAL_STORAGE",
-    "WRITE_EXTERNAL_STORAGE",
-    "ACCESS_FINE_LOCATION",
-    "ACCESS_COARSE_LOCATION",
-    "INTERNET",
-    "BLUETOOTH_CONNECT",
-    "BLUETOOTH_ADMIN",
-    "VIBRATE",
-    "WAKE_LOCK",
-    "FOREGROUND_SERVICE",
-    "RECORD_AUDIO",
-    "BODY_SENSORS",
-    "USE_FULL_SCREEN_INTENT",
-    "POST_NOTIFICATIONS",
-    "SCHEDULE_EXACT_ALARM",
-    "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
-    "SYSTEM_ALERT_WINDOW"
-  ],
-  "android": {
-    "package": "com.mcorpjarvis.commandcenter",
-    "versionCode": 1,
-    "useNextNotificationsApi": true,
-    "permissions": [
-      "CAMERA",
-      "MICROPHONE",
-      "READ_EXTERNAL_STORAGE",
-      "WRITE_EXTERNAL_STORAGE",
-      "ACCESS_FINE_LOCATION",
-      "ACCESS_COARSE_LOCATION",
-      "INTERNET",
-      "BLUETOOTH_CONNECT",
-      "BLUETOOTH_ADMIN",
-      "VIBRATE",
-      "WAKE_LOCK",
-      "FOREGROUND_SERVICE",
-      "RECORD_AUDIO",
-      "BODY_SENSORS",
-      "USE_FULL_SCREEN_INTENT",
-      "POST_NOTIFICATIONS",
-      "SCHEDULE_EXACT_ALARM",
-      "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
-      "SYSTEM_ALERT_WINDOW"
-    ]
-  },
-  "permissions": [
-    "CAMERA",
-    "MICROPHONE",
-    "READ_EXTERNAL_STORAGE",
-    "WRITE_EXTERNAL_STORAGE",
-    "ACCESS_FINE_LOCATION",
-    "ACCESS_COARSE_LOCATION",
-    "INTERNET",
-    "BLUETOOTH_CONNECT",
-    "FOREGROUND_SERVICE",
-    "SYSTEM_ALERT_WINDOW",
-    "RECORD_AUDIO"
-  ],
-  "android": {
-    "package": "com.mcorpjarvis.commandcenter",
-    "versionCode": 1,
-    "permissions": [
-      "CAMERA",
-      "MICROPHONE",
-      "READ_EXTERNAL_STORAGE",
-      "WRITE_EXTERNAL_STORAGE",
-      "ACCESS_FINE_LOCATION",
-      "ACCESS_COARSE_LOCATION",
-      "INTERNET",
-      "BLUETOOTH_CONNECT",
-      "FOREGROUND_SERVICE",
-      "SYSTEM_ALERT_WINDOW",
-      "RECORD_AUDIO"
-    ]
-  },
     "name": "Ultimate AI Command Center",
     "slug": "ultimate-ai-command-center",
     "version": "1.0.0",
@@ -93,7 +16,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.ultimate-ai-command-center",
+      "bundleIdentifier": "app.jarvis.command-center",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
@@ -110,13 +33,29 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.ultimate_ai_command_center",
+      "package": "app.jarvis.command_center",
+      "versionCode": 1,
+      "useNextNotificationsApi": true,
       "permissions": [
-        "RECORD_AUDIO",
+        "CAMERA",
+        "MICROPHONE",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
         "INTERNET",
-        "CAMERA",
+        "BLUETOOTH_CONNECT",
+        "BLUETOOTH_ADMIN",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE",
+        "RECORD_AUDIO",
+        "BODY_SENSORS",
+        "USE_FULL_SCREEN_INTENT",
+        "POST_NOTIFICATIONS",
+        "SCHEDULE_EXACT_ALARM",
+        "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+        "SYSTEM_ALERT_WINDOW",
         "READ_MEDIA_IMAGES",
         "READ_MEDIA_VIDEO",
         "READ_MEDIA_AUDIO",
@@ -131,7 +70,7 @@
       [
         "expo-router",
         {
-          "origin": "https://rork.com/"
+          "origin": "https://jarvis.ai/"
         }
       ],
       [

@@ -1,6 +1,7 @@
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import { Platform } from 'react-native';
+import { AI_CONFIG } from '@/config/api.config';
 
 export interface VoiceSettings {
   enabled: boolean;
@@ -94,13 +95,14 @@ class JarvisVoiceService {
   }
 
   private async speakWithGoogleCloud(text: string, options?: Partial<VoiceSettings>): Promise<void> {
-    // This uses the Rork toolkit endpoint which provides Google Cloud TTS integration
+    // This uses the JARVIS toolkit endpoint which provides Google Cloud TTS integration
     // Note: For production, consider using the official Google Cloud TTS API directly
     // with proper authentication if you have a Google Cloud account
     const voiceName = options?.googleVoiceName || this.settings.googleVoiceName;
     
     try {
-      const response = await fetch('https://toolkit.rork.com/tts/synthesize/', {
+      const ttsURL = process.env.EXPO_PUBLIC_TTS_URL || AI_CONFIG.toolkit.imageGenURL?.replace('/images/generate/', '/tts/synthesize/') || 'https://toolkit.jarvis.ai/tts/synthesize/';
+      const response = await fetch(ttsURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +136,7 @@ class JarvisVoiceService {
         }
       });
       
-      console.log('[JARVIS] Spoke using Google Cloud TTS via toolkit.rork.com');
+      console.log('[JARVIS] Spoke using Google Cloud TTS via JARVIS toolkit');
     } catch (error) {
       console.error('[JARVIS] Google Cloud TTS error:', error);
       throw error;

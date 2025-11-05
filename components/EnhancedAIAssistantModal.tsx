@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, Send, Bot, User, Zap, Target, Mic, MicOff, Volume2, VolumeX, Settings, DollarSign, TrendingUp, Sparkles, Shield, Bell, Eye, Code, Cpu, Save, Check, X as XIcon, Paperclip, XCircle } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { useRorkAgent, createRorkTool } from '@rork/toolkit-sdk';
+import { useJarvisAgent, createJarvisTool } from '@jarvis/toolkit';
 import { useApp } from '@/contexts/AppContext';
 import { trpcRawClient } from '@/lib/trpc-client';
 import { z } from 'zod';
@@ -16,6 +16,7 @@ import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import { IronManTheme } from '@/constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AI_CONFIG } from '@/config/api.config';
 
 interface AIAssistantModalProps {
   visible: boolean;
@@ -97,9 +98,9 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
     }
   }, [state.aiPreferences]);
 
-  const { messages, sendMessage } = useRorkAgent({
+  const { messages, sendMessage } = useJarvisAgent({
     tools: {
-      generateContent: createRorkTool({
+      generateContent: createJarvisTool({
         description: 'Generate social media content based on trends and persona',
         zodSchema: z.object({
           platform: z.string().describe('Target platform (Instagram, TikTok, YouTube, etc)'),
@@ -120,7 +121,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
       
-      analyzeTrends: createRorkTool({
+      analyzeTrends: createJarvisTool({
         description: 'Analyze current trends and provide insights',
         zodSchema: z.object({
           platform: z.string().describe('Platform to analyze'),
@@ -137,7 +138,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      schedulePost: createRorkTool({
+      schedulePost: createJarvisTool({
         description: 'Schedule content to be posted at optimal time',
         zodSchema: z.object({
           title: z.string().describe('Post title'),
@@ -154,7 +155,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      optimizeMonetization: createRorkTool({
+      optimizeMonetization: createJarvisTool({
         description: 'Analyze and optimize revenue streams',
         zodSchema: z.object({
           currentRevenue: z.number().describe('Current monthly revenue'),
@@ -169,7 +170,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      connectPlatform: createRorkTool({
+      connectPlatform: createJarvisTool({
         description: 'Connect a new social media or e-commerce platform',
         zodSchema: z.object({
           platform: z.string().describe('Platform name'),
@@ -184,7 +185,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      generateMedia: createRorkTool({
+      generateMedia: createJarvisTool({
         description: 'Generate images, videos, or other media using AI',
         zodSchema: z.object({
           type: z.enum(['image', 'video', 'audio']).describe('Media type'),
@@ -200,7 +201,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      createRevenueStream: createRorkTool({
+      createRevenueStream: createJarvisTool({
         description: 'Set up a new revenue stream',
         zodSchema: z.object({
           name: z.string().describe('Revenue stream name'),
@@ -216,7 +217,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      createPersona: createRorkTool({
+      createPersona: createJarvisTool({
         description: 'Create a new content persona for different audience segments',
         zodSchema: z.object({
           name: z.string().describe('Persona name'),
@@ -233,7 +234,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      updateMetrics: createRorkTool({
+      updateMetrics: createJarvisTool({
         description: 'Update performance metrics based on analysis',
         zodSchema: z.object({
           followers: z.number().optional(),
@@ -248,7 +249,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      automateWorkflow: createRorkTool({
+      automateWorkflow: createJarvisTool({
         description: 'Create automated workflows for routine tasks',
         zodSchema: z.object({
           taskType: z.string().describe('Type of task to automate'),
@@ -263,7 +264,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      controlIoTDevice: createRorkTool({
+      controlIoTDevice: createJarvisTool({
         description: 'Control IoT devices like 3D printers, smart lights, sensors, and other connected devices',
         zodSchema: z.object({
           deviceId: z.string().describe('Device ID to control'),
@@ -289,7 +290,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      add3DPrinter: createRorkTool({
+      add3DPrinter: createJarvisTool({
         description: 'Add a 3D printer to the IoT network for remote control',
         zodSchema: z.object({
           name: z.string().describe('Printer name'),
@@ -328,7 +329,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      addSmartDevice: createRorkTool({
+      addSmartDevice: createJarvisTool({
         description: 'Add smart home devices like lights, plugs, or thermostats',
         zodSchema: z.object({
           name: z.string().describe('Device name'),
@@ -353,7 +354,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      analyzeCodebase: createRorkTool({
+      analyzeCodebase: createJarvisTool({
         description: 'Analyze the application codebase to understand structure, complexity, and suggest improvements',
         zodSchema: z.object({
           focus: z.enum(['overview', 'file', 'recommendations']).describe('What to analyze'),
@@ -383,7 +384,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      writeCode: createRorkTool({
+      writeCode: createJarvisTool({
         description: 'Write or modify code files in the project',
         zodSchema: z.object({
           filePath: z.string().describe('Path where to save the file'),
@@ -404,7 +405,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      executeCode: createRorkTool({
+      executeCode: createJarvisTool({
         description: 'Execute code in a sandboxed environment for testing',
         zodSchema: z.object({
           language: z.string().describe('Programming language (python, javascript, typescript, etc)'),
@@ -424,7 +425,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      createProject: createRorkTool({
+      createProject: createJarvisTool({
         description: 'Scaffold a new project with the specified framework and structure',
         zodSchema: z.object({
           projectType: z.string().describe('Type of project (web app, API, mobile app, CLI tool, etc)'),
@@ -445,7 +446,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      gitOperation: createRorkTool({
+      gitOperation: createJarvisTool({
         description: 'Perform Git version control operations',
         zodSchema: z.object({
           operation: z.enum(['commit', 'push', 'pull', 'branch', 'merge', 'status']).describe('Git operation to perform'),
@@ -478,7 +479,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      manageDependencies: createRorkTool({
+      manageDependencies: createJarvisTool({
         description: 'Install, update, or remove project dependencies',
         zodSchema: z.object({
           action: z.enum(['install', 'update', 'remove']).describe('Action to perform'),
@@ -509,7 +510,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      deployProject: createRorkTool({
+      deployProject: createJarvisTool({
         description: 'Deploy the project to production or staging environment',
         zodSchema: z.object({
           environment: z.enum(['production', 'staging', 'development']).describe('Target environment'),
@@ -524,7 +525,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      runTests: createRorkTool({
+      runTests: createJarvisTool({
         description: 'Run automated tests on the codebase',
         zodSchema: z.object({
           testType: z.enum(['unit', 'integration', 'e2e', 'all']).describe('Type of tests to run'),
@@ -539,7 +540,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      optimizePerformance: createRorkTool({
+      optimizePerformance: createJarvisTool({
         description: 'Analyze and optimize application performance',
         zodSchema: z.object({
           target: z.enum(['bundle-size', 'runtime', 'memory', 'network', 'all']).describe('Performance target to optimize'),
@@ -553,7 +554,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      securityScan: createRorkTool({
+      securityScan: createJarvisTool({
         description: 'Scan codebase for security vulnerabilities',
         zodSchema: z.object({
           scanType: z.enum(['dependencies', 'code', 'secrets', 'all']).describe('Type of security scan'),
@@ -567,7 +568,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      searchCodebase: createRorkTool({
+      searchCodebase: createJarvisTool({
         description: 'Search the codebase for specific files, features, or functionality',
         zodSchema: z.object({
           query: z.string().describe('Search query'),
@@ -587,7 +588,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      getCodeInsights: createRorkTool({
+      getCodeInsights: createJarvisTool({
         description: 'Get AI-powered insights about the codebase architecture and quality',
         zodSchema: z.object({
           category: z.enum(['architecture', 'performance', 'security', 'maintainability', 'all']).optional().describe('Filter by category'),
@@ -613,7 +614,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
 
       // =============== SELF-MODIFICATION TOOLS ===============
 
-      proposeCodeChange: createRorkTool({
+      proposeCodeChange: createJarvisTool({
         description: 'Propose a code modification to an existing file with approval workflow',
         zodSchema: z.object({
           filePath: z.string().describe('Path to file to modify'),
@@ -654,7 +655,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      suggestImprovements: createRorkTool({
+      suggestImprovements: createJarvisTool({
         description: 'Analyze codebase and suggest improvements (refactoring, optimization, bug fixes)',
         zodSchema: z.object({
           category: z.enum(['optimization', 'bug_fix', 'feature', 'refactor', 'security', 'performance']).describe('Category of improvement'),
@@ -684,7 +685,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      generateNewComponent: createRorkTool({
+      generateNewComponent: createJarvisTool({
         description: 'Generate a new React Native component or service module',
         zodSchema: z.object({
           name: z.string().describe('Component or module name'),
@@ -714,7 +715,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      viewPendingModifications: createRorkTool({
+      viewPendingModifications: createJarvisTool({
         description: 'View all pending code modifications awaiting approval',
         zodSchema: z.object({
           status: z.enum(['pending', 'approved', 'applied', 'rejected', 'all']).optional().describe('Filter by status'),
@@ -744,7 +745,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      approveCodeChange: createRorkTool({
+      approveCodeChange: createJarvisTool({
         description: 'Approve a pending code modification',
         zodSchema: z.object({
           changeId: z.string().describe('ID of the code change to approve'),
@@ -762,7 +763,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      applyCodeChange: createRorkTool({
+      applyCodeChange: createJarvisTool({
         description: 'Apply an approved code modification to the codebase',
         zodSchema: z.object({
           changeId: z.string().describe('ID of the approved code change to apply'),
@@ -781,7 +782,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      rejectCodeChange: createRorkTool({
+      rejectCodeChange: createJarvisTool({
         description: 'Reject a pending code modification',
         zodSchema: z.object({
           changeId: z.string().describe('ID of the code change to reject'),
@@ -799,7 +800,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      startDebugSession: createRorkTool({
+      startDebugSession: createJarvisTool({
         description: 'Start a debug session to investigate and fix an issue',
         zodSchema: z.object({
           issue: z.string().describe('Description of the issue to debug'),
@@ -821,7 +822,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      viewSelfModificationStats: createRorkTool({
+      viewSelfModificationStats: createJarvisTool({
         description: 'View statistics about JARVIS self-modification activities',
         zodSchema: z.object({}),
         execute() {
@@ -835,7 +836,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      exportChangelog: createRorkTool({
+      exportChangelog: createJarvisTool({
         description: 'Export a changelog of all self-modifications made by JARVIS',
         zodSchema: z.object({}),
         async execute() {
@@ -850,7 +851,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         },
       }),
 
-      setAutonomousMode: createRorkTool({
+      setAutonomousMode: createJarvisTool({
         description: 'Enable or disable autonomous code modification mode',
         zodSchema: z.object({
           enabled: z.boolean().describe('Enable or disable autonomous mode'),
@@ -1187,7 +1188,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
 
-      const response = await fetch('https://toolkit.rork.com/stt/transcribe/', {
+      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
         method: 'POST',
         body: formData,
       });
@@ -1220,7 +1221,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         type: `audio/${fileType}`,
       } as any);
 
-      const response = await fetch('https://toolkit.rork.com/stt/transcribe/', {
+      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
         method: 'POST',
         body: formData,
       });

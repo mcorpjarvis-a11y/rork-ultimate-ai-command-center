@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Switch
 import { useState, useRef, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MessageCircle, Send, Bot, User, Zap, Brain, Target, TrendingUp, DollarSign, Calendar, Image as ImageIcon, FileText, BarChart3, RefreshCw } from 'lucide-react-native';
-import { useRorkAgent, createRorkTool } from '@rork/toolkit-sdk';
+import { useJarvisAgent, createJarvisTool } from '@jarvis/toolkit';
 import { useApp } from '@/contexts/AppContext';
 import { z } from 'zod';
 
@@ -16,9 +16,9 @@ export default function AIAssistant() {
     'content', 'trends', 'scheduling', 'monetization', 'analytics', 'social', 'media'
   ]);
 
-  const { messages, sendMessage } = useRorkAgent({
+  const { messages, sendMessage } = useJarvisAgent({
     tools: {
-      generateContent: createRorkTool({
+      generateContent: createJarvisTool({
         description: 'Generate social media content based on trends and persona',
         zodSchema: z.object({
           platform: z.string().describe('Target platform (Instagram, TikTok, YouTube, etc)'),
@@ -39,7 +39,7 @@ export default function AIAssistant() {
         },
       }),
       
-      analyzeTrends: createRorkTool({
+      analyzeTrends: createJarvisTool({
         description: 'Analyze current trends and provide insights',
         zodSchema: z.object({
           platform: z.string().describe('Platform to analyze'),
@@ -56,7 +56,7 @@ export default function AIAssistant() {
         },
       }),
 
-      schedulePost: createRorkTool({
+      schedulePost: createJarvisTool({
         description: 'Schedule content to be posted at optimal time',
         zodSchema: z.object({
           title: z.string().describe('Post title'),
@@ -73,7 +73,7 @@ export default function AIAssistant() {
         },
       }),
 
-      optimizeMonetization: createRorkTool({
+      optimizeMonetization: createJarvisTool({
         description: 'Analyze and optimize revenue streams',
         zodSchema: z.object({
           currentRevenue: z.number().describe('Current monthly revenue'),
@@ -94,7 +94,7 @@ export default function AIAssistant() {
         },
       }),
 
-      connectPlatform: createRorkTool({
+      connectPlatform: createJarvisTool({
         description: 'Connect a new social media or e-commerce platform',
         zodSchema: z.object({
           platform: z.string().describe('Platform name'),
@@ -109,7 +109,7 @@ export default function AIAssistant() {
         },
       }),
 
-      generateMedia: createRorkTool({
+      generateMedia: createJarvisTool({
         description: 'Generate images, videos, or other media using AI',
         zodSchema: z.object({
           type: z.enum(['image', 'video', 'audio']).describe('Media type'),
@@ -125,7 +125,7 @@ export default function AIAssistant() {
         },
       }),
 
-      createRevenueStream: createRorkTool({
+      createRevenueStream: createJarvisTool({
         description: 'Set up a new revenue stream',
         zodSchema: z.object({
           name: z.string().describe('Revenue stream name'),
@@ -141,7 +141,7 @@ export default function AIAssistant() {
         },
       }),
 
-      createPersona: createRorkTool({
+      createPersona: createJarvisTool({
         description: 'Create a new content persona for different audience segments',
         zodSchema: z.object({
           name: z.string().describe('Persona name'),
@@ -158,7 +158,7 @@ export default function AIAssistant() {
         },
       }),
 
-      updateMetrics: createRorkTool({
+      updateMetrics: createJarvisTool({
         description: 'Update performance metrics based on analysis',
         zodSchema: z.object({
           followers: z.number().optional(),
@@ -173,7 +173,7 @@ export default function AIAssistant() {
         },
       }),
 
-      automateWorkflow: createRorkTool({
+      automateWorkflow: createJarvisTool({
         description: 'Create automated workflows for routine tasks',
         zodSchema: z.object({
           taskType: z.string().describe('Type of task to automate'),

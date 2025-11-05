@@ -5,6 +5,7 @@ import JarvisGuidanceService from './JarvisGuidanceService';
 import JarvisPersonality from './personality/JarvisPersonality';
 import AIService from './ai/AIService';
 import FreeAIService from './ai/FreeAIService';
+import { AI_CONFIG } from '@/config/api.config';
 
 export interface ListenerConfig {
   enabled: boolean;
@@ -533,7 +534,7 @@ class JarvisListenerService {
 
       // TODO: Replace with your actual transcription endpoint
       // This could be Google Speech API, OpenAI Whisper, or custom endpoint
-      const response = await fetch('https://toolkit.rork.com/stt/transcribe/', {
+      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
         method: 'POST',
         body: formData,
         headers: {

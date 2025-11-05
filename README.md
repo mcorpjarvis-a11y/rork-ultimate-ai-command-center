@@ -1,8 +1,8 @@
-# Welcome to your Rork app
+# Welcome to JARVIS Ultimate AI Command Center
 
 ## Project info
 
-This is a native cross-platform mobile app created with [Rork](https://rork.com)
+This is a native cross-platform mobile app - the Ultimate AI Command Center powered by JARVIS.
 
 **Platform**: Native iOS & Android app, exportable to web
 **Framework**: Expo Router + React Native
@@ -11,21 +11,13 @@ This is a native cross-platform mobile app created with [Rork](https://rork.com)
 
 There are several ways of editing your native mobile application.
 
-### **Use Rork**
-
-Simply visit [rork.com](https://rork.com) and prompt to build your app with AI.
-
-Changes made via Rork will be committed automatically to this GitHub repo.
-
-Whenever you make a change in your local code editor and push it to GitHub, it will be also reflected in Rork.
-
 ### **Use your preferred code editor**
 
-If you want to work locally using your own code editor, you can clone this repo and push changes. Pushed changes will also be reflected in Rork.
+If you want to work locally using your own code editor, you can clone this repo and push changes.
 
 If you are new to coding and unsure which editor to use, we recommend Cursor. If you're familiar with terminals, try Claude Code.
 
-The only requirement is having Node.js & Bun installed - [install Node.js with nvm](https://github.com/nvm-sh/nvm) and [install Bun](https://bun.sh/docs/installation)
+The only requirement is having Node.js installed - [install Node.js with nvm](https://github.com/nvm-sh/nvm)
 
 Follow these steps:
 
@@ -37,16 +29,17 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # Step 3: Install the necessary dependencies.
-bun i
+npm install
 
-# Step 4: Start the instant web preview of your Rork app in your browser, with auto-reloading of your changes
-bun run start-web
+# Step 4: Start the instant web preview of your app in your browser, with auto-reloading of your changes
+npm run start-web
 
-# Step 5: Start iOS preview
+# Step 5: Start iOS/Android preview
 # Option A (recommended):
-bun run start  # then press "i" in the terminal to open iOS Simulator
+npm run start  # then press "i" for iOS or "a" for Android
 # Option B (if supported by your environment):
-bun run start -- --ios
+npm run ios
+npm run android
 ```
 
 ### **Edit a file directly in GitHub**
@@ -70,17 +63,17 @@ This project is built with the most popular native mobile cross-platform technic
 
 ### **On your phone (Recommended)**
 
-1. **iOS**: Download the [Rork app from the App Store](https://apps.apple.com/app/rork) or [Expo Go](https://apps.apple.com/app/expo-go/id982107779)
+1. **iOS**: Download [Expo Go](https://apps.apple.com/app/expo-go/id982107779) from the App Store
 2. **Android**: Download the [Expo Go app from Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
-3. Run `bun run start` and scan the QR code from your development server
+3. Run `npm run start` and scan the QR code from your development server
 
 ### **In your browser**
 
-Run `bun start-web` to test in a web browser. Note: The browser preview is great for quick testing, but some native features may not be available.
+Run `npm run start-web` to test in a web browser. Note: The browser preview is great for quick testing, but some native features may not be available.
 
 ### **iOS Simulator / Android Emulator**
 
-You can test Rork apps in Expo Go or Rork iOS app. You don't need XCode or Android Studio for most features.
+You can test apps in Expo Go. You don't need XCode or Android Studio for most features.
 
 **When do you need Custom Development Builds?**
 
@@ -95,10 +88,10 @@ If you have XCode (iOS) or Android Studio installed:
 
 ```bash
 # iOS Simulator
-bun run start -- --ios
+npm run ios
 
 # Android Emulator
-bun run start -- --android
+npm run android
 ```
 
 ## How can I deploy this project?
@@ -309,10 +302,9 @@ For mobile apps, you'll configure your app's deep linking scheme in `app.json`.
 
 - Check [Expo's documentation](https://docs.expo.dev/) for native APIs
 - Browse [React Native's documentation](https://reactnative.dev/docs/getting-started) for core components
-- Visit [Rork's FAQ](https://rork.com/faq) for platform-specific questions
 
-## About Rork
+## About this app
 
-Rork builds fully native mobile apps using React Native and Expo - the same technology stack used by Discord, Shopify, Coinbase, Instagram, and nearly 30% of the top 100 apps on the App Store.
+This is a fully native mobile app built using React Native and Expo - the same technology stack used by Discord, Shopify, Coinbase, Instagram, and nearly 30% of the top 100 apps on the App Store.
 
-Your Rork app is production-ready and can be published to both the App Store and Google Play Store. You can also export your app to run on the web, making it truly cross-platform.
+This app is production-ready and can be published to both the App Store and Google Play Store. You can also export your app to run on the web, making it truly cross-platform.
