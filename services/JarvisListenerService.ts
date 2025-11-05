@@ -573,6 +573,14 @@ class JarvisListenerService {
         console.warn('[JarvisListener] STT endpoint not configured. Please set up EXPO_PUBLIC_STT_URL in your .env file.');
         console.info('[JarvisListener] You can use OpenAI Whisper API, Google Speech-to-Text, or other STT services.');
         console.info('[JarvisListener] For now, using Web Speech API fallback when available.');
+        
+        // Provide helpful user guidance
+        const guidanceService = JarvisGuidanceService.getInstance();
+        const sttGuidance = await guidanceService.getSTTSetupGuidance();
+        if (sttGuidance) {
+          console.info('[JarvisListener] Setup guidance:', sttGuidance);
+        }
+        
         return null;
       }
 

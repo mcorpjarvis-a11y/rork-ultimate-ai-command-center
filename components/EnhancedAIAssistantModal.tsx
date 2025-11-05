@@ -12,6 +12,8 @@ import CodebaseAnalysisService from '@/services/CodebaseAnalysisService';
 import SelfModificationService from '@/services/SelfModificationService';
 import JarvisCodeGenerationService from '@/services/code/JarvisCodeGenerationService';
 import JarvisPersonality from '@/services/personality/JarvisPersonality';
+import JarvisVoiceService from '@/services/JarvisVoiceService';
+import JarvisGuidanceService from '@/services/JarvisGuidanceService';
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import { IronManTheme } from '@/constants/colors';
@@ -25,7 +27,8 @@ interface AIAssistantModalProps {
 
 type TabType = 'chat' | 'settings' | 'capabilities' | 'ai-models';
 
-const JARVIS_GREETING = "Good day, sir. JARVIS at your service. All systems operational and standing by for your commands.";
+// Use personality-driven greeting
+const JARVIS_GREETING = JarvisPersonality.generateResponse({ type: 'greeting' });
 
 export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssistantModalProps) {
   const insets = useSafeAreaInsets();
@@ -951,11 +954,21 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
     }
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (message.trim() || selectedImages.length > 0) {
+      const userMessage = message.trim() || 'Analyze these images';
+      
+      // Store conversation in personality memory
+      await JarvisPersonality.storeConversation(
+        userMessage,
+        '', // Will be filled when we get the response
+        'chat',
+        extractTopicsFromMessage(userMessage)
+      );
+
       if (selectedImages.length > 0) {
         const messageObject = {
-          text: message.trim() || 'Analyze these images',
+          text: userMessage,
           files: selectedImages.map(img => ({
             type: 'file' as const,
             mediaType: img.type,
@@ -970,6 +983,22 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
       setSelectedImages([]);
       Keyboard.dismiss();
     }
+  };
+
+  // Helper to extract topics from user message
+  const extractTopicsFromMessage = (msg: string): string[] => {
+    const topics: string[] = [];
+    const lowerMsg = msg.toLowerCase();
+    
+    // Common topic patterns
+    if (lowerMsg.includes('content') || lowerMsg.includes('post') || lowerMsg.includes('create')) topics.push('content');
+    if (lowerMsg.includes('social') || lowerMsg.includes('instagram') || lowerMsg.includes('tiktok')) topics.push('social-media');
+    if (lowerMsg.includes('revenue') || lowerMsg.includes('money') || lowerMsg.includes('monetize')) topics.push('monetization');
+    if (lowerMsg.includes('analytics') || lowerMsg.includes('metrics') || lowerMsg.includes('performance')) topics.push('analytics');
+    if (lowerMsg.includes('code') || lowerMsg.includes('debug') || lowerMsg.includes('improve')) topics.push('development');
+    if (lowerMsg.includes('iot') || lowerMsg.includes('device') || lowerMsg.includes('printer')) topics.push('iot');
+    
+    return topics.length > 0 ? topics : ['general'];
   };
 
   const pickImage = async () => {
@@ -1011,43 +1040,27 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
     }
 
     try {
-      const currentlySpeaking = await Speech.isSpeakingAsync();
-      if (currentlySpeaking) {
-        console.log('[JARVIS] Stopping current speech...');
-        await Speech.stop();
-        await new Promise(resolve => setTimeout(resolve, 200));
-      }
-
-      console.log('[JARVIS] ===== SPEAKING NOW =====');
+      // Use the dedicated JarvisVoiceService for consistent voice handling
+      console.log('[JARVIS] ===== SPEAKING NOW (via JarvisVoiceService) =====');
       console.log('[JARVIS] Text:', text);
-      console.log('[JARVIS] Settings:', { pitch: settings.voice.pitch, rate: settings.voice.rate, enabled: settings.voice.enabled });
       
       setIsSpeaking(true);
       
-      const speechOptions: Speech.SpeechOptions = {
-        language: 'en-GB', // British accent like Jarvis
+      await JarvisVoiceService.speak(text, {
+        enabled: true,
         pitch: settings.voice.pitch,
         rate: settings.voice.rate,
-        volume: settings.voice.volume,
-        onDone: () => {
-          console.log('[JARVIS] ===== Speech completed successfully =====');
-          setIsSpeaking(false);
-        },
-        onStopped: () => {
-          console.log('[JARVIS] Speech stopped');
-          setIsSpeaking(false);
-        },
-        onError: (error: any) => {
-          console.error('[JARVIS] ===== Speech error =====', error);
-          setIsSpeaking(false);
-        },
-      };
-
-      // Prefer British voices for Jarvis-like sound
-      if (Platform.OS === 'android') {
-        // Try British male voice first, fallback to standard
-        speechOptions.voice = 'en-gb-x-gbb-local'; // British male voice
-        // Fallback options: 'en-gb-x-gba-local' (British female) or 'en-us-x-tpf#male_1-local'
+        language: 'en-GB', // British accent for Jarvis
+      });
+      
+      setIsSpeaking(false);
+      console.log('[JARVIS] ===== Speech completed =====');
+      
+    } catch (error) {
+      console.error('[JARVIS] Speech error:', error);
+      setIsSpeaking(false);
+    }
+  };
       } else if (Platform.OS === 'ios') {
         // Use British voice on iOS (Daniel is close, but prefer British)
         speechOptions.voice = 'com.apple.ttsbundle.Daniel-compact'; // British male voice
