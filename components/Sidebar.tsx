@@ -26,6 +26,11 @@ import {
   Shield,
   Cpu,
   Code,
+  Mail,
+  TrendingUp,
+  Handshake,
+  Store,
+  Scissors,
 } from 'lucide-react-native';
 
 interface MenuItem {
@@ -56,6 +61,7 @@ const menuItems: MenuItem[] = [
       { id: 'ai-persona-builder', label: 'Persona Builder', icon: Users },
       { id: 'ai-media-generator', label: 'Media Generator', icon: ImageIcon },
       { id: 'ai-media-studio', label: 'Media Studio', icon: Video },
+      { id: 'ai-video-editor', label: 'Smart Video Editor', icon: Scissors },
     ],
   },
   {
@@ -75,6 +81,17 @@ const menuItems: MenuItem[] = [
     submenu: [
       { id: 'automation-scheduler', label: 'Scheduler', icon: Calendar },
       { id: 'automation-workflow-rules', label: 'Workflow Rules', icon: Workflow },
+    ],
+  },
+  {
+    id: 'growth',
+    label: 'Growth',
+    icon: TrendingUp,
+    submenu: [
+      { id: 'growth-email-marketing', label: 'Email Marketing', icon: Mail },
+      { id: 'growth-competitor-radar', label: 'Competitor Radar', icon: TrendingUp },
+      { id: 'growth-collab-finder', label: 'Collab Finder', icon: Handshake },
+      { id: 'growth-brand-marketplace', label: 'Brand Marketplace', icon: Store },
     ],
   },
   { id: 'monetization', label: 'Monetization', icon: DollarSign },
