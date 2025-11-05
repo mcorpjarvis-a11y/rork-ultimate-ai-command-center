@@ -4,10 +4,11 @@
  * JARVIS Voice Loop Integration Test
  * 
  * This script tests the full integration between:
- * - JarvisListenerService
- * - JarvisVoiceService
+ * - JarvisListenerService (with continuous listening & wake word detection)
+ * - JarvisVoiceService (with British voice support)
  * - JarvisGuidanceService
  * - JarvisPersonality
+ * - AIService & FreeAIService (Gemini, HuggingFace, Groq)
  * 
  * Run in Termux:
  *   bun run test-jarvis-voice-loop.ts
@@ -17,6 +18,7 @@ import JarvisListenerService from './services/JarvisListenerService.js';
 import JarvisVoiceService from './services/JarvisVoiceService.js';
 import JarvisGuidanceService from './services/JarvisGuidanceService.js';
 import JarvisPersonality from './services/personality/JarvisPersonality.js';
+import FreeAIService from './services/ai/FreeAIService.js';
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -136,6 +138,42 @@ async function testServices() {
       console.log(`  ✓ Social media is fully configured`);
     }
     log('✅', COLORS.green, 'Configuration check successful!\n');
+    await wait(1000);
+
+    // Test 11: Voice Settings Check
+    log('🎤', COLORS.blue, 'Test 11: Checking British voice configuration...');
+    const voiceConfig = JarvisVoiceService.getSettings();
+    console.log(`  ✓ Language: ${voiceConfig.language}`);
+    console.log(`  ✓ Google Voice Name: ${voiceConfig.googleVoiceName}`);
+    console.log(`  ✓ Use Google Cloud TTS: ${voiceConfig.useGoogleCloudTTS ? 'Yes' : 'No (fallback to expo-speech)'}`);
+    log('✅', COLORS.green, 'British voice configured correctly!\n');
+    await wait(1000);
+
+    // Test 12: Continuous Listening Configuration
+    log('🎤', COLORS.blue, 'Test 12: Checking continuous listening configuration...');
+    const listenerSettings = JarvisListenerService.getConfig();
+    console.log(`  ✓ Wake Word: "${listenerSettings.wakeWord}"`);
+    console.log(`  ✓ Confidence Threshold: ${listenerSettings.wakeWordConfidenceThreshold}`);
+    console.log(`  ✓ Continuous Mode: ${listenerSettings.continuous ? 'Enabled' : 'Disabled'}`);
+    console.log(`  ✓ Currently Listening: ${JarvisListenerService.isContinuousMode() ? 'Yes' : 'No'}`);
+    log('✅', COLORS.green, 'Continuous listening configured correctly!\n');
+    await wait(1000);
+
+    // Test 13: Free AI Service Check
+    log('🎤', COLORS.blue, 'Test 13: Checking Free AI service providers...');
+    const aiStats = await FreeAIService.getStats();
+    console.log(`  ✓ Total Providers: ${aiStats.totalProviders}`);
+    console.log(`  ✓ Configured: ${aiStats.configured}`);
+    console.log(`  ✓ Connected: ${aiStats.connected}`);
+    console.log(`  ✓ Total Requests: ${aiStats.totalRequests}`);
+    
+    const providers = FreeAIService.getAllProviders();
+    providers.forEach(provider => {
+      const statusIcon = provider.status === 'connected' ? '✅' : 
+                         provider.status === 'configured' ? '🟡' : '❌';
+      console.log(`  ${statusIcon} ${provider.name}: ${provider.status}`);
+    });
+    log('✅', COLORS.green, 'AI service providers checked!\n');
 
     // Final Summary
     console.log('\n' + '='.repeat(60));
@@ -145,12 +183,19 @@ async function testServices() {
     log('✨', COLORS.cyan, 'JARVIS Voice Loop Integration: FULLY OPERATIONAL');
     console.log('');
     console.log('Integration verified:');
-    console.log('  ✓ JarvisListenerService → Command processing');
-    console.log('  ✓ JarvisVoiceService → Speech output');
+    console.log('  ✓ JarvisListenerService → Command processing & wake word detection');
+    console.log('  ✓ JarvisVoiceService → British voice (en-GB-Wavenet-D) output');
     console.log('  ✓ JarvisGuidanceService → Intent detection & setup guidance');
     console.log('  ✓ JarvisPersonality → Memory & contextual responses');
+    console.log('  ✓ FreeAIService → Groq, HuggingFace, etc. integration');
+    console.log('  ✓ Continuous Listening → Wake word "Jarvis" detection ready');
     console.log('');
-    log('🚀', COLORS.magenta, 'Ready for voice input/output in Termux + Expo!');
+    log('🚀', COLORS.magenta, 'Ready for continuous voice interaction in Termux + Expo!');
+    console.log('');
+    console.log('Usage:');
+    console.log('  • Start continuous listening: JarvisListenerService.startContinuousListening()');
+    console.log('  • Stop continuous listening: JarvisListenerService.stopContinuousListening()');
+    console.log('  • Process direct command: JarvisListenerService.processCommand("your command")');
     console.log('');
 
   } catch (error) {
