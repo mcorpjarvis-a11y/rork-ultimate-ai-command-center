@@ -17,8 +17,8 @@ class JarvisVoiceService {
   private settings: VoiceSettings = {
     enabled: true,
     voice: 'com.apple.speech.synthesis.voice.daniel',
-    rate: 1.0,
-    pitch: 1.0,
+    rate: 1.1,
+    pitch: 0.9,
     language: 'en-US',
     autoSpeak: true,
   };
@@ -222,6 +222,7 @@ class JarvisVoiceService {
       'Greetings, sir. Ready to assist.',
       'Good to see you, sir. How may I help?',
       'Welcome back, sir. Standing by.',
+      'At your service, sir. How may I be of assistance?',
     ];
     
     const greeting = greetings[Math.floor(Math.random() * greetings.length)];
@@ -231,10 +232,12 @@ class JarvisVoiceService {
   speakConfirmation(): void {
     const confirmations = [
       'Right away, sir.',
-      'Consider it done.',
+      'Consider it done, sir.',
       'On it, sir.',
       'Immediately, sir.',
-      'Processing now.',
+      'Processing now, sir.',
+      'As you wish, sir.',
+      'Very good, sir.',
     ];
     
     const confirmation = confirmations[Math.floor(Math.random() * confirmations.length)];

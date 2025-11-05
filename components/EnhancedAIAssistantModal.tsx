@@ -48,8 +48,8 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
     voice: {
       enabled: true,
       autoSpeak: true,
-      rate: 0.85, // Calm, professional rate like Jarvis
-      pitch: 0.88, // Slightly lower pitch for refined British accent
+      rate: 1.1, // Jarvis voice rate from Iron Man
+      pitch: 0.9, // Jarvis voice pitch from Iron Man
       volume: 1.0,
     },
     autonomy: {
