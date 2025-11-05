@@ -369,31 +369,31 @@ None currently - all critical issues resolved!
 
 ## 🎯 IMMEDIATE NEXT STEPS
 
-### ⚠️ SECURITY IMPORTANT
+### ⚠️ DEVELOPMENT KEYS NOTICE
 
-**API Key Management:**
-- ❌ **NEVER** hardcode API keys in source code
-- ✅ **ALWAYS** use environment variables (`.env` file)
-- ✅ Keep `.env` file in `.gitignore` (already configured)
-- ✅ Use `.env.example` as a template (provided)
+**Burner API Keys for Development:**
+- ✅ Temporary burner keys are included in `config/api.config.ts` for easy testing
+- ✅ These are from temporary accounts that will be deleted when development is complete
+- ✅ App works out-of-the-box for testing without additional setup
+- ⚠️ **These keys will be removed before final production build**
 
-**Previous hardcoded keys removed:**
-- ✅ HuggingFace token removed from `config/api.config.ts`
-- ✅ Groq API key removed from `config/api.config.ts`
+**Current burner keys included:**
+- HuggingFace token (temporary development account)
+- Groq API key (temporary development account)
 
-**To set up your keys:**
+**For production or your own testing:**
 1. Copy `.env.example` to `.env`
-2. Get your free API keys:
+2. Get your own API keys:
    - Groq: https://console.groq.com (recommended, free)
    - HuggingFace: https://huggingface.co/settings/tokens (free)
-3. Add keys to your `.env` file
-4. Never commit `.env` to git
+3. Add keys to your `.env` file (will override burner keys)
+4. Never commit your personal `.env` to git
 
 ### This Session
 1. ✅ Fix @jarvis/toolkit imports (DONE)
 2. ✅ Fix JarvisListener network errors (DONE)
 3. ✅ Add .env.example with all required variables (DONE)
-4. ✅ Remove hardcoded API keys from source code (DONE)
+4. ✅ Restore burner API keys for development testing (DONE)
 5. 🔄 Create setup validation service
 6. 🔄 Add environment check on app startup
 7. ✅ Run code review and security scan (DONE)
