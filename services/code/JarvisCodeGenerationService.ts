@@ -1,9 +1,17 @@
 import { generateText, generateObject } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { documentDirectory, getInfoAsync, readAsStringAsync, writeAsStringAsync } from 'expo-file-system/legacy';
 import { Platform } from 'react-native';
 import React from "react";
+import { FREE_AI_MODELS } from '@/config/api.config';
+
+// Configure Groq as the model provider
+const groq = createOpenAI({
+  baseURL: FREE_AI_MODELS.groq.baseURL,
+  apiKey: FREE_AI_MODELS.groq.apiKey,
+});
 
 export interface CodeGenerationRequest {
   task: string;
@@ -105,25 +113,14 @@ class JarvisCodeGenerationService {
         performanceNotes: z.array(z.string()).describe('Performance notes'),
       });
 
-      // TODO: Configure AI model provider before using generateObject
-      // Example: const result = await generateObject({
-      //   model: openai('gpt-4'),
-      //   messages: [{ role: 'user', content: prompt }],
-      //   schema,
-      // });
+      const result = await generateObject({
+        model: groq(FREE_AI_MODELS.groq.models.text['llama-3.1-70b']),
+        messages: [{ role: 'user', content: prompt }],
+        schema,
+      });
 
-      // Return mock result for now
-      const result: CodeGenerationResult = {
-        code: `// Generated code placeholder\n// TODO: Configure AI model to generate actual code`,
-        explanation: 'AI model not configured',
-        changes: ['Placeholder code generated'],
-        testSuggestions: ['Configure AI model for test suggestions'],
-        securityNotes: ['Configure AI model for security analysis'],
-        performanceNotes: ['Configure AI model for performance analysis'],
-      };
-
-      console.log('[Jarvis Code] Code generated successfully (mock)');
-      return result;
+      console.log('[Jarvis Code] Code generated successfully');
+      return result.object as CodeGenerationResult;
     } catch (error) {
       console.error('[Jarvis Code] Generation failed:', error);
       throw new Error('Failed to generate code');
@@ -441,18 +438,14 @@ Generate a complete implementation including:
 Provide the output as a structured plan with file paths and contents.`;
 
     try {
-      // TODO: Configure AI model provider before using generateText
-      // const response = await generateText({ 
-      //   model: openai('gpt-4'),
-      //   messages: [{ role: 'user', content: prompt }] 
-      // });
-
-      // Return mock response for now
-      const response = `Feature generation not available - AI model not configured`;
+      const result = await generateText({ 
+        model: groq(FREE_AI_MODELS.groq.models.text['llama-3.1-70b']),
+        messages: [{ role: 'user', content: prompt }] 
+      });
 
       return {
         files: [],
-        documentation: response,
+        documentation: result.text,
       };
     } catch (error) {
       console.error('[Jarvis Code] Failed to generate feature:', error);

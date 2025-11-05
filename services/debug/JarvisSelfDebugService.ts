@@ -1,6 +1,14 @@
 import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CodebaseAnalysisService from '@/services/CodebaseAnalysisService';
+import { FREE_AI_MODELS } from '@/config/api.config';
+
+// Configure Groq as the model provider
+const groq = createOpenAI({
+  baseURL: FREE_AI_MODELS.groq.baseURL,
+  apiKey: FREE_AI_MODELS.groq.apiKey,
+});
 
 export interface DebugSession {
   id: string;
@@ -295,15 +303,12 @@ Provide a concise diagnosis with:
 Be specific and actionable.`;
 
     try {
-      // TODO: Configure AI model provider before using generateText
-      // const diagnosis = await generateText({ 
-      //   model: openai('gpt-4'),
-      //   messages: [{ role: 'user', content: prompt }] 
-      // });
+      const result = await generateText({ 
+        model: groq(FREE_AI_MODELS.groq.models.text['llama-3.1-8b']),
+        messages: [{ role: 'user', content: prompt }] 
+      });
       
-      // Return mock diagnosis for now
-      const diagnosis = `Automatic diagnosis not available - AI model not configured. Issue: ${issue.description}`;
-      return diagnosis;
+      return result.text;
     } catch (error) {
       console.error('[Jarvis Debug] Diagnosis failed:', error);
       return 'Unable to diagnose automatically. Manual investigation required.';

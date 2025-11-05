@@ -1,10 +1,17 @@
 import { generateObject, generateText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { createRorkTool, useRorkAgent } from "@rork/toolkit-sdk";
-import { AI_CONFIG } from '@/config/api.config';
+import { AI_CONFIG, FREE_AI_MODELS } from '@/config/api.config';
 import APIClient from '@/services/core/APIClient';
 import CacheManager from '@/services/storage/CacheManager';
 import { AITask } from '@/types/models.types';
 import { z } from 'zod';
+
+// Configure Groq (OpenAI-compatible) as the default model provider
+const groq = createOpenAI({
+  baseURL: FREE_AI_MODELS.groq.baseURL,
+  apiKey: FREE_AI_MODELS.groq.apiKey,
+});
 
 export interface AIGenerationOptions {
   model?: string;
@@ -59,20 +66,19 @@ class AIService {
     console.log('[AIService] Generating text with AI...');
     
     try {
-      // TODO: Configure AI model provider (OpenAI, Anthropic, etc.) before using generateText
-      // Example: const result = await generateText({
-      //   model: openai('gpt-4'),
-      //   messages: [{ role: 'user', content: prompt }],
-      // });
+      const result = await generateText({
+        model: groq(options.model || FREE_AI_MODELS.groq.models.text['llama-3.1-8b']),
+        messages: [{ role: 'user', content: prompt }],
+        temperature: options.temperature,
+      });
       
-      // Return mock response for now
-      const mockResponse = `AI Response to: ${prompt.substring(0, 50)}...`;
+      const responseText = result.text;
       
       if (options.cache) {
-        CacheManager.set(cacheKey, mockResponse, 30 * 60 * 1000);
+        CacheManager.set(cacheKey, responseText, 30 * 60 * 1000);
       }
 
-      return mockResponse;
+      return responseText;
     } catch (error) {
       console.error('[AIService] Text generation error:', error);
       throw new Error('Failed to generate text with AI');
@@ -87,16 +93,14 @@ class AIService {
     console.log('[AIService] Generating structured object with AI...');
     
     try {
-      // TODO: Configure AI model provider before using generateObject
-      // Example: const result = await generateObject({
-      //   model: openai('gpt-4'),
-      //   messages: [{ role: 'user', content: prompt }],
-      //   schema,
-      // });
+      const result = await generateObject({
+        model: groq(options.model || FREE_AI_MODELS.groq.models.text['llama-3.1-8b']),
+        messages: [{ role: 'user', content: prompt }],
+        schema,
+        temperature: options.temperature,
+      });
       
-      // Return mock empty object that matches schema for now
-      // This will need proper AI configuration to work
-      throw new Error('AI model not configured. Please set up OpenAI, Anthropic, or another provider.');
+      return result.object as z.infer<T>;
     } catch (error) {
       console.error('[AIService] Object generation error:', error);
       throw new Error('Failed to generate object with AI');
