@@ -13,6 +13,8 @@ export interface ListenerConfig {
   autoRespond: boolean;
   continuous: boolean;
   wakeWordConfidenceThreshold: number;
+  wakeWordListenDuration: number; // milliseconds for wake word detection buffer
+  commandListenDuration: number; // milliseconds for full command capture
 }
 
 export interface TranscriptionResult {
@@ -34,6 +36,8 @@ class JarvisListenerService {
     autoRespond: true,
     continuous: false,
     wakeWordConfidenceThreshold: 0.7,
+    wakeWordListenDuration: 3000, // 3 seconds for wake word detection
+    commandListenDuration: 10000, // 10 seconds for full command
   };
 
   private constructor() {
@@ -281,8 +285,8 @@ class JarvisListenerService {
 
       await recording.startAsync();
       
-      // Record for 3 seconds
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Record for configured wake word duration
+      await new Promise(resolve => setTimeout(resolve, this.config.wakeWordListenDuration));
       
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
@@ -400,8 +404,8 @@ class JarvisListenerService {
 
       await recording.startAsync();
       
-      // Record for up to 10 seconds for the full command
-      await new Promise(resolve => setTimeout(resolve, 10000));
+      // Record for configured command duration
+      await new Promise(resolve => setTimeout(resolve, this.config.commandListenDuration));
       
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
@@ -668,7 +672,8 @@ class JarvisListenerService {
     let response = aiResponse.trim();
     
     // Remove any existing "sir" references to avoid duplication
-    response = response.replace(/,?\s*sir[,.]?\s*/gi, ' ').trim();
+    // Use word boundaries to only match complete 'sir' words
+    response = response.replace(/\b,?\s*sir[,.]?\s*\b/gi, ' ').trim();
     
     // Add Jarvis-style formality if not already present
     const formalPhrases = ['certainly', 'of course', 'indeed', 'absolutely', 'right away'];

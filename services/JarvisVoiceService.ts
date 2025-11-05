@@ -15,7 +15,6 @@ export interface VoiceSettings {
 
 class JarvisVoiceService {
   private static instance: JarvisVoiceService;
-  private recording: Audio.Recording | null = null;
   private settings: VoiceSettings = {
     enabled: true,
     voice: 'com.apple.speech.synthesis.voice.daniel',
@@ -94,8 +93,9 @@ class JarvisVoiceService {
   }
 
   private async speakWithGoogleCloud(text: string, options?: Partial<VoiceSettings>): Promise<void> {
-    // This would use Google Cloud Text-to-Speech API if configured
-    // For now, we'll use the toolkit endpoint which may support it
+    // This uses the Rork toolkit endpoint which provides Google Cloud TTS integration
+    // Note: For production, consider using the official Google Cloud TTS API directly
+    // with proper authentication if you have a Google Cloud account
     const voiceName = options?.googleVoiceName || this.settings.googleVoiceName;
     
     try {
@@ -133,7 +133,7 @@ class JarvisVoiceService {
         }
       });
       
-      console.log('[JARVIS] Spoke using Google Cloud TTS');
+      console.log('[JARVIS] Spoke using Google Cloud TTS via toolkit.rork.com');
     } catch (error) {
       console.error('[JARVIS] Google Cloud TTS error:', error);
       throw error;
