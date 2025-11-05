@@ -25,6 +25,8 @@ export { default as PlugAndPlayService } from './PlugAndPlayService';
 export { default as CodebaseAnalysisService } from './CodebaseAnalysisService';
 export { default as IoTDeviceService } from './IoTDeviceService';
 export { default as JarvisGuidanceService } from './JarvisGuidanceService';
+export { default as JarvisVoiceService } from './JarvisVoiceService';
+export { default as JarvisListenerService } from './JarvisListenerService';
 export { default as IntegrationManager } from './IntegrationManager';
 export { default as AutonomousEngine } from './AutonomousEngine';
 

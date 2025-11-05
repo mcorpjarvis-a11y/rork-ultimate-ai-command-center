@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CodebaseAnalysisService, { FileAnalysis } from './CodebaseAnalysisService';
-import JarvisPersonality from './personality/JarvisPersonality';
+import CodebaseAnalysisService, { FileAnalysis } from './CodebaseAnalysisService.js';
+import JarvisPersonality from './personality/JarvisPersonality.js';
 
 export interface CodeChange {
   id: string;
