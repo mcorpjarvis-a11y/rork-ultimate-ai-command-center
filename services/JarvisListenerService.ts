@@ -110,6 +110,28 @@ class JarvisListenerService {
     }
   }
 
+  private isSTTConfigured(): boolean {
+    const sttURL = AI_CONFIG.toolkit.sttURL;
+    
+    // Check if it's the default placeholder URL
+    if (sttURL.includes('toolkit.jarvis.ai')) {
+      return false;
+    }
+    
+    // Check if it's empty or undefined
+    if (!sttURL || sttURL.trim() === '') {
+      return false;
+    }
+    
+    // Validate it's a proper URL
+    try {
+      new URL(sttURL);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async startContinuousListening(): Promise<void> {
     if (this.continuousMode) {
       console.log('[JarvisListener] Continuous mode already active');
@@ -130,8 +152,7 @@ class JarvisListenerService {
     }
 
     // For native platforms, check if STT is configured
-    const sttURL = AI_CONFIG.toolkit.sttURL;
-    if (sttURL.includes('toolkit.jarvis.ai')) {
+    if (!this.isSTTConfigured()) {
       console.warn('[JarvisListener] Continuous listening requires STT endpoint configuration');
       await JarvisVoiceService.speak('My apologies, sir. Continuous listening requires Speech-to-Text configuration. Please configure EXPO_PUBLIC_STT_URL in your environment.');
       return;
@@ -149,9 +170,7 @@ class JarvisListenerService {
 
   private async runContinuousLoop(): Promise<void> {
     // Check if we should actually run continuous mode
-    const sttURL = AI_CONFIG.toolkit.sttURL;
-    const isSTTConfigured = !sttURL.includes('toolkit.jarvis.ai');
-    const canUseContinuous = Platform.OS === 'web' || isSTTConfigured;
+    const canUseContinuous = Platform.OS === 'web' || this.isSTTConfigured();
 
     if (!canUseContinuous) {
       console.warn('[JarvisListener] Cannot run continuous mode without STT configuration');
@@ -550,15 +569,14 @@ class JarvisListenerService {
       console.log('[JarvisListener] Transcribing audio...');
 
       // Check if STT endpoint is configured and reachable
-      const sttURL = AI_CONFIG.toolkit.sttURL;
-      
-      // If using the default toolkit URL that doesn't exist, skip transcription
-      if (sttURL.includes('toolkit.jarvis.ai')) {
+      if (!this.isSTTConfigured()) {
         console.warn('[JarvisListener] STT endpoint not configured. Please set up EXPO_PUBLIC_STT_URL in your .env file.');
         console.info('[JarvisListener] You can use OpenAI Whisper API, Google Speech-to-Text, or other STT services.');
         console.info('[JarvisListener] For now, using Web Speech API fallback when available.');
         return null;
       }
+
+      const sttURL = AI_CONFIG.toolkit.sttURL;
 
       // For Termux environment, use configured Speech-to-Text API
       // This could be Google Cloud Speech API, OpenAI Whisper, or custom endpoint

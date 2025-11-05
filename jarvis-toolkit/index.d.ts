@@ -1,4 +1,5 @@
 import { Message } from '@ai-sdk/react';
+import { CoreTool } from 'ai';
 import { z } from 'zod';
 
 export interface JarvisAgentOptions {
@@ -33,7 +34,7 @@ export function useJarvisAgent(options?: JarvisAgentOptions): JarvisAgentResult;
 
 export function createJarvisTool<T extends z.ZodType>(
   config: JarvisToolConfig<T>
-): any;
+): CoreTool<T, any>;
 
 export function initToolkit(): boolean;
 
