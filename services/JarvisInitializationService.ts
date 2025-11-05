@@ -9,6 +9,17 @@ const INITIALIZATION_KEY = '@jarvis_initialized';
 
 // Configuration constants
 const FIRST_TIME_GREETING = 'Good day, sir. JARVIS systems fully online and operational. All API connections established. Continuous listening mode activated. How may I assist you?';
+const GREETING_DELAY_MS = 1000;
+
+// API key validation patterns
+const API_KEY_PATTERNS: Record<string, RegExp> = {
+  groq: /^gsk_[a-zA-Z0-9]{40,}$/,
+  huggingface: /^hf_[a-zA-Z0-9]{30,}$/,
+  gemini: /^[A-Za-z0-9_-]{30,}$/,
+  togetherai: /^[a-zA-Z0-9]{20,}$/,
+  deepseek: /^[a-zA-Z0-9]{20,}$/,
+  replicate: /^r8_[a-zA-Z0-9]{20,}$/,
+};
 
 /**
  * JarvisInitializationService
@@ -143,17 +154,7 @@ class JarvisInitializationService {
    * Validate API key format based on provider
    */
   private validateAPIKey(providerId: string, key: string): boolean {
-    // Basic validation patterns for each provider
-    const patterns: Record<string, RegExp> = {
-      groq: /^gsk_[a-zA-Z0-9]{40,}$/,
-      huggingface: /^hf_[a-zA-Z0-9]{30,}$/,
-      gemini: /^[A-Za-z0-9_-]{30,}$/,
-      togetherai: /^[a-zA-Z0-9]{20,}$/,
-      deepseek: /^[a-zA-Z0-9]{20,}$/,
-      replicate: /^r8_[a-zA-Z0-9]{20,}$/,
-    };
-
-    const pattern = patterns[providerId];
+    const pattern = API_KEY_PATTERNS[providerId];
     if (!pattern) {
       // No pattern defined, accept any non-empty key
       console.warn(`[JarvisInit] No validation pattern for ${providerId}, accepting key`);
@@ -280,16 +281,16 @@ class JarvisInitializationService {
 
     try {
       // Small delay to ensure everything is ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, GREETING_DELAY_MS));
 
       // Check if this is the first initialization
       const firstTime = await AsyncStorage.getItem(INITIALIZATION_KEY);
       
       if (!firstTime) {
-        // First time greeting
+        // First time greeting (awaited for sequencing)
         await JarvisVoiceService.speak(FIRST_TIME_GREETING);
       } else {
-        // Subsequent greeting
+        // Subsequent greeting (fire and forget - speakGreeting is synchronous)
         JarvisVoiceService.speakGreeting();
       }
 
