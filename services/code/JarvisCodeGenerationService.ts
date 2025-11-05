@@ -1,7 +1,7 @@
-import { generateText, generateObject } from '@rork/toolkit-sdk';
+import { generateText, generateObject } from 'ai';
 import { z } from 'zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
+import { documentDirectory, getInfoAsync, readAsStringAsync, writeAsStringAsync } from 'expo-file-system/legacy';
 import { Platform } from 'react-native';
 import React from "react";
 
@@ -166,11 +166,11 @@ Provide the complete implementation.`;
       existingCode = 'Cannot read file on web platform';
     } else {
       try {
-        const fileUri = `${FileSystem.documentDirectory}${filePath}`;
-        const fileExists = await FileSystem.getInfoAsync(fileUri);
+        const fileUri = `${documentDirectory}${filePath}`;
+        const fileExists = await getInfoAsync(fileUri);
         
         if (fileExists.exists) {
-          existingCode = await FileSystem.readAsStringAsync(fileUri);
+          existingCode = await readAsStringAsync(fileUri);
         }
       } catch (error) {
         console.log('[Jarvis Code] Could not read file:', error);
@@ -237,8 +237,8 @@ Provide the complete implementation.`;
     }
 
     try {
-      const fileUri = `${FileSystem.documentDirectory}${modification.filePath}`;
-      await FileSystem.writeAsStringAsync(fileUri, modification.modifiedCode);
+      const fileUri = `${documentDirectory}${modification.filePath}`;
+      await writeAsStringAsync(fileUri, modification.modifiedCode);
       
       modification.applied = true;
       await this.saveModifications();

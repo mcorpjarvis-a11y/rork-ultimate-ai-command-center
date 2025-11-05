@@ -1,4 +1,4 @@
-import { generateText } from '@rork/toolkit-sdk';
+import { generateText } from 'ai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import JarvisCodeGenerationService from '@/services/code/JarvisCodeGenerationService';
 import JarvisSelfDebugService from '@/services/debug/JarvisSelfDebugService';

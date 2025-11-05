@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import { documentDirectory, getInfoAsync, makeDirectoryAsync, readAsStringAsync, writeAsStringAsync, deleteAsync, EncodingType, copyAsync, readDirectoryAsync, getFreeDiskStorageAsync, getTotalDiskCapacityAsync } from 'expo-file-system/legacy';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as DocumentPicker from 'expo-document-picker';
@@ -44,11 +44,11 @@ class MediaStorageService {
     console.log('[MediaStorageService] Initializing');
 
     if (Platform.OS !== 'web') {
-      this.localDirectory = `${FileSystem.documentDirectory}jarvis-media/`;
+      this.localDirectory = `${documentDirectory}jarvis-media/`;
       
-      const dirInfo = await FileSystem.getInfoAsync(this.localDirectory);
+      const dirInfo = await getInfoAsync(this.localDirectory);
       if (!dirInfo.exists) {
-        await FileSystem.makeDirectoryAsync(this.localDirectory, {
+        await makeDirectoryAsync(this.localDirectory, {
           intermediates: true,
         });
       }
@@ -253,7 +253,7 @@ class MediaStorageService {
     console.log('[MediaStorageService] Saving asset locally:', localPath);
 
     try {
-      await FileSystem.copyAsync({
+      await copyAsync({
         from: asset.uri,
         to: localPath,
       });
@@ -279,17 +279,17 @@ class MediaStorageService {
       return [];
     }
 
-    const dirInfo = await FileSystem.getInfoAsync(this.localDirectory);
+    const dirInfo = await getInfoAsync(this.localDirectory);
     if (!dirInfo.exists) {
       return [];
     }
 
-    const files = await FileSystem.readDirectoryAsync(this.localDirectory);
+    const files = await readDirectoryAsync(this.localDirectory);
     const assets: MediaAsset[] = [];
 
     for (const file of files) {
       const filePath = `${this.localDirectory}${file}`;
-      const info = await FileSystem.getInfoAsync(filePath);
+      const info = await getInfoAsync(filePath);
 
       if (!info.exists) continue;
 
@@ -323,7 +323,7 @@ class MediaStorageService {
     }
 
     console.log('[MediaStorageService] Deleting asset:', uri);
-    await FileSystem.deleteAsync(uri, { idempotent: true });
+    await deleteAsync(uri, { idempotent: true });
   }
 
   async getStorageInfo(): Promise<StorageInfo> {
@@ -332,8 +332,8 @@ class MediaStorageService {
     }
 
     try {
-      const freeSpace = await FileSystem.getFreeDiskStorageAsync();
-      const totalSpace = await FileSystem.getTotalDiskCapacityAsync();
+      const freeSpace = await getFreeDiskStorageAsync();
+      const totalSpace = await getTotalDiskCapacityAsync();
       const usedSpace = totalSpace - freeSpace;
 
       return {
@@ -362,8 +362,8 @@ class MediaStorageService {
     }
 
     console.log('[MediaStorageService] Clearing local storage');
-    await FileSystem.deleteAsync(this.localDirectory, { idempotent: true });
-    await FileSystem.makeDirectoryAsync(this.localDirectory, { intermediates: true });
+    await deleteAsync(this.localDirectory, { idempotent: true });
+    await makeDirectoryAsync(this.localDirectory, { intermediates: true });
   }
 
   async updateSettings(settings: Partial<StorageSettings>): Promise<void> {
@@ -392,8 +392,8 @@ class MediaStorageService {
       return uri;
     }
 
-    const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
+    const base64 = await readAsStringAsync(uri, {
+      encoding: EncodingType.Base64,
     });
 
     const extension = uri.split('.').pop()?.toLowerCase();

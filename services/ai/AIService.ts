@@ -1,4 +1,5 @@
-import { generateObject, generateText, createRorkTool, useRorkAgent } from "@rork/toolkit-sdk";
+import { generateObject, generateText } from "ai";
+import { createRorkTool, useRorkAgent } from "@rork/toolkit-sdk";
 import { AI_CONFIG } from '@/config/api.config';
 import APIClient from '@/services/core/APIClient';
 import CacheManager from '@/services/storage/CacheManager';

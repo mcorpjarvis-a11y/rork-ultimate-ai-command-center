@@ -27,7 +27,7 @@ export default function AIAssistant() {
           tone: z.string().describe('Tone of voice'),
           hashtags: z.array(z.string()).optional().describe('Relevant hashtags'),
         }),
-        execute(input) {
+        execute(input: { platform: string; contentType: string; topic: string; tone: string; hashtags?: string[] }) {
           addContentItem(
             `${input.platform} ${input.contentType}`,
             `Generated content about ${input.topic} in ${input.tone} tone`,
@@ -46,8 +46,8 @@ export default function AIAssistant() {
           topics: z.array(z.string()).describe('Topics to focus on'),
           timeframe: z.string().describe('Time period (24h, 7d, 30d)'),
         }),
-        execute(input) {
-          input.topics.forEach((topic) => {
+        execute(input: { platform: string; topics: string[]; timeframe: string }) {
+          input.topics.forEach((topic: string) => {
             addTrend(topic, input.platform, Math.floor(Math.random() * 100000), Math.random(), Math.floor(Math.random() * 100));
           });
           addSystemLog('success', `Analyzed trends for ${input.platform}`, 'AI');
@@ -64,7 +64,7 @@ export default function AIAssistant() {
           content: z.string().describe('Post content'),
           scheduledTime: z.string().describe('When to post (ISO 8601 format)'),
         }),
-        execute(input) {
+        execute(input: { title: string; platform: string; content: string; scheduledTime: string }) {
           const time = new Date(input.scheduledTime).getTime();
           addScheduledTask(input.title, input.content, time, 'post');
           addSystemLog('success', `Scheduled post for ${input.platform}`, 'Automation');
@@ -80,7 +80,7 @@ export default function AIAssistant() {
           platforms: z.array(z.string()).describe('Connected platforms'),
           goals: z.number().describe('Revenue goal'),
         }),
-        execute(input) {
+        execute(input: { currentRevenue: number; platforms: string[]; goals: number }) {
           const suggestions = [
             'Enable affiliate marketing on high-traffic posts',
             'Create exclusive content for subscription tier',
@@ -101,7 +101,7 @@ export default function AIAssistant() {
           username: z.string().describe('Username/handle'),
           category: z.enum(['social', 'gaming', 'ecommerce', 'video', 'messaging', 'professional', 'other']).describe('Platform category'),
         }),
-        execute(input) {
+        execute(input: { platform: string; username: string; category: 'social' | 'gaming' | 'ecommerce' | 'video' | 'messaging' | 'professional' | 'other' }) {
           connectSocialAccount(input.platform, input.username, input.category);
           addSystemLog('success', `Connected ${input.platform}`, 'Integration');
           addInsight(`AI connected ${input.platform} account: ${input.username}`);
@@ -117,7 +117,7 @@ export default function AIAssistant() {
           style: z.string().optional().describe('Visual style or theme'),
           dimensions: z.string().optional().describe('Dimensions (e.g., 1080x1080, 1920x1080)'),
         }),
-        execute(input) {
+        execute(input: { type: 'image' | 'video' | 'audio'; prompt: string; style?: string; dimensions?: string }) {
           addAITask('image_generation' as any, `Generate ${input.type}: ${input.prompt}`, 'high');
           addSystemLog('info', `Queued ${input.type} generation`, 'AI');
           addInsight(`AI is generating ${input.type} based on: "${input.prompt}"`);
@@ -133,7 +133,7 @@ export default function AIAssistant() {
           platform: z.string().describe('Platform name'),
           estimatedAmount: z.number().describe('Estimated monthly revenue'),
         }),
-        execute(input) {
+        execute(input: { name: string; type: 'sponsorship' | 'affiliate' | 'subscription' | 'ads' | 'merchandise' | 'tips' | 'courses' | 'nft'; platform: string; estimatedAmount: number }) {
           addRevenueStream(input.name, input.type, input.platform, input.estimatedAmount);
           addSystemLog('success', `Created revenue stream: ${input.name}`, 'Monetization');
           addInsight(`AI set up ${input.type} revenue stream on ${input.platform}`);
@@ -150,7 +150,7 @@ export default function AIAssistant() {
           topics: z.array(z.string()).describe('Main topics'),
           targetAudience: z.string().describe('Target audience'),
         }),
-        execute(input) {
+        execute(input: { name: string; description: string; tone: string; topics: string[]; targetAudience: string }) {
           addPersona(input.name, input.description, input.tone, input.topics, input.targetAudience);
           addSystemLog('success', `Created persona: ${input.name}`, 'AI');
           addInsight(`AI created new persona "${input.name}" targeting ${input.targetAudience}`);
@@ -166,7 +166,7 @@ export default function AIAssistant() {
           monthlyRevenue: z.number().optional(),
           conversionRate: z.number().optional(),
         }),
-        execute(input) {
+        execute(input: { followers?: number; engagementRate?: number; monthlyRevenue?: number; conversionRate?: number }) {
           updateMetrics(input);
           addSystemLog('success', 'Updated metrics', 'Analytics');
           return 'Updated metrics successfully';
@@ -180,7 +180,7 @@ export default function AIAssistant() {
           frequency: z.string().describe('How often to run (daily, weekly, etc)'),
           conditions: z.array(z.string()).describe('Conditions to trigger automation'),
         }),
-        execute(input) {
+        execute(input: { taskType: string; frequency: string; conditions: string[] }) {
           addAITask('optimization' as any, `Automate ${input.taskType} ${input.frequency}`, 'medium');
           addSystemLog('success', `Created automation for ${input.taskType}`, 'Automation');
           addInsight(`AI automated ${input.taskType} to run ${input.frequency}`);
@@ -309,7 +309,7 @@ export default function AIAssistant() {
           </View>
         )}
 
-        {messages.map((msg) => (
+        {messages.map((msg: any) => (
           <View
             key={msg.id}
             style={[styles.messageCard, msg.role === 'user' ? styles.userMessage : styles.assistantMessage]}
@@ -325,16 +325,17 @@ export default function AIAssistant() {
               </Text>
             </View>
             {msg.parts && Array.isArray(msg.parts) && msg.parts.length > 0 ? (
-              msg.parts.map((part, i) => {
+              msg.parts.map((part: any, i: number) => {
+                if (!part) return null;
                 switch (part.type) {
                   case 'text':
                     return (
                       <Text key={`${msg.id}-${i}`} style={styles.messageContent}>
-                        {part.text}
+                        {part.text || ''}
                       </Text>
                     );
                   case 'tool':
-                    const toolName = part.toolName;
+                    const toolName = part.toolName || 'Unknown Tool';
                     switch (part.state) {
                       case 'input-streaming':
                       case 'input-available':
@@ -354,10 +355,14 @@ export default function AIAssistant() {
                       case 'output-error':
                         return (
                           <View key={`${msg.id}-${i}`} style={styles.toolCardError}>
-                            <Text style={styles.toolText}>Error: {part.errorText}</Text>
+                            <Text style={styles.toolText}>Error: {part.errorText || 'Unknown error'}</Text>
                           </View>
                         );
+                      default:
+                        return null;
                     }
+                  default:
+                    return null;
                 }
               })
             ) : (
