@@ -25,6 +25,7 @@ import {
   Cloud,
   Shield,
   Cpu,
+  Code,
 } from 'lucide-react-native';
 
 interface MenuItem {
@@ -87,6 +88,7 @@ const menuItems: MenuItem[] = [
       { id: 'tools-cloud-storage', label: 'Cloud Storage', icon: Cloud },
       { id: 'tools-security', label: 'Security', icon: Shield },
       { id: 'tools-iot-devices', label: 'IoT Devices', icon: Cpu },
+      { id: 'tools-code-modifications', label: 'Code Modifications', icon: Code },
     ],
   },
   { id: 'profiles', label: 'Profiles', icon: User },

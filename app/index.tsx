@@ -28,6 +28,7 @@ import Tutorial from '@/components/pages/Tutorial';
 import CloudStorage from '@/components/pages/CloudStorage';
 import Security from '@/components/pages/Security';
 import IoTDevices from '@/components/pages/IoTDevices';
+import CodeModifications from '@/components/pages/CodeModifications';
 import FloatingButtons from '@/components/FloatingButtons';
 import EnhancedAIAssistantModal from '@/components/EnhancedAIAssistantModal';
 import { JarvisOnboarding } from '@/components/JarvisOnboarding';
@@ -112,6 +113,7 @@ export default function Index() {
       'tools-cloud-storage': { title: 'AI Influencer', section: 'Tools / Cloud Storage' },
       'tools-security': { title: 'AI Influencer', section: 'Tools / Security' },
       'tools-iot-devices': { title: 'AI Influencer', section: 'Tools / IoT Devices' },
+      'tools-code-modifications': { title: 'AI Influencer', section: 'Tools / Code Modifications' },
     };
 
     const info = pageMap[currentPage] || { title: 'AI Influencer', section: 'Dashboard' };
@@ -166,6 +168,8 @@ export default function Index() {
         return <Security />;
       case 'tools-iot-devices':
         return <IoTDevices />;
+      case 'tools-code-modifications':
+        return <CodeModifications />;
       default:
         return <OverviewDashboard />;
     }
