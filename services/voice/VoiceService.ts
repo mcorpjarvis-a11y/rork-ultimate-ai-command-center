@@ -180,7 +180,7 @@ class VoiceService {
 
       formData.append('language', this.settings.language);
 
-      const response = await fetch('AI_CONFIG.toolkit.sttURL', {
+      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
         method: 'POST',
         body: formData,
       });

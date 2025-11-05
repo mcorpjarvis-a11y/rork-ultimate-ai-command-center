@@ -101,8 +101,7 @@ class JarvisVoiceService {
     const voiceName = options?.googleVoiceName || this.settings.googleVoiceName;
     
     try {
-      const ttsURL = process.env.EXPO_PUBLIC_TTS_URL || AI_CONFIG.toolkit.imageGenURL?.replace('/images/generate/', '/tts/synthesize/') || 'https://toolkit.jarvis.ai/tts/synthesize/';
-      const response = await fetch(ttsURL, {
+      const response = await fetch(AI_CONFIG.toolkit.ttsURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
