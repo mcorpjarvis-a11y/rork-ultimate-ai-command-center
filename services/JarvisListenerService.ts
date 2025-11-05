@@ -3,13 +3,18 @@ import { Platform } from 'react-native';
 import JarvisVoiceService from './JarvisVoiceService.js';
 import JarvisGuidanceService from './JarvisGuidanceService.js';
 import JarvisPersonality from './personality/JarvisPersonality.js';
+import AIService from './ai/AIService.js';
+import FreeAIService from './ai/FreeAIService.js';
 
 export interface ListenerConfig {
   enabled: boolean;
   language: string;
-  wakeWord?: string;
+  wakeWord: string;
   autoRespond: boolean;
   continuous: boolean;
+  wakeWordConfidenceThreshold: number;
+  wakeWordListenDuration: number; // milliseconds for wake word detection buffer
+  commandListenDuration: number; // milliseconds for full command capture
 }
 
 export interface TranscriptionResult {
@@ -22,11 +27,17 @@ class JarvisListenerService {
   private static instance: JarvisListenerService;
   private recording: Audio.Recording | null = null;
   private isListening: boolean = false;
+  private isSpeaking: boolean = false;
+  private continuousMode: boolean = false;
   private config: ListenerConfig = {
     enabled: true,
     language: 'en-US',
+    wakeWord: 'jarvis',
     autoRespond: true,
     continuous: false,
+    wakeWordConfidenceThreshold: 0.7,
+    wakeWordListenDuration: 3000, // 3 seconds for wake word detection
+    commandListenDuration: 10000, // 10 seconds for full command
   };
 
   private constructor() {
@@ -87,13 +98,71 @@ class JarvisListenerService {
       this.isListening = true;
       
       // Provide audio feedback that we're listening
-      await JarvisVoiceService.speak('Listening, sir.');
+      if (!this.config.continuous) {
+        await JarvisVoiceService.speak('Listening, sir.');
+      }
       
     } catch (error) {
       console.error('[JarvisListener] Failed to start listening:', error);
       this.isListening = false;
       throw error;
     }
+  }
+
+  async startContinuousListening(): Promise<void> {
+    if (this.continuousMode) {
+      console.log('[JarvisListener] Continuous mode already active');
+      return;
+    }
+
+    console.log('[JarvisListener] Starting continuous listening for wake word...');
+    this.continuousMode = true;
+    this.config.continuous = true;
+    
+    await JarvisVoiceService.speak('Continuous listening activated, sir. I will respond when you say Jarvis.');
+    
+    // Start the continuous listening loop
+    this.runContinuousLoop();
+  }
+
+  private async runContinuousLoop(): Promise<void> {
+    while (this.continuousMode && this.config.enabled) {
+      try {
+        // Don't listen while speaking to avoid self-triggering
+        if (this.isSpeaking) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          continue;
+        }
+
+        console.log('[JarvisListener] Listening for wake word...');
+        
+        if (Platform.OS === 'web') {
+          await this.listenForWakeWordWeb();
+        } else {
+          await this.listenForWakeWordNative();
+        }
+
+        // Small delay before next iteration
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error('[JarvisListener] Error in continuous loop:', error);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+    
+    console.log('[JarvisListener] Continuous listening stopped');
+  }
+
+  async stopContinuousListening(): Promise<void> {
+    console.log('[JarvisListener] Stopping continuous listening...');
+    this.continuousMode = false;
+    this.config.continuous = false;
+    
+    if (this.recording) {
+      await this.stopListening();
+    }
+    
+    await JarvisVoiceService.speak('Continuous listening deactivated, sir.');
   }
 
   private async startWebListening(): Promise<void> {
@@ -126,14 +195,231 @@ class JarvisListenerService {
     recognition.onerror = (event: any) => {
       console.error('[JarvisListener] Web recognition error:', event.error);
       this.isListening = false;
+      
+      // Auto-restart if in continuous mode
+      if (this.continuousMode) {
+        setTimeout(() => this.startWebListening(), 1000);
+      }
     };
 
     recognition.onend = () => {
       console.log('[JarvisListener] Web recognition ended');
       this.isListening = false;
+      
+      // Auto-restart if in continuous mode
+      if (this.continuousMode) {
+        setTimeout(() => this.startWebListening(), 500);
+      }
     };
 
     recognition.start();
+  }
+
+  private async listenForWakeWordWeb(): Promise<void> {
+    if (typeof window === 'undefined' || !('webkitSpeechRecognition' in window)) {
+      return;
+    }
+
+    const SpeechRecognition = (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = this.config.language;
+
+    return new Promise((resolve) => {
+      recognition.onresult = async (event: any) => {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        const confidence = event.results[0][0].confidence;
+
+        console.log('[JarvisListener] Detected:', transcript);
+
+        if (transcript.includes(this.config.wakeWord) && confidence >= this.config.wakeWordConfidenceThreshold) {
+          console.log('[JarvisListener] Wake word detected!');
+          await this.handleWakeWordDetected();
+        }
+        resolve();
+      };
+
+      recognition.onerror = () => {
+        resolve();
+      };
+
+      recognition.onend = () => {
+        resolve();
+      };
+
+      recognition.start();
+    });
+  }
+
+  private async listenForWakeWordNative(): Promise<void> {
+    try {
+      // Set up short recording for wake word detection (3 seconds)
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync({
+        android: {
+          extension: '.m4a',
+          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+          audioEncoder: Audio.AndroidAudioEncoder.AAC,
+          sampleRate: 16000,
+          numberOfChannels: 1,
+          bitRate: 128000,
+        },
+        ios: {
+          extension: '.wav',
+          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+          audioQuality: Audio.IOSAudioQuality.MEDIUM,
+          sampleRate: 16000,
+          numberOfChannels: 1,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
+        },
+        web: {
+          mimeType: 'audio/webm',
+          bitsPerSecond: 128000,
+        },
+      });
+
+      await recording.startAsync();
+      
+      // Record for configured wake word duration
+      await new Promise(resolve => setTimeout(resolve, this.config.wakeWordListenDuration));
+      
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+
+      if (uri) {
+        const transcription = await this.transcribeAudio(uri);
+        if (transcription && transcription.text.toLowerCase().includes(this.config.wakeWord)) {
+          if (!transcription.confidence || transcription.confidence >= this.config.wakeWordConfidenceThreshold) {
+            console.log('[JarvisListener] Wake word detected!');
+            await this.handleWakeWordDetected();
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[JarvisListener] Wake word detection error:', error);
+    }
+  }
+
+  private async handleWakeWordDetected(): Promise<void> {
+    console.log('[JarvisListener] Processing wake word activation...');
+    
+    // Acknowledge wake word
+    this.isSpeaking = true;
+    await JarvisVoiceService.speak('Yes, sir?');
+    this.isSpeaking = false;
+    
+    // Now listen for the actual command with full recognition
+    await this.listenForFullCommand();
+  }
+
+  private async listenForFullCommand(): Promise<void> {
+    console.log('[JarvisListener] Listening for full command...');
+    
+    try {
+      if (Platform.OS === 'web') {
+        await this.captureFullCommandWeb();
+      } else {
+        await this.captureFullCommandNative();
+      }
+    } catch (error) {
+      console.error('[JarvisListener] Failed to capture command:', error);
+      this.isSpeaking = true;
+      await JarvisVoiceService.speak('My apologies, sir. I did not catch that.');
+      this.isSpeaking = false;
+    }
+  }
+
+  private async captureFullCommandWeb(): Promise<void> {
+    if (typeof window === 'undefined' || !('webkitSpeechRecognition' in window)) {
+      return;
+    }
+
+    const SpeechRecognition = (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = this.config.language;
+
+    return new Promise((resolve) => {
+      recognition.onresult = async (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        const confidence = event.results[0][0].confidence;
+
+        const result: TranscriptionResult = {
+          text: transcript,
+          confidence,
+          timestamp: Date.now(),
+        };
+
+        await this.processTranscription(result);
+        resolve();
+      };
+
+      recognition.onerror = () => {
+        resolve();
+      };
+
+      recognition.onend = () => {
+        resolve();
+      };
+
+      recognition.start();
+    });
+  }
+
+  private async captureFullCommandNative(): Promise<void> {
+    try {
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync({
+        android: {
+          extension: '.m4a',
+          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
+          audioEncoder: Audio.AndroidAudioEncoder.AAC,
+          sampleRate: 16000,
+          numberOfChannels: 1,
+          bitRate: 128000,
+        },
+        ios: {
+          extension: '.wav',
+          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
+          audioQuality: Audio.IOSAudioQuality.HIGH,
+          sampleRate: 16000,
+          numberOfChannels: 1,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
+        },
+        web: {
+          mimeType: 'audio/webm',
+          bitsPerSecond: 128000,
+        },
+      });
+
+      await recording.startAsync();
+      
+      // Record for configured command duration
+      await new Promise(resolve => setTimeout(resolve, this.config.commandListenDuration));
+      
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+
+      if (uri) {
+        const transcription = await this.transcribeAudio(uri);
+        if (transcription) {
+          await this.processTranscription(transcription);
+        }
+      }
+    } catch (error) {
+      console.error('[JarvisListener] Full command capture error:', error);
+      throw error;
+    }
   }
 
   private async startNativeListening(): Promise<void> {
@@ -311,13 +597,8 @@ class JarvisListenerService {
           });
         }
       } else {
-        // Generate personalized response based on personality
-        responseText = JarvisPersonality.generatePersonalizedResponse('voice-input', userInput);
-        
-        // If no custom response, provide a contextual reply
-        if (!responseText || responseText === 'Acknowledged, sir.') {
-          responseText = await this.generateContextualResponse(userInput);
-        }
+        // Generate AI-powered response using available services
+        responseText = await this.generateAIResponse(userInput);
       }
 
       // Update conversation memory with the response
@@ -328,15 +609,86 @@ class JarvisListenerService {
 
       // Speak the response if auto-respond is enabled
       if (this.config.autoRespond) {
+        this.isSpeaking = true;
         await JarvisVoiceService.speak(responseText);
+        this.isSpeaking = false;
       }
 
       console.log('[JarvisListener] Response generated and spoken');
 
     } catch (error) {
       console.error('[JarvisListener] Failed to process transcription:', error);
+      this.isSpeaking = true;
       await JarvisVoiceService.speak('My apologies, sir. I encountered an error processing your request.');
+      this.isSpeaking = false;
     }
+  }
+
+  private async generateAIResponse(userInput: string): Promise<string> {
+    try {
+      console.log('[JarvisListener] Generating AI response for:', userInput);
+
+      // First try to use the free AI services (Groq, HuggingFace, etc.)
+      try {
+        const aiResponse = await FreeAIService.generateText(userInput, {
+          maxTokens: 500,
+          temperature: 0.7,
+        });
+        
+        if (aiResponse && aiResponse.trim()) {
+          console.log('[JarvisListener] AI response generated via FreeAIService');
+          return this.formatJarvisResponse(aiResponse);
+        }
+      } catch (freeAIError) {
+        console.warn('[JarvisListener] FreeAIService failed, trying AIService:', freeAIError);
+      }
+
+      // Fallback to the main AIService (which may use Gemini or other paid services)
+      try {
+        const aiResponse = await AIService.generateText(userInput, {
+          cache: false,
+          maxTokens: 500,
+        });
+        
+        if (aiResponse && aiResponse.trim()) {
+          console.log('[JarvisListener] AI response generated via AIService');
+          return this.formatJarvisResponse(aiResponse);
+        }
+      } catch (aiError) {
+        console.warn('[JarvisListener] AIService failed, using fallback:', aiError);
+      }
+
+      // Final fallback: Use personality-based contextual response
+      return await this.generateContextualResponse(userInput);
+      
+    } catch (error) {
+      console.error('[JarvisListener] All AI services failed:', error);
+      return await this.generateContextualResponse(userInput);
+    }
+  }
+
+  private formatJarvisResponse(aiResponse: string): string {
+    // Format the AI response to sound more like Jarvis
+    let response = aiResponse.trim();
+    
+    // Remove any existing "sir" references to avoid duplication
+    // Use word boundaries to only match complete 'sir' words
+    response = response.replace(/\b,?\s*sir[,.]?\s*\b/gi, ' ').trim();
+    
+    // Add Jarvis-style formality if not already present
+    const formalPhrases = ['certainly', 'of course', 'indeed', 'absolutely', 'right away'];
+    const hasFormalPhrase = formalPhrases.some(phrase => 
+      response.toLowerCase().includes(phrase)
+    );
+    
+    // Add "sir" at the end if the response doesn't already sound formal
+    if (!hasFormalPhrase && JarvisPersonality.shouldUseFormalTitle()) {
+      response = response + ', sir.';
+    } else if (!response.endsWith('.') && !response.endsWith('!') && !response.endsWith('?')) {
+      response = response + '.';
+    }
+    
+    return response;
   }
 
   private extractTopics(text: string): string[] {
@@ -415,6 +767,18 @@ class JarvisListenerService {
     } else {
       await this.startListening();
     }
+  }
+
+  async toggleContinuousListening(): Promise<void> {
+    if (this.continuousMode) {
+      await this.stopContinuousListening();
+    } else {
+      await this.startContinuousListening();
+    }
+  }
+
+  isContinuousMode(): boolean {
+    return this.continuousMode;
   }
 
   async processCommand(command: string): Promise<string> {

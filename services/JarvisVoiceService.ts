@@ -9,18 +9,21 @@ export interface VoiceSettings {
   pitch: number;
   language: string;
   autoSpeak: boolean;
+  useGoogleCloudTTS: boolean;
+  googleVoiceName: string;
 }
 
 class JarvisVoiceService {
   private static instance: JarvisVoiceService;
-  private recording: Audio.Recording | null = null;
   private settings: VoiceSettings = {
     enabled: true,
     voice: 'com.apple.speech.synthesis.voice.daniel',
     rate: 1.1,
     pitch: 0.9,
-    language: 'en-US',
+    language: 'en-GB', // British English
     autoSpeak: true,
+    useGoogleCloudTTS: false, // Can be enabled if Google Cloud TTS API is available
+    googleVoiceName: 'en-GB-Wavenet-D', // British male voice, Jarvis-like
   };
 
   private constructor() {
@@ -59,6 +62,17 @@ class JarvisVoiceService {
         await Speech.stop();
       }
 
+      // Try to use Google Cloud TTS if enabled and available
+      if ((options?.useGoogleCloudTTS || this.settings.useGoogleCloudTTS)) {
+        try {
+          await this.speakWithGoogleCloud(text, options);
+          return;
+        } catch (googleError) {
+          console.warn('[JARVIS] Google Cloud TTS failed, falling back to expo-speech:', googleError);
+        }
+      }
+
+      // Fallback to expo-speech with British voice settings
       const voiceOptions: Speech.SpeechOptions = {
         language: options?.language || this.settings.language,
         pitch: options?.pitch || this.settings.pitch,
@@ -75,6 +89,54 @@ class JarvisVoiceService {
       Speech.speak(text, voiceOptions);
     } catch (error) {
       console.error('Failed to speak:', error);
+    }
+  }
+
+  private async speakWithGoogleCloud(text: string, options?: Partial<VoiceSettings>): Promise<void> {
+    // This uses the Rork toolkit endpoint which provides Google Cloud TTS integration
+    // Note: For production, consider using the official Google Cloud TTS API directly
+    // with proper authentication if you have a Google Cloud account
+    const voiceName = options?.googleVoiceName || this.settings.googleVoiceName;
+    
+    try {
+      const response = await fetch('https://toolkit.rork.com/tts/synthesize/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          languageCode: 'en-GB',
+          voiceName: voiceName,
+          audioEncoding: 'MP3',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Google Cloud TTS request failed');
+      }
+
+      const audioData = await response.json();
+      
+      // Play the audio using expo-av
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: audioData.audioContent },
+        { shouldPlay: true }
+      );
+      
+      await sound.playAsync();
+      
+      // Unload after playing
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+      
+      console.log('[JARVIS] Spoke using Google Cloud TTS via toolkit.rork.com');
+    } catch (error) {
+      console.error('[JARVIS] Google Cloud TTS error:', error);
+      throw error;
     }
   }
 
