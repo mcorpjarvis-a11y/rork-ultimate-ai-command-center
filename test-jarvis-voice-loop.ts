@@ -13,10 +13,10 @@
  *   bun run test-jarvis-voice-loop.ts
  */
 
-import JarvisListenerService from './services/JarvisListenerService.js';
-import JarvisVoiceService from './services/JarvisVoiceService.js';
-import JarvisGuidanceService from './services/JarvisGuidanceService.js';
-import JarvisPersonality from './services/personality/JarvisPersonality.js';
+import JarvisListenerService from './services/JarvisListenerService';
+import JarvisVoiceService from './services/JarvisVoiceService';
+import JarvisGuidanceService from './services/JarvisGuidanceService';
+import JarvisPersonality from './services/personality/JarvisPersonality';
 
 const COLORS = {
   reset: '\x1b[0m',
