@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
+import JarvisStatusIndicator from '@/components/JarvisStatusIndicator';
 
 import OverviewDashboard from '@/components/pages/OverviewDashboard';
 import SystemLogs from '@/components/pages/SystemLogs';
@@ -207,6 +208,7 @@ export default function Index() {
           title={pageTitle}
           section={sectionTitle}
         />
+        <JarvisStatusIndicator />
         <View style={styles.content}>
           <Sidebar
             currentPage={currentPage}
