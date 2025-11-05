@@ -211,10 +211,14 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     if (lastMessage && lastMessage.role === 'assistant' && autoSpeak && visible) {
-      const textParts = lastMessage.parts.filter(p => p.type === 'text');
-      if (textParts.length > 0) {
-        const text = textParts.map((p: any) => p.text).join(' ');
-        speakText(text);
+      if (lastMessage.parts && Array.isArray(lastMessage.parts)) {
+        const textParts = lastMessage.parts.filter(p => p.type === 'text');
+        if (textParts.length > 0) {
+          const text = textParts.map((p: any) => p.text).join(' ');
+          speakText(text);
+        }
+      } else if ((lastMessage as any).text) {
+        speakText((lastMessage as any).text);
       }
     }
   }, [messages, autoSpeak, visible]);
