@@ -369,14 +369,35 @@ None currently - all critical issues resolved!
 
 ## 🎯 IMMEDIATE NEXT STEPS
 
+### ⚠️ SECURITY IMPORTANT
+
+**API Key Management:**
+- ❌ **NEVER** hardcode API keys in source code
+- ✅ **ALWAYS** use environment variables (`.env` file)
+- ✅ Keep `.env` file in `.gitignore` (already configured)
+- ✅ Use `.env.example` as a template (provided)
+
+**Previous hardcoded keys removed:**
+- ✅ HuggingFace token removed from `config/api.config.ts`
+- ✅ Groq API key removed from `config/api.config.ts`
+
+**To set up your keys:**
+1. Copy `.env.example` to `.env`
+2. Get your free API keys:
+   - Groq: https://console.groq.com (recommended, free)
+   - HuggingFace: https://huggingface.co/settings/tokens (free)
+3. Add keys to your `.env` file
+4. Never commit `.env` to git
+
 ### This Session
 1. ✅ Fix @jarvis/toolkit imports (DONE)
 2. ✅ Fix JarvisListener network errors (DONE)
-3. 🔄 Add .env.example with all required variables
-4. 🔄 Create setup validation service
-5. 🔄 Add environment check on app startup
-6. 🔄 Run code review and security scan
-7. 🔄 Archive/consolidate old documentation
+3. ✅ Add .env.example with all required variables (DONE)
+4. ✅ Remove hardcoded API keys from source code (DONE)
+5. 🔄 Create setup validation service
+6. 🔄 Add environment check on app startup
+7. ✅ Run code review and security scan (DONE)
+8. 🔄 Archive/consolidate old documentation
 
 ### Next Session
 1. Set up backend API server
