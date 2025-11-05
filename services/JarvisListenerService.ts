@@ -1,10 +1,10 @@
 import { Audio } from 'expo-av';
 import { Platform } from 'react-native';
-import JarvisVoiceService from './JarvisVoiceService.js';
-import JarvisGuidanceService from './JarvisGuidanceService.js';
-import JarvisPersonality from './personality/JarvisPersonality.js';
-import AIService from './ai/AIService.js';
-import FreeAIService from './ai/FreeAIService.js';
+import JarvisVoiceService from './JarvisVoiceService';
+import JarvisGuidanceService from './JarvisGuidanceService';
+import JarvisPersonality from './personality/JarvisPersonality';
+import AIService from './ai/AIService';
+import FreeAIService from './ai/FreeAIService';
 
 export interface ListenerConfig {
   enabled: boolean;
