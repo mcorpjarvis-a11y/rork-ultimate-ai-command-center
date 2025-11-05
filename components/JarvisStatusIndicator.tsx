@@ -16,8 +16,8 @@ export default function JarvisStatusIndicator() {
   useEffect(() => {
     loadStatus();
     
-    // Refresh status every 5 seconds
-    const interval = setInterval(loadStatus, 5000);
+    // Refresh status every 10 seconds (reduced from 5 for better performance)
+    const interval = setInterval(loadStatus, 10000);
     return () => clearInterval(interval);
   }, []);
 

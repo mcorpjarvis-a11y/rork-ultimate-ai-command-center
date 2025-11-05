@@ -7,6 +7,9 @@ import FreeAIService from './ai/FreeAIService';
 
 const INITIALIZATION_KEY = '@jarvis_initialized';
 
+// Configuration constants
+const FIRST_TIME_GREETING = 'Good day, sir. JARVIS systems fully online and operational. All API connections established. Continuous listening mode activated. How may I assist you?';
+
 /**
  * JarvisInitializationService
  * 
@@ -18,6 +21,14 @@ class JarvisInitializationService {
   private static instance: JarvisInitializationService;
   private initialized: boolean = false;
   private initializationPromise: Promise<void> | null = null;
+  private cachedStatus: {
+    initialized: boolean;
+    aiProvidersConnected: number;
+    listeningMode: boolean;
+    memoryCount: number;
+  } | null = null;
+  private statusCacheExpiry: number = 0;
+  private readonly STATUS_CACHE_TTL = 2000; // 2 seconds
 
   private constructor() {}
 
@@ -103,13 +114,13 @@ class JarvisInitializationService {
 
       // Collect all API keys from FREE_AI_MODELS
       Object.entries(FREE_AI_MODELS).forEach(([id, config]) => {
-        if (config.apiKey && config.apiKey.trim() !== '') {
+        if (config.apiKey && config.apiKey.trim() !== '' && this.validateAPIKey(id, config.apiKey)) {
           keysToLoad.push({ id, key: config.apiKey });
         }
       });
 
       // Also check for Gemini key from AI_CONFIG
-      if (AI_CONFIG.gemini?.apiKey && AI_CONFIG.gemini.apiKey.trim() !== '') {
+      if (AI_CONFIG.gemini?.apiKey && AI_CONFIG.gemini.apiKey.trim() !== '' && this.validateAPIKey('gemini', AI_CONFIG.gemini.apiKey)) {
         keysToLoad.push({ id: 'gemini', key: AI_CONFIG.gemini.apiKey });
       }
 
@@ -126,6 +137,34 @@ class JarvisInitializationService {
       console.error('[JarvisInit] Failed to load API keys:', error);
       // Don't throw - we can still continue with whatever keys are available
     }
+  }
+
+  /**
+   * Validate API key format based on provider
+   */
+  private validateAPIKey(providerId: string, key: string): boolean {
+    // Basic validation patterns for each provider
+    const patterns: Record<string, RegExp> = {
+      groq: /^gsk_[a-zA-Z0-9]{40,}$/,
+      huggingface: /^hf_[a-zA-Z0-9]{30,}$/,
+      gemini: /^[A-Za-z0-9_-]{30,}$/,
+      togetherai: /^[a-zA-Z0-9]{20,}$/,
+      deepseek: /^[a-zA-Z0-9]{20,}$/,
+      replicate: /^r8_[a-zA-Z0-9]{20,}$/,
+    };
+
+    const pattern = patterns[providerId];
+    if (!pattern) {
+      // No pattern defined, accept any non-empty key
+      console.warn(`[JarvisInit] No validation pattern for ${providerId}, accepting key`);
+      return true;
+    }
+
+    const isValid = pattern.test(key);
+    if (!isValid) {
+      console.warn(`[JarvisInit] Invalid API key format for ${providerId}`);
+    }
+    return isValid;
   }
 
   /**
@@ -248,9 +287,7 @@ class JarvisInitializationService {
       
       if (!firstTime) {
         // First time greeting
-        await JarvisVoiceService.speak(
-          'Good day, sir. JARVIS systems fully online and operational. All API connections established. Continuous listening mode activated. How may I assist you?'
-        );
+        await JarvisVoiceService.speak(FIRST_TIME_GREETING);
       } else {
         // Subsequent greeting
         JarvisVoiceService.speakGreeting();
@@ -281,7 +318,7 @@ class JarvisInitializationService {
   }
 
   /**
-   * Get initialization status
+   * Get initialization status (with caching)
    */
   async getStatus(): Promise<{
     initialized: boolean;
@@ -289,16 +326,36 @@ class JarvisInitializationService {
     listeningMode: boolean;
     memoryCount: number;
   }> {
+    const now = Date.now();
+    
+    // Return cached status if still valid
+    if (this.cachedStatus && now < this.statusCacheExpiry) {
+      return this.cachedStatus;
+    }
+
+    // Compute fresh status
     const providers = FreeAIService.getConfiguredProviders();
     const stats = JarvisPersonality.getPersonalityStats();
     const listening = JarvisListenerService.isContinuousMode();
 
-    return {
+    this.cachedStatus = {
       initialized: this.initialized,
       aiProvidersConnected: providers.filter(p => p.status === 'connected').length,
       listeningMode: listening,
       memoryCount: stats.memoriesStored,
     };
+    
+    this.statusCacheExpiry = now + this.STATUS_CACHE_TTL;
+
+    return this.cachedStatus;
+  }
+
+  /**
+   * Invalidate status cache (call when status changes)
+   */
+  invalidateStatusCache(): void {
+    this.cachedStatus = null;
+    this.statusCacheExpiry = 0;
   }
 }
 
