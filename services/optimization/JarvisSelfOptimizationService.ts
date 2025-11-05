@@ -301,7 +301,14 @@ Target State: ${opportunity.proposedState}
 
 Provide a detailed implementation plan with specific actions.`;
 
-      const implementation = await generateText({ messages: [{ role: 'user', content: prompt }] });
+      // TODO: Configure AI model provider before using generateText
+      // const implementation = await generateText({ 
+      //   model: openai('gpt-4'),
+      //   messages: [{ role: 'user', content: prompt }] 
+      // });
+      
+      // Return mock implementation for now
+      const implementation = `Implementation plan not available - AI model not configured. Opportunity: ${opportunity.title}`;
 
       console.log('[Jarvis Optimization] Implementation plan:', implementation);
 

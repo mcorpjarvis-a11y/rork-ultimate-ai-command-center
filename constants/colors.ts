@@ -7,6 +7,7 @@ const deepGold = '#B8860B';
 
 export const IronManTheme = {
   primary: ironManRed,
+  ironManRed,
   secondary: ironManGold,
   accent: arcReactorBlue,
   arcReactorBlue,

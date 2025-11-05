@@ -376,7 +376,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   analysisCard: {
-    backgroundColor: `linear-gradient(135deg, ${IronManTheme.primary}, ${IronManTheme.secondary})`,
     backgroundColor: IronManTheme.surfaceLight,
     borderWidth: 1,
     borderColor: IronManTheme.accent,

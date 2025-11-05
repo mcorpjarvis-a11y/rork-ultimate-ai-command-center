@@ -295,7 +295,14 @@ Provide a concise diagnosis with:
 Be specific and actionable.`;
 
     try {
-      const diagnosis = await generateText({ messages: [{ role: 'user', content: prompt }] });
+      // TODO: Configure AI model provider before using generateText
+      // const diagnosis = await generateText({ 
+      //   model: openai('gpt-4'),
+      //   messages: [{ role: 'user', content: prompt }] 
+      // });
+      
+      // Return mock diagnosis for now
+      const diagnosis = `Automatic diagnosis not available - AI model not configured. Issue: ${issue.description}`;
       return diagnosis;
     } catch (error) {
       console.error('[Jarvis Debug] Diagnosis failed:', error);

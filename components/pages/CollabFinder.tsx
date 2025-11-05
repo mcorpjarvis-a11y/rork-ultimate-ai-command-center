@@ -13,8 +13,12 @@ export default function CollabFinder() {
   const [selectedInfluencer, setSelectedInfluencer] = useState<Influencer | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [requestForm, setRequestForm] = useState({
-    type: 'sponsored_post' as const,
+  const [requestForm, setRequestForm] = useState<{
+    type: 'sponsored_post' | 'product_review' | 'giveaway' | 'joint_video';
+    budget: string;
+    message: string;
+  }>({
+    type: 'sponsored_post',
     budget: '',
     message: '',
   });

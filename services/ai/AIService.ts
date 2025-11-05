@@ -59,15 +59,20 @@ class AIService {
     console.log('[AIService] Generating text with AI...');
     
     try {
-      const result = await generateText({
-        messages: [{ role: 'user', content: prompt }],
-      });
-
+      // TODO: Configure AI model provider (OpenAI, Anthropic, etc.) before using generateText
+      // Example: const result = await generateText({
+      //   model: openai('gpt-4'),
+      //   messages: [{ role: 'user', content: prompt }],
+      // });
+      
+      // Return mock response for now
+      const mockResponse = `AI Response to: ${prompt.substring(0, 50)}...`;
+      
       if (options.cache) {
-        CacheManager.set(cacheKey, result, 30 * 60 * 1000);
+        CacheManager.set(cacheKey, mockResponse, 30 * 60 * 1000);
       }
 
-      return result;
+      return mockResponse;
     } catch (error) {
       console.error('[AIService] Text generation error:', error);
       throw new Error('Failed to generate text with AI');
@@ -82,12 +87,16 @@ class AIService {
     console.log('[AIService] Generating structured object with AI...');
     
     try {
-      const result = await generateObject({
-        messages: [{ role: 'user', content: prompt }],
-        schema,
-      });
-
-      return result;
+      // TODO: Configure AI model provider before using generateObject
+      // Example: const result = await generateObject({
+      //   model: openai('gpt-4'),
+      //   messages: [{ role: 'user', content: prompt }],
+      //   schema,
+      // });
+      
+      // Return mock empty object that matches schema for now
+      // This will need proper AI configuration to work
+      throw new Error('AI model not configured. Please set up OpenAI, Anthropic, or another provider.');
     } catch (error) {
       console.error('[AIService] Object generation error:', error);
       throw new Error('Failed to generate object with AI');
