@@ -9,6 +9,9 @@ import { trpcRawClient } from '@/lib/trpc-client';
 import { z } from 'zod';
 import IoTDeviceService from '@/services/IoTDeviceService';
 import CodebaseAnalysisService from '@/services/CodebaseAnalysisService';
+import SelfModificationService from '@/services/SelfModificationService';
+import JarvisCodeGenerationService from '@/services/code/JarvisCodeGenerationService';
+import JarvisPersonality from '@/services/personality/JarvisPersonality';
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import { IronManTheme } from '@/constants/colors';
@@ -607,6 +610,264 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           return `Here are the code insights, sir: ${insightText}`;
         },
       }),
+
+      // =============== SELF-MODIFICATION TOOLS ===============
+
+      proposeCodeChange: createRorkTool({
+        description: 'Propose a code modification to an existing file with approval workflow',
+        zodSchema: z.object({
+          filePath: z.string().describe('Path to file to modify'),
+          reason: z.string().describe('Reason for the modification'),
+          changeType: z.enum(['create', 'modify', 'delete', 'refactor']).describe('Type of change'),
+          description: z.string().describe('Detailed description of changes'),
+          before: z.string().optional().describe('Original code'),
+          after: z.string().describe('Modified code'),
+        }),
+        async execute(input) {
+          if (!JarvisPersonality.canPerformAutonomousAction('modifyCode')) {
+            return 'I apologize, sir, but I do not currently have permission to modify code. Please enable this capability in the Persona Builder.';
+          }
+
+          try {
+            const change = await SelfModificationService.proposeCodeChange(
+              input.filePath,
+              input.changeType,
+              input.description,
+              input.reason,
+              input.before || '',
+              input.after
+            );
+
+            addSystemLog('info', `Proposed ${input.changeType} for ${input.filePath}`, 'Self-Modification');
+            addInsight(`JARVIS proposed code change: ${input.description}`);
+
+            const autonomousMode = SelfModificationService.isAutonomousMode();
+            if (autonomousMode) {
+              return `Code change proposed and auto-approved, sir. Change ID: ${change.id}. ${input.description}. The modification has been applied automatically.`;
+            } else {
+              return `Code change proposed, sir. Change ID: ${change.id}. ${input.description}. Awaiting your approval before applying.`;
+            }
+          } catch (error: any) {
+            addSystemLog('error', `Code proposal failed: ${error.message}`, 'Self-Modification');
+            return `I apologize, sir. The code change proposal failed: ${error.message}`;
+          }
+        },
+      }),
+
+      suggestImprovements: createRorkTool({
+        description: 'Analyze codebase and suggest improvements (refactoring, optimization, bug fixes)',
+        zodSchema: z.object({
+          category: z.enum(['optimization', 'bug_fix', 'feature', 'refactor', 'security', 'performance']).describe('Category of improvement'),
+          priority: z.enum(['low', 'medium', 'high', 'critical']).optional().describe('Priority level'),
+        }),
+        async execute(input) {
+          try {
+            const analysis = await SelfModificationService.analyzeCodebase();
+            addSystemLog('info', 'Generated improvement suggestions', 'Self-Modification');
+            
+            // Get existing suggestions
+            const suggestions = SelfModificationService.getSuggestions()
+              .filter(s => s.category === input.category && (!input.priority || s.priority === input.priority));
+
+            if (suggestions.length === 0) {
+              return `I've analyzed the codebase, sir. No ${input.category} improvements are currently needed. The system appears well-optimized in this area.`;
+            }
+
+            const suggestionsText = suggestions.slice(0, 3).map((s, i) => 
+              `${i + 1}. ${s.title} (${s.priority} priority): ${s.description}`
+            ).join(' ');
+
+            return `I've identified ${suggestions.length} ${input.category} improvements, sir: ${suggestionsText}${suggestions.length > 3 ? ` ...and ${suggestions.length - 3} more.` : ''}`;
+          } catch (error: any) {
+            return `Analysis failed, sir: ${error.message}`;
+          }
+        },
+      }),
+
+      generateNewComponent: createRorkTool({
+        description: 'Generate a new React Native component or service module',
+        zodSchema: z.object({
+          name: z.string().describe('Component or module name'),
+          type: z.enum(['component', 'page', 'service', 'util']).describe('Type of module to generate'),
+          requirements: z.string().describe('Feature requirements and specifications'),
+        }),
+        async execute(input) {
+          if (!JarvisPersonality.canPerformAutonomousAction('modifyCode')) {
+            return 'I apologize, sir, but I do not currently have permission to generate code. Please enable this capability in the Persona Builder.';
+          }
+
+          try {
+            const component = await SelfModificationService.generateComponent(
+              input.name,
+              input.type,
+              input.requirements
+            );
+
+            addSystemLog('success', `Generated ${input.type}: ${input.name}`, 'Self-Modification');
+            addInsight(`JARVIS created new ${input.type}: ${input.name}`);
+
+            return `${input.type.charAt(0).toUpperCase() + input.type.slice(1)} "${input.name}" has been generated, sir. The code is ready for your review. Would you like me to integrate it into the application?`;
+          } catch (error: any) {
+            addSystemLog('error', `Component generation failed: ${error.message}`, 'Self-Modification');
+            return `I apologize, sir. Component generation failed: ${error.message}`;
+          }
+        },
+      }),
+
+      viewPendingModifications: createRorkTool({
+        description: 'View all pending code modifications awaiting approval',
+        zodSchema: z.object({
+          status: z.enum(['pending', 'approved', 'applied', 'rejected', 'all']).optional().describe('Filter by status'),
+        }),
+        execute(input) {
+          const stats = SelfModificationService.getStats();
+          
+          let changes = [];
+          if (input.status === 'pending' || !input.status) {
+            changes = SelfModificationService.getPendingCodeChanges();
+          } else {
+            changes = SelfModificationService.getCodeChanges()
+              .filter(c => input.status === 'all' || c.status === input.status);
+          }
+
+          addSystemLog('info', 'Retrieved code modifications', 'Self-Modification');
+
+          if (changes.length === 0) {
+            return `No ${input.status || 'pending'} code modifications, sir. All systems are stable.`;
+          }
+
+          const changesList = changes.slice(0, 5).map((c, i) => 
+            `${i + 1}. [${c.id}] ${c.changeType} ${c.fileName}: ${c.description} (${c.status})`
+          ).join(' ');
+
+          return `${changes.length} ${input.status || 'pending'} code modifications, sir: ${changesList}${changes.length > 5 ? ` ...and ${changes.length - 5} more.` : ''} Total stats: ${stats.appliedChanges} applied, ${stats.pendingChanges} pending.`;
+        },
+      }),
+
+      approveCodeChange: createRorkTool({
+        description: 'Approve a pending code modification',
+        zodSchema: z.object({
+          changeId: z.string().describe('ID of the code change to approve'),
+        }),
+        async execute(input) {
+          try {
+            await SelfModificationService.approveCodeChange(input.changeId);
+            addSystemLog('success', `Approved code change: ${input.changeId}`, 'Self-Modification');
+            addInsight('User approved JARVIS code modification');
+            
+            return `Code change ${input.changeId} approved, sir. Shall I apply it now?`;
+          } catch (error: any) {
+            return `I apologize, sir. Approval failed: ${error.message}`;
+          }
+        },
+      }),
+
+      applyCodeChange: createRorkTool({
+        description: 'Apply an approved code modification to the codebase',
+        zodSchema: z.object({
+          changeId: z.string().describe('ID of the approved code change to apply'),
+        }),
+        async execute(input) {
+          try {
+            await SelfModificationService.applyCodeChange(input.changeId);
+            addSystemLog('success', `Applied code change: ${input.changeId}`, 'Self-Modification');
+            addInsight('JARVIS successfully modified codebase');
+            
+            return `Code change ${input.changeId} has been applied successfully, sir. The modification is now live in the codebase.`;
+          } catch (error: any) {
+            addSystemLog('error', `Failed to apply change: ${error.message}`, 'Self-Modification');
+            return `I apologize, sir. Failed to apply the change: ${error.message}`;
+          }
+        },
+      }),
+
+      rejectCodeChange: createRorkTool({
+        description: 'Reject a pending code modification',
+        zodSchema: z.object({
+          changeId: z.string().describe('ID of the code change to reject'),
+          reason: z.string().describe('Reason for rejection'),
+        }),
+        async execute(input) {
+          try {
+            await SelfModificationService.rejectCodeChange(input.changeId, input.reason);
+            addSystemLog('info', `Rejected code change: ${input.changeId}`, 'Self-Modification');
+            
+            return `Code change ${input.changeId} has been rejected, sir. Reason: ${input.reason}. I'll learn from this feedback.`;
+          } catch (error: any) {
+            return `I apologize, sir. Rejection failed: ${error.message}`;
+          }
+        },
+      }),
+
+      startDebugSession: createRorkTool({
+        description: 'Start a debug session to investigate and fix an issue',
+        zodSchema: z.object({
+          issue: z.string().describe('Description of the issue to debug'),
+        }),
+        async execute(input) {
+          if (!JarvisPersonality.canPerformAutonomousAction('debugSystem')) {
+            return 'I apologize, sir, but I do not currently have permission to debug the system. Please enable this capability in the Persona Builder.';
+          }
+
+          try {
+            const session = await SelfModificationService.startDebugSession(input.issue);
+            addSystemLog('info', `Started debug session: ${session.id}`, 'Self-Modification');
+            addInsight(`JARVIS investigating: ${input.issue}`);
+            
+            return `Debug session ${session.id} initiated, sir. I'm investigating "${input.issue}" and will report my findings shortly.`;
+          } catch (error: any) {
+            return `Debug session failed to start, sir: ${error.message}`;
+          }
+        },
+      }),
+
+      viewSelfModificationStats: createRorkTool({
+        description: 'View statistics about JARVIS self-modification activities',
+        zodSchema: z.object({}),
+        execute() {
+          const stats = SelfModificationService.getStats();
+          const generated = SelfModificationService.getGeneratedComponents();
+          const debugSessions = SelfModificationService.getDebugSessions();
+          
+          addSystemLog('info', 'Retrieved self-modification statistics', 'Self-Modification');
+
+          return `Self-modification statistics, sir: ${stats.totalChanges} total modifications (${stats.appliedChanges} applied, ${stats.pendingChanges} pending). ${stats.suggestionsCount} improvement suggestions. ${stats.componentsGenerated} components generated. ${stats.debugSessionsResolved} debug sessions resolved. Autonomous mode: ${SelfModificationService.isAutonomousMode() ? 'ENABLED' : 'DISABLED'}.`;
+        },
+      }),
+
+      exportChangelog: createRorkTool({
+        description: 'Export a changelog of all self-modifications made by JARVIS',
+        zodSchema: z.object({}),
+        async execute() {
+          try {
+            const changelog = await SelfModificationService.exportChangelog();
+            addSystemLog('success', 'Exported modification changelog', 'Self-Modification');
+            
+            return `Changelog exported successfully, sir. ${changelog.split('\n').length} lines documenting all modifications I've made to the codebase.`;
+          } catch (error: any) {
+            return `Changelog export failed, sir: ${error.message}`;
+          }
+        },
+      }),
+
+      setAutonomousMode: createRorkTool({
+        description: 'Enable or disable autonomous code modification mode',
+        zodSchema: z.object({
+          enabled: z.boolean().describe('Enable or disable autonomous mode'),
+        }),
+        execute(input) {
+          SelfModificationService.setAutonomousMode(input.enabled);
+          addSystemLog('success', `Autonomous mode ${input.enabled ? 'enabled' : 'disabled'}`, 'Self-Modification');
+          
+          if (input.enabled) {
+            return 'Autonomous mode enabled, sir. I will now apply approved code modifications automatically without requiring explicit approval for each change. I will still log all modifications for your review.';
+          } else {
+            return 'Autonomous mode disabled, sir. All code modifications will now require your explicit approval before being applied.';
+          }
+        },
+      }),
+
+      // =============== END SELF-MODIFICATION TOOLS ===============
     },
   });
 
