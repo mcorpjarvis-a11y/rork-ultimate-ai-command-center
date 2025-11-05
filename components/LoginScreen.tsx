@@ -218,11 +218,44 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               )}
             </TouchableOpacity>
 
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity
+              style={[styles.googleButton, googleLoading && styles.buttonDisabled]}
+              onPress={handleGoogleLogin}
+              disabled={googleLoading}
+            >
+              {googleLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <User size={20} color="#fff" style={{ marginRight: 10 }} />
+                  <Text style={styles.buttonText}>
+                    Continue with Google
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.skipButton}
+              onPress={handleSkipLogin}
+            >
+              <Text style={styles.skipButtonText}>
+                Skip for now (Demo Mode)
+              </Text>
+            </TouchableOpacity>
+
             <View style={styles.features}>
               <Text style={styles.featuresTitle}>🔒 Secure Features:</Text>
               <Text style={styles.featureItem}>✓ Password-protected access</Text>
+              <Text style={styles.featureItem}>✓ Google OAuth integration</Text>
               <Text style={styles.featureItem}>✓ Encrypted API key storage</Text>
-              <Text style={styles.featureItem}>✓ Persistent configuration</Text>
+              <Text style={styles.featureItem}>✓ Google Drive backup/sync</Text>
               <Text style={styles.featureItem}>✓ Private AI assistant</Text>
             </View>
 
@@ -351,10 +384,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   googleButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#4285F4',
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   googleButtonContent: {
     flexDirection: 'row',
@@ -378,6 +413,16 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 16,
     fontWeight: '600',
+  },
+  skipButton: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  skipButtonText: {
+    color: '#666',
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
   features: {
     marginTop: 24,
