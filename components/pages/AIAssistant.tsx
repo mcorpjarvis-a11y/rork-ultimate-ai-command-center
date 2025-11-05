@@ -324,41 +324,47 @@ export default function AIAssistant() {
                 {msg.role === 'assistant' ? 'Master AI' : 'You'}
               </Text>
             </View>
-            {msg.parts.map((part, i) => {
-              switch (part.type) {
-                case 'text':
-                  return (
-                    <Text key={`${msg.id}-${i}`} style={styles.messageContent}>
-                      {part.text}
-                    </Text>
-                  );
-                case 'tool':
-                  const toolName = part.toolName;
-                  switch (part.state) {
-                    case 'input-streaming':
-                    case 'input-available':
-                      return (
-                        <View key={`${msg.id}-${i}`} style={styles.toolCard}>
-                          <Zap color="#FFD700" size={16} />
-                          <Text style={styles.toolText}>Executing: {toolName}</Text>
-                        </View>
-                      );
-                    case 'output-available':
-                      return (
-                        <View key={`${msg.id}-${i}`} style={styles.toolCardSuccess}>
-                          <Target color="#7CFC00" size={16} />
-                          <Text style={styles.toolText}>Completed: {toolName}</Text>
-                        </View>
-                      );
-                    case 'output-error':
-                      return (
-                        <View key={`${msg.id}-${i}`} style={styles.toolCardError}>
-                          <Text style={styles.toolText}>Error: {part.errorText}</Text>
-                        </View>
-                      );
-                  }
-              }
-            })}
+            {msg.parts && Array.isArray(msg.parts) && msg.parts.length > 0 ? (
+              msg.parts.map((part, i) => {
+                switch (part.type) {
+                  case 'text':
+                    return (
+                      <Text key={`${msg.id}-${i}`} style={styles.messageContent}>
+                        {part.text}
+                      </Text>
+                    );
+                  case 'tool':
+                    const toolName = part.toolName;
+                    switch (part.state) {
+                      case 'input-streaming':
+                      case 'input-available':
+                        return (
+                          <View key={`${msg.id}-${i}`} style={styles.toolCard}>
+                            <Zap color="#FFD700" size={16} />
+                            <Text style={styles.toolText}>Executing: {toolName}</Text>
+                          </View>
+                        );
+                      case 'output-available':
+                        return (
+                          <View key={`${msg.id}-${i}`} style={styles.toolCardSuccess}>
+                            <Target color="#7CFC00" size={16} />
+                            <Text style={styles.toolText}>Completed: {toolName}</Text>
+                          </View>
+                        );
+                      case 'output-error':
+                        return (
+                          <View key={`${msg.id}-${i}`} style={styles.toolCardError}>
+                            <Text style={styles.toolText}>Error: {part.errorText}</Text>
+                          </View>
+                        );
+                    }
+                }
+              })
+            ) : (
+              <Text style={styles.messageContent}>
+                {(msg as any).text || (msg as any).content || 'Message received'}
+              </Text>
+            )}
           </View>
         ))}
       </ScrollView>

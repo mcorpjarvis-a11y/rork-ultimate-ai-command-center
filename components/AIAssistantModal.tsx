@@ -510,41 +510,47 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
                         {msg.role === 'assistant' ? 'JARVIS' : 'You'}
                       </Text>
                     </View>
-                    {msg.parts.map((part, i) => {
-                      switch (part.type) {
-                        case 'text':
-                          return (
-                            <Text key={`${msg.id}-${i}`} style={styles.messageText}>
-                              {part.text}
-                            </Text>
-                          );
-                        case 'tool':
-                          const toolName = part.toolName;
-                          switch (part.state) {
-                            case 'input-streaming':
-                            case 'input-available':
-                              return (
-                                <View key={`${msg.id}-${i}`} style={styles.toolExecuting}>
-                                  <Zap color="#FFD700" size={14} />
-                                  <Text style={styles.toolText}>{toolName}</Text>
-                                </View>
-                              );
-                            case 'output-available':
-                              return (
-                                <View key={`${msg.id}-${i}`} style={styles.toolSuccess}>
-                                  <Target color="#7CFC00" size={14} />
-                                  <Text style={styles.toolText}>Completed</Text>
-                                </View>
-                              );
-                            case 'output-error':
-                              return (
-                                <View key={`${msg.id}-${i}`} style={styles.toolError}>
-                                  <Text style={styles.toolErrorText}>{part.errorText}</Text>
-                                </View>
-                              );
-                          }
-                      }
-                    })}
+                    {msg.parts && Array.isArray(msg.parts) && msg.parts.length > 0 ? (
+                      msg.parts.map((part, i) => {
+                        switch (part.type) {
+                          case 'text':
+                            return (
+                              <Text key={`${msg.id}-${i}`} style={styles.messageText}>
+                                {part.text}
+                              </Text>
+                            );
+                          case 'tool':
+                            const toolName = part.toolName;
+                            switch (part.state) {
+                              case 'input-streaming':
+                              case 'input-available':
+                                return (
+                                  <View key={`${msg.id}-${i}`} style={styles.toolExecuting}>
+                                    <Zap color="#FFD700" size={14} />
+                                    <Text style={styles.toolText}>{toolName}</Text>
+                                  </View>
+                                );
+                              case 'output-available':
+                                return (
+                                  <View key={`${msg.id}-${i}`} style={styles.toolSuccess}>
+                                    <Target color="#7CFC00" size={14} />
+                                    <Text style={styles.toolText}>Completed</Text>
+                                  </View>
+                                );
+                              case 'output-error':
+                                return (
+                                  <View key={`${msg.id}-${i}`} style={styles.toolError}>
+                                    <Text style={styles.toolErrorText}>{part.errorText}</Text>
+                                  </View>
+                                );
+                            }
+                        }
+                      })
+                    ) : (
+                      <Text style={styles.messageText}>
+                        {(msg as any).text || (msg as any).content || 'Message received'}
+                      </Text>
+                    )}
                   </View>
                 ))
               )}
