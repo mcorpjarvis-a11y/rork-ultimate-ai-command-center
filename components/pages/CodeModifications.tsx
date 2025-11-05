@@ -189,7 +189,7 @@ export default function CodeModifications() {
         </View>
       )}
 
-      {change.status === 'approved' && !change.applied && (
+      {change.status === 'approved' && !change.appliedAt && (
         <TouchableOpacity
           style={[styles.actionButton, styles.applyButton]}
           onPress={() => handleApply(change.id)}

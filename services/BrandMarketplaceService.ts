@@ -420,8 +420,8 @@ class BrandMarketplaceService {
     if (filters?.category) {
       results = results.filter(d => d.category === filters.category);
     }
-    if (filters?.minBudget) {
-      results = results.filter(d => d.budget >= filters.minBudget);
+    if (filters?.minBudget !== undefined) {
+      results = results.filter(d => d.budget >= filters.minBudget!);
     }
     if (filters?.dealType) {
       results = results.filter(d => d.dealType === filters.dealType);

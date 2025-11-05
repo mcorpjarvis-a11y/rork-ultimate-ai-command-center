@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react';
 import { Alert, Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import NetInfo from '@react-native-community/netinfo';
+
+// NetInfo is optional - comment out if not installed
+// import NetInfo from '@react-native-community/netinfo';
 
 export function useHapticFeedback() {
   const trigger = useCallback((type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' = 'light') => {
@@ -72,9 +74,14 @@ export function useOfflineDetection() {
   const checkConnection = useCallback(async () => {
     setIsChecking(true);
     try {
-      const state = await NetInfo.fetch();
-      setIsOnline(state.isConnected ?? false);
-      return state.isConnected ?? false;
+      // NetInfo check disabled - install @react-native-community/netinfo to enable
+      // const state = await NetInfo.fetch();
+      // setIsOnline(state.isConnected ?? false);
+      // return state.isConnected ?? false;
+      
+      // Default to online if NetInfo is not available
+      setIsOnline(true);
+      return true;
     } catch (error) {
       console.error('[Network] Failed to check connection:', error);
       setIsOnline(false);

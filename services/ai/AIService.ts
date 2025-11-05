@@ -1,9 +1,17 @@
-import { generateObject, generateText, createRorkTool, useRorkAgent } from "@rork/toolkit-sdk";
-import { AI_CONFIG } from '@/config/api.config';
+import { generateObject, generateText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createRorkTool, useRorkAgent } from "@rork/toolkit-sdk";
+import { AI_CONFIG, FREE_AI_MODELS } from '@/config/api.config';
 import APIClient from '@/services/core/APIClient';
 import CacheManager from '@/services/storage/CacheManager';
 import { AITask } from '@/types/models.types';
 import { z } from 'zod';
+
+// Configure Groq (OpenAI-compatible) as the default model provider
+const groq = createOpenAI({
+  baseURL: FREE_AI_MODELS.groq.baseURL,
+  apiKey: FREE_AI_MODELS.groq.apiKey,
+});
 
 export interface AIGenerationOptions {
   model?: string;
@@ -59,14 +67,18 @@ class AIService {
     
     try {
       const result = await generateText({
+        model: groq(options.model || FREE_AI_MODELS.groq.models.text['llama-3.1-8b']),
         messages: [{ role: 'user', content: prompt }],
+        temperature: options.temperature,
       });
-
+      
+      const responseText = result.text;
+      
       if (options.cache) {
-        CacheManager.set(cacheKey, result, 30 * 60 * 1000);
+        CacheManager.set(cacheKey, responseText, 30 * 60 * 1000);
       }
 
-      return result;
+      return responseText;
     } catch (error) {
       console.error('[AIService] Text generation error:', error);
       throw new Error('Failed to generate text with AI');
@@ -82,11 +94,13 @@ class AIService {
     
     try {
       const result = await generateObject({
+        model: groq(options.model || FREE_AI_MODELS.groq.models.text['llama-3.1-8b']),
         messages: [{ role: 'user', content: prompt }],
         schema,
+        temperature: options.temperature,
       });
-
-      return result;
+      
+      return result.object as z.infer<T>;
     } catch (error) {
       console.error('[AIService] Object generation error:', error);
       throw new Error('Failed to generate object with AI');

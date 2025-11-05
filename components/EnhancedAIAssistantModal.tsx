@@ -108,7 +108,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           tone: z.string().describe('Tone of voice'),
           hashtags: z.array(z.string()).optional().describe('Relevant hashtags'),
         }),
-        execute(input) {
+        execute(input: any) {
           addContentItem(
             `${input.platform} ${input.contentType}`,
             `Generated content about ${input.topic} in ${input.tone} tone`,
@@ -127,8 +127,8 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           topics: z.array(z.string()).describe('Topics to focus on'),
           timeframe: z.string().describe('Time period (24h, 7d, 30d)'),
         }),
-        execute(input) {
-          input.topics.forEach((topic) => {
+        execute(input: any) {
+          input.topics.forEach((topic: any) => {
             addTrend(topic, input.platform, Math.floor(Math.random() * 100000), Math.random(), Math.floor(Math.random() * 100));
           });
           addSystemLog('success', `Analyzed trends for ${input.platform}`, 'AI');
@@ -145,7 +145,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           content: z.string().describe('Post content'),
           scheduledTime: z.string().describe('When to post (ISO 8601 format)'),
         }),
-        execute(input) {
+        execute(input: any) {
           const time = new Date(input.scheduledTime).getTime();
           addScheduledTask(input.title, input.content, time, 'post');
           addSystemLog('success', `Scheduled post for ${input.platform}`, 'Automation');
@@ -161,7 +161,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           platforms: z.array(z.string()).describe('Connected platforms'),
           goals: z.number().describe('Revenue goal'),
         }),
-        execute(input) {
+        execute(input: any) {
           const increase = input.goals - input.currentRevenue;
           addInsight(`AI identified strategies to increase revenue by $${increase.toFixed(2)}`);
           addSystemLog('success', 'Generated monetization optimization plan', 'AI');
@@ -176,7 +176,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           username: z.string().describe('Username/handle'),
           category: z.enum(['social', 'gaming', 'ecommerce', 'video', 'messaging', 'professional', 'other']).describe('Platform category'),
         }),
-        execute(input) {
+        execute(input: any) {
           connectSocialAccount(input.platform, input.username, input.category);
           addSystemLog('success', `Connected ${input.platform}`, 'Integration');
           addInsight(`AI connected ${input.platform} account: ${input.username}`);
@@ -192,7 +192,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           style: z.string().optional().describe('Visual style or theme'),
           dimensions: z.string().optional().describe('Dimensions (e.g., 1080x1080, 1920x1080)'),
         }),
-        execute(input) {
+        execute(input: any) {
           addAITask('image_generation' as any, `Generate ${input.type}: ${input.prompt}`, 'high');
           addSystemLog('info', `Queued ${input.type} generation`, 'AI');
           addInsight(`AI is generating ${input.type} based on: "${input.prompt}"`);
@@ -208,7 +208,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           platform: z.string().describe('Platform name'),
           estimatedAmount: z.number().describe('Estimated monthly revenue'),
         }),
-        execute(input) {
+        execute(input: any) {
           addRevenueStream(input.name, input.type, input.platform, input.estimatedAmount);
           addSystemLog('success', `Created revenue stream: ${input.name}`, 'Monetization');
           addInsight(`AI set up ${input.type} revenue stream on ${input.platform}`);
@@ -225,7 +225,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           topics: z.array(z.string()).describe('Main topics'),
           targetAudience: z.string().describe('Target audience'),
         }),
-        execute(input) {
+        execute(input: any) {
           addPersona(input.name, input.description, input.tone, input.topics, input.targetAudience);
           addSystemLog('success', `Created persona: ${input.name}`, 'AI');
           addInsight(`AI created new persona "${input.name}" targeting ${input.targetAudience}`);
@@ -241,7 +241,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           monthlyRevenue: z.number().optional(),
           conversionRate: z.number().optional(),
         }),
-        execute(input) {
+        execute(input: any) {
           updateMetrics(input);
           addSystemLog('success', 'Updated metrics', 'Analytics');
           return 'Metrics updated successfully, sir.';
@@ -255,7 +255,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           frequency: z.string().describe('How often to run (daily, weekly, etc)'),
           conditions: z.array(z.string()).describe('Conditions to trigger automation'),
         }),
-        execute(input) {
+        execute(input: any) {
           addAITask('optimization' as any, `Automate ${input.taskType} ${input.frequency}`, 'medium');
           addSystemLog('success', `Created automation for ${input.taskType}`, 'Automation');
           addInsight(`AI automated ${input.taskType} to run ${input.frequency}`);
@@ -270,7 +270,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           command: z.string().describe('Command to execute'),
           parameters: z.record(z.string(), z.any()).optional().describe('Command parameters'),
         }),
-        execute(input) {
+        execute(input: any) {
           const device = IoTDeviceService.getDevice(input.deviceId);
           if (!device) {
             return `Device not found, sir. Please check the device ID and try again.`;
@@ -298,7 +298,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           ipAddress: z.string().describe('IP address of the printer'),
           apiKey: z.string().optional().describe('API key if required'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           const commands = [
             { id: 'print_file', name: 'Start Print', description: 'Start printing', parameters: [{ name: 'filename', type: 'string' as const, required: true }] },
             { id: 'pause_print', name: 'Pause Print', description: 'Pause print job', parameters: [] },
@@ -336,7 +336,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           ipAddress: z.string().describe('IP address'),
           apiKey: z.string().optional().describe('API key if required'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           const deviceConfig = IoTDeviceService.createSmartHomeDevice(input.name, input.type);
           
           await IoTDeviceService.addDevice({
@@ -359,7 +359,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           focus: z.enum(['overview', 'file', 'recommendations']).describe('What to analyze'),
           filePath: z.string().optional().describe('Specific file path to analyze'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           if (input.focus === 'overview') {
             const overview = await CodebaseAnalysisService.getCodebaseOverview();
             addSystemLog('info', 'Codebase overview generated', 'Analysis');
@@ -375,7 +375,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           if (input.focus === 'recommendations') {
             const recommendations = CodebaseAnalysisService.generateUpgradeRecommendations();
             addSystemLog('info', 'Generated upgrade recommendations', 'Analysis');
-            const list = recommendations.map((r, i) => `${i + 1}. ${r}`).join(' ');
+            const list = recommendations.map((r, i: number) => `${i + 1}. ${r}`).join(' ');
             return `I have identified ${recommendations.length} recommendations for improving the system: ${list}`;
           }
 
@@ -391,7 +391,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           language: z.string().describe('Programming language (typescript, javascript, python, etc)'),
           action: z.enum(['create', 'update', 'append']).describe('Action to perform'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             await trpcRawClient.ai.writeFile.mutate(input);
             addSystemLog('success', `File operation: ${input.action} ${input.filePath}`, 'Development');
@@ -411,7 +411,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           code: z.string().describe('Code to execute'),
           environment: z.string().describe('Execution environment (sandbox, container, local)'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             const result = await trpcRawClient.ai.executeCode.mutate(input);
             addSystemLog(result.success ? 'success' : 'error', `Code execution: ${input.language}`, 'Development');
@@ -432,7 +432,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           projectName: z.string().describe('Name of the project'),
           directory: z.string().describe('Directory where to create the project'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             const result = await trpcRawClient.ai.createProject.mutate(input);
             addSystemLog('success', `Project scaffolding: ${input.projectName} with ${input.framework}`, 'Development');
@@ -453,7 +453,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           repository: z.string().optional().describe('Repository URL or path'),
           branchName: z.string().optional().describe('Branch name (for branch operations)'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             const result = await trpcRawClient.ai.gitOperation.mutate(input);
             addSystemLog('success', `Git operation: ${input.operation}`, 'Development');
@@ -485,7 +485,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           packages: z.array(z.string()).describe('List of package names'),
           packageManager: z.enum(['npm', 'yarn', 'pnpm', 'bun', 'pip', 'cargo', 'composer']).describe('Package manager to use'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             await trpcRawClient.ai.manageDependencies.mutate(input);
             const pkgList = input.packages.join(', ');
@@ -516,7 +516,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           platform: z.string().describe('Deployment platform (Vercel, Netlify, AWS, etc)'),
           buildCommand: z.string().optional().describe('Custom build command'),
         }),
-        execute(input) {
+        execute(input: any) {
           addSystemLog('success', `Deployment to ${input.environment} on ${input.platform}`, 'Development');
           addInsight(`JARVIS deployed application to ${input.environment} environment`);
           
@@ -531,7 +531,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           coverage: z.boolean().optional().describe('Generate coverage report'),
           watch: z.boolean().optional().describe('Run in watch mode'),
         }),
-        execute(input) {
+        execute(input: any) {
           addSystemLog('info', `Running ${input.testType} tests`, 'Development');
           addInsight(`JARVIS executed ${input.testType} tests${input.coverage ? ' with coverage' : ''}`);
           
@@ -545,7 +545,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           target: z.enum(['bundle-size', 'runtime', 'memory', 'network', 'all']).describe('Performance target to optimize'),
           aggressive: z.boolean().optional().describe('Use aggressive optimization'),
         }),
-        execute(input) {
+        execute(input: any) {
           addSystemLog('info', `Performance optimization: ${input.target}`, 'Development');
           addInsight(`JARVIS optimized ${input.target} performance`);
           
@@ -559,7 +559,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           scanType: z.enum(['dependencies', 'code', 'secrets', 'all']).describe('Type of security scan'),
           autoFix: z.boolean().optional().describe('Automatically fix issues when possible'),
         }),
-        execute(input) {
+        execute(input: any) {
           addSystemLog('info', `Security scan: ${input.scanType}`, 'Security');
           addInsight(`JARVIS performed ${input.scanType} security scan${input.autoFix ? ' with auto-fix' : ''}`);
           
@@ -572,7 +572,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           query: z.string().describe('Search query'),
         }),
-        execute(input) {
+        execute(input: any) {
           const results = CodebaseAnalysisService.searchFiles(input.query);
           addSystemLog('info', `Searched codebase: "${input.query}"`, 'Analysis');
           
@@ -592,7 +592,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           category: z.enum(['architecture', 'performance', 'security', 'maintainability', 'all']).optional().describe('Filter by category'),
         }),
-        execute(input) {
+        execute(input: any) {
           const insights = input.category && input.category !== 'all'
             ? CodebaseAnalysisService.getInsightsByCategory(input.category)
             : CodebaseAnalysisService.getInsights();
@@ -623,7 +623,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           before: z.string().optional().describe('Original code'),
           after: z.string().describe('Modified code'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           if (!JarvisPersonality.canPerformAutonomousAction('modifyCode')) {
             return 'I apologize, sir, but I do not currently have permission to modify code. Please enable this capability in the Persona Builder.';
           }
@@ -660,7 +660,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           category: z.enum(['optimization', 'bug_fix', 'feature', 'refactor', 'security', 'performance']).describe('Category of improvement'),
           priority: z.enum(['low', 'medium', 'high', 'critical']).optional().describe('Priority level'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             const analysis = await SelfModificationService.analyzeCodebase();
             addSystemLog('info', 'Generated improvement suggestions', 'Self-Modification');
@@ -673,7 +673,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
               return `I've analyzed the codebase, sir. No ${input.category} improvements are currently needed. The system appears well-optimized in this area.`;
             }
 
-            const suggestionsText = suggestions.slice(0, 3).map((s, i) => 
+            const suggestionsText = suggestions.slice(0, 3).map((s, i: number) => 
               `${i + 1}. ${s.title} (${s.priority} priority): ${s.description}`
             ).join(' ');
 
@@ -691,7 +691,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           type: z.enum(['component', 'page', 'service', 'util']).describe('Type of module to generate'),
           requirements: z.string().describe('Feature requirements and specifications'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           if (!JarvisPersonality.canPerformAutonomousAction('modifyCode')) {
             return 'I apologize, sir, but I do not currently have permission to generate code. Please enable this capability in the Persona Builder.';
           }
@@ -719,7 +719,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           status: z.enum(['pending', 'approved', 'applied', 'rejected', 'all']).optional().describe('Filter by status'),
         }),
-        execute(input) {
+        execute(input: any) {
           const stats = SelfModificationService.getStats();
           
           let changes = [];
@@ -736,7 +736,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
             return `No ${input.status || 'pending'} code modifications, sir. All systems are stable.`;
           }
 
-          const changesList = changes.slice(0, 5).map((c, i) => 
+          const changesList = changes.slice(0, 5).map((c, i: number) => 
             `${i + 1}. [${c.id}] ${c.changeType} ${c.fileName}: ${c.description} (${c.status})`
           ).join(' ');
 
@@ -749,7 +749,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           changeId: z.string().describe('ID of the code change to approve'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             await SelfModificationService.approveCodeChange(input.changeId);
             addSystemLog('success', `Approved code change: ${input.changeId}`, 'Self-Modification');
@@ -767,7 +767,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           changeId: z.string().describe('ID of the approved code change to apply'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             await SelfModificationService.applyCodeChange(input.changeId);
             addSystemLog('success', `Applied code change: ${input.changeId}`, 'Self-Modification');
@@ -787,7 +787,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
           changeId: z.string().describe('ID of the code change to reject'),
           reason: z.string().describe('Reason for rejection'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           try {
             await SelfModificationService.rejectCodeChange(input.changeId, input.reason);
             addSystemLog('info', `Rejected code change: ${input.changeId}`, 'Self-Modification');
@@ -804,7 +804,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           issue: z.string().describe('Description of the issue to debug'),
         }),
-        async execute(input) {
+        async execute(input: any) {
           if (!JarvisPersonality.canPerformAutonomousAction('debugSystem')) {
             return 'I apologize, sir, but I do not currently have permission to debug the system. Please enable this capability in the Persona Builder.';
           }
@@ -855,7 +855,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           enabled: z.boolean().describe('Enable or disable autonomous mode'),
         }),
-        execute(input) {
+        execute(input: any) {
           SelfModificationService.setAutonomousMode(input.enabled);
           addSystemLog('success', `Autonomous mode ${input.enabled ? 'enabled' : 'disabled'}`, 'Self-Modification');
           
@@ -896,13 +896,13 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
   }, [messages, visible, hasGreeted, settings.voice.enabled, settings.voice.autoSpeak]);
 
   useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
+    const lastMessage: any = messages[messages.length - 1];
     if (lastMessage && lastMessage.role === 'assistant' && settings.voice.enabled && settings.voice.autoSpeak && visible) {
       let text = '';
       
       // Try to get text from parts array
       if (lastMessage.parts && Array.isArray(lastMessage.parts)) {
-        const textParts = lastMessage.parts.filter(p => p.type === 'text');
+        const textParts = lastMessage.parts.filter((p: any) => p.type === 'text');
         if (textParts.length > 0) {
           text = textParts.map((p: any) => p.text).join(' ');
         }
@@ -1000,7 +1000,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
   };
 
   const removeImage = (index: number) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setSelectedImages(prev => prev.filter((_, i: number) => i !== index));
   };
 
   const speakText = async (text: string) => {
@@ -1281,7 +1281,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
             </View>
           </View>
         ) : (
-          messages.map((msg) => (
+          messages.map((msg: any) => (
             <View
               key={msg.id}
               style={[styles.messageCard, msg.role === 'user' ? styles.userMessage : styles.assistantMessage]}
@@ -1297,7 +1297,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
                 </Text>
               </View>
               {msg.parts && Array.isArray(msg.parts) && msg.parts.length > 0 ? (
-                msg.parts.map((part, i) => {
+                msg.parts.map((part: any, i: number) => {
                   switch (part.type) {
                     case 'text':
                       return (

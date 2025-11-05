@@ -207,8 +207,8 @@ class JarvisInitializationService {
     console.log('[JarvisInit] Initializing Jarvis Personality...');
 
     try {
-      // Load any stored personality data
-      await JarvisPersonality.loadPersonality();
+      // Personality is automatically loaded on first getInstance call
+      // No need to call loadPersonality() explicitly as it's private and called in constructor
       
       const stats = JarvisPersonality.getPersonalityStats();
       console.log(`[JarvisInit] ✅ Personality loaded: ${stats.memoriesStored} memories, ${stats.autonomyLevel}% autonomy`);

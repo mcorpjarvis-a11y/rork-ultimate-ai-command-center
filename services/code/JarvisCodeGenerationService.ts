@@ -1,9 +1,17 @@
-import { generateText, generateObject } from '@rork/toolkit-sdk';
+import { generateText, generateObject } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
+import { documentDirectory, getInfoAsync, readAsStringAsync, writeAsStringAsync } from 'expo-file-system/legacy';
 import { Platform } from 'react-native';
 import React from "react";
+import { FREE_AI_MODELS } from '@/config/api.config';
+
+// Configure Groq as the model provider
+const groq = createOpenAI({
+  baseURL: FREE_AI_MODELS.groq.baseURL,
+  apiKey: FREE_AI_MODELS.groq.apiKey,
+});
 
 export interface CodeGenerationRequest {
   task: string;
@@ -106,12 +114,13 @@ class JarvisCodeGenerationService {
       });
 
       const result = await generateObject({
+        model: groq(FREE_AI_MODELS.groq.models.text['llama-3.1-70b']),
         messages: [{ role: 'user', content: prompt }],
         schema,
       });
 
       console.log('[Jarvis Code] Code generated successfully');
-      return result;
+      return result.object as CodeGenerationResult;
     } catch (error) {
       console.error('[Jarvis Code] Generation failed:', error);
       throw new Error('Failed to generate code');
@@ -166,11 +175,11 @@ Provide the complete implementation.`;
       existingCode = 'Cannot read file on web platform';
     } else {
       try {
-        const fileUri = `${FileSystem.documentDirectory}${filePath}`;
-        const fileExists = await FileSystem.getInfoAsync(fileUri);
+        const fileUri = `${documentDirectory}${filePath}`;
+        const fileExists = await getInfoAsync(fileUri);
         
         if (fileExists.exists) {
-          existingCode = await FileSystem.readAsStringAsync(fileUri);
+          existingCode = await readAsStringAsync(fileUri);
         }
       } catch (error) {
         console.log('[Jarvis Code] Could not read file:', error);
@@ -237,8 +246,8 @@ Provide the complete implementation.`;
     }
 
     try {
-      const fileUri = `${FileSystem.documentDirectory}${modification.filePath}`;
-      await FileSystem.writeAsStringAsync(fileUri, modification.modifiedCode);
+      const fileUri = `${documentDirectory}${modification.filePath}`;
+      await writeAsStringAsync(fileUri, modification.modifiedCode);
       
       modification.applied = true;
       await this.saveModifications();
@@ -429,11 +438,14 @@ Generate a complete implementation including:
 Provide the output as a structured plan with file paths and contents.`;
 
     try {
-      const response = await generateText({ messages: [{ role: 'user', content: prompt }] });
+      const result = await generateText({ 
+        model: groq(FREE_AI_MODELS.groq.models.text['llama-3.1-70b']),
+        messages: [{ role: 'user', content: prompt }] 
+      });
 
       return {
         files: [],
-        documentation: response,
+        documentation: result.text,
       };
     } catch (error) {
       console.error('[Jarvis Code] Failed to generate feature:', error);

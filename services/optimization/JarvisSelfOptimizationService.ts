@@ -1,7 +1,15 @@
-import { generateText } from '@rork/toolkit-sdk';
+import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import JarvisCodeGenerationService from '@/services/code/JarvisCodeGenerationService';
 import JarvisSelfDebugService from '@/services/debug/JarvisSelfDebugService';
+import { FREE_AI_MODELS } from '@/config/api.config';
+
+// Configure Groq as the model provider
+const groq = createOpenAI({
+  baseURL: FREE_AI_MODELS.groq.baseURL,
+  apiKey: FREE_AI_MODELS.groq.apiKey,
+});
 
 export interface OptimizationOpportunity {
   id: string;
@@ -301,7 +309,12 @@ Target State: ${opportunity.proposedState}
 
 Provide a detailed implementation plan with specific actions.`;
 
-      const implementation = await generateText({ messages: [{ role: 'user', content: prompt }] });
+      const aiResult = await generateText({ 
+        model: groq(FREE_AI_MODELS.groq.models.text['llama-3.1-8b']),
+        messages: [{ role: 'user', content: prompt }] 
+      });
+      
+      const implementation = aiResult.text;
 
       console.log('[Jarvis Optimization] Implementation plan:', implementation);
 

@@ -473,7 +473,6 @@ const styles = StyleSheet.create({
     color: IronManTheme.accent,
   },
   createButton: {
-    backgroundColor: `linear-gradient(135deg, ${IronManTheme.primary}, ${IronManTheme.secondary})`,
     backgroundColor: IronManTheme.primary,
     padding: 16,
     borderRadius: 12,

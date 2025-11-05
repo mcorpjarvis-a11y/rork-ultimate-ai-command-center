@@ -39,7 +39,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           tone: z.string().describe('Tone of voice'),
           hashtags: z.array(z.string()).optional().describe('Relevant hashtags'),
         }),
-        execute(input) {
+        execute(input: any) {
           addContentItem(
             `${input.platform} ${input.contentType}`,
             `Generated content about ${input.topic} in ${input.tone} tone`,
@@ -58,8 +58,8 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           topics: z.array(z.string()).describe('Topics to focus on'),
           timeframe: z.string().describe('Time period (24h, 7d, 30d)'),
         }),
-        execute(input) {
-          input.topics.forEach((topic) => {
+        execute(input: any) {
+          input.topics.forEach((topic: any) => {
             addTrend(topic, input.platform, Math.floor(Math.random() * 100000), Math.random(), Math.floor(Math.random() * 100));
           });
           addSystemLog('success', `Analyzed trends for ${input.platform}`, 'AI');
@@ -76,7 +76,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           content: z.string().describe('Post content'),
           scheduledTime: z.string().describe('When to post (ISO 8601 format)'),
         }),
-        execute(input) {
+        execute(input: any) {
           const time = new Date(input.scheduledTime).getTime();
           addScheduledTask(input.title, input.content, time, 'post');
           addSystemLog('success', `Scheduled post for ${input.platform}`, 'Automation');
@@ -92,7 +92,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           platforms: z.array(z.string()).describe('Connected platforms'),
           goals: z.number().describe('Revenue goal'),
         }),
-        execute(input) {
+        execute(input: any) {
           const suggestions = [
             'Enable affiliate marketing on high-traffic posts',
             'Create exclusive content for subscription tier',
@@ -113,7 +113,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           username: z.string().describe('Username/handle'),
           category: z.enum(['social', 'gaming', 'ecommerce', 'video', 'messaging', 'professional', 'other']).describe('Platform category'),
         }),
-        execute(input) {
+        execute(input: any) {
           connectSocialAccount(input.platform, input.username, input.category);
           addSystemLog('success', `Connected ${input.platform}`, 'Integration');
           addInsight(`AI connected ${input.platform} account: ${input.username}`);
@@ -129,7 +129,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           style: z.string().optional().describe('Visual style or theme'),
           dimensions: z.string().optional().describe('Dimensions (e.g., 1080x1080, 1920x1080)'),
         }),
-        execute(input) {
+        execute(input: any) {
           addAITask('image_generation' as any, `Generate ${input.type}: ${input.prompt}`, 'high');
           addSystemLog('info', `Queued ${input.type} generation`, 'AI');
           addInsight(`AI is generating ${input.type} based on: "${input.prompt}"`);
@@ -145,7 +145,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           platform: z.string().describe('Platform name'),
           estimatedAmount: z.number().describe('Estimated monthly revenue'),
         }),
-        execute(input) {
+        execute(input: any) {
           addRevenueStream(input.name, input.type, input.platform, input.estimatedAmount);
           addSystemLog('success', `Created revenue stream: ${input.name}`, 'Monetization');
           addInsight(`AI set up ${input.type} revenue stream on ${input.platform}`);
@@ -162,7 +162,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           topics: z.array(z.string()).describe('Main topics'),
           targetAudience: z.string().describe('Target audience'),
         }),
-        execute(input) {
+        execute(input: any) {
           addPersona(input.name, input.description, input.tone, input.topics, input.targetAudience);
           addSystemLog('success', `Created persona: ${input.name}`, 'AI');
           addInsight(`AI created new persona "${input.name}" targeting ${input.targetAudience}`);
@@ -178,7 +178,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           monthlyRevenue: z.number().optional(),
           conversionRate: z.number().optional(),
         }),
-        execute(input) {
+        execute(input: any) {
           updateMetrics(input);
           addSystemLog('success', 'Updated metrics', 'Analytics');
           return 'Updated metrics successfully';
@@ -192,7 +192,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
           frequency: z.string().describe('How often to run (daily, weekly, etc)'),
           conditions: z.array(z.string()).describe('Conditions to trigger automation'),
         }),
-        execute(input) {
+        execute(input: any) {
           addAITask('optimization' as any, `Automate ${input.taskType} ${input.frequency}`, 'medium');
           addSystemLog('success', `Created automation for ${input.taskType}`, 'Automation');
           addInsight(`AI automated ${input.taskType} to run ${input.frequency}`);
@@ -209,10 +209,10 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
   }, [messages, visible]);
 
   useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
+    const lastMessage: any = messages[messages.length - 1];
     if (lastMessage && lastMessage.role === 'assistant' && autoSpeak && visible) {
       if (lastMessage.parts && Array.isArray(lastMessage.parts)) {
-        const textParts = lastMessage.parts.filter(p => p.type === 'text');
+        const textParts = lastMessage.parts.filter((p: any) => p.type === 'text');
         if (textParts.length > 0) {
           const text = textParts.map((p: any) => p.text).join(' ');
           speakText(text);
@@ -499,7 +499,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
                   </View>
                 </View>
               ) : (
-                messages.map((msg) => (
+                messages.map((msg: any) => (
                   <View
                     key={msg.id}
                     style={[styles.messageCard, msg.role === 'user' ? styles.userMessage : styles.assistantMessage]}
@@ -515,7 +515,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
                       </Text>
                     </View>
                     {msg.parts && Array.isArray(msg.parts) && msg.parts.length > 0 ? (
-                      msg.parts.map((part, i) => {
+                      msg.parts.map((part: any, i: number) => {
                         switch (part.type) {
                           case 'text':
                             return (
