@@ -8,7 +8,7 @@ export const API_CONFIG = {
 export const FREE_AI_MODELS = {
   huggingface: {
     baseURL: 'https://api-inference.huggingface.co/models',
-    apiKey: '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',
+    apiKey: process.env.EXPO_PUBLIC_HF_API_TOKEN || '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',
     models: {
       text: {
         'mistral-7b': 'mistralai/Mistral-7B-Instruct-v0.2',
@@ -30,7 +30,7 @@ export const FREE_AI_MODELS = {
   },
   togetherai: {
     baseURL: 'https://api.together.xyz/v1',
-    apiKey: '',
+    apiKey: process.env.EXPO_PUBLIC_TOGETHER_API_KEY || '',
     models: {
       text: {
         'llama-3.1-70b': 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
@@ -52,7 +52,7 @@ export const FREE_AI_MODELS = {
   },
   deepseek: {
     baseURL: 'https://api.deepseek.com/v1',
-    apiKey: '',
+    apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY || '',
     models: {
       code: {
         'deepseek-coder': 'deepseek-coder',
@@ -64,7 +64,7 @@ export const FREE_AI_MODELS = {
   },
   groq: {
     baseURL: 'https://api.groq.com/openai/v1',
-    apiKey: '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',
+    apiKey: process.env.EXPO_PUBLIC_GROQ_API_KEY || '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',
     models: {
       text: {
         'llama-3.1-70b': 'llama-3.1-70b-versatile',
@@ -78,7 +78,7 @@ export const FREE_AI_MODELS = {
   },
   replicate: {
     baseURL: 'https://api.replicate.com/v1',
-    apiKey: '',
+    apiKey: process.env.EXPO_PUBLIC_REPLICATE_API_KEY || '',
     models: {
       text: {
         'llama-3-70b': 'meta/meta-llama-3-70b-instruct',
@@ -109,7 +109,7 @@ export const AI_CONFIG = {
   gemini: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta',
     model: 'gemini-pro',
-    apiKey: '',
+    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY || '',
     tier: 'free',
   },
   toolkit: {

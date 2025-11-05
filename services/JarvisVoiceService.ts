@@ -15,6 +15,7 @@ export interface VoiceSettings {
 
 class JarvisVoiceService {
   private static instance: JarvisVoiceService;
+  private recording: Audio.Recording | null = null;
   private settings: VoiceSettings = {
     enabled: true,
     voice: 'com.apple.speech.synthesis.voice.daniel',

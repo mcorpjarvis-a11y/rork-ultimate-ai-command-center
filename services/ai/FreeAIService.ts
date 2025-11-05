@@ -511,6 +511,17 @@ class FreeAIService {
 
     throw new Error(`Image generation not implemented for ${provider.name}`);
   }
+
+  /**
+   * Test a specific provider connection
+   * Wrapper around testConnection for easier use
+   */
+  async testProvider(providerId: string): Promise<void> {
+    const result = await this.testConnection(providerId);
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+  }
 }
 
 export default new FreeAIService();
