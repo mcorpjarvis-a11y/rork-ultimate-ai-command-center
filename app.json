@@ -80,7 +80,7 @@
     "name": "Ultimate AI Command Center",
     "slug": "ultimate-ai-command-center",
     "version": "1.0.0",
-    "sdkVersion": "53.0.0",
+    "sdkVersion": "54.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
