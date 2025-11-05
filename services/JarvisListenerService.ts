@@ -110,9 +110,51 @@ class JarvisListenerService {
     }
   }
 
+  private isSTTConfigured(): boolean {
+    const sttURL = AI_CONFIG.toolkit.sttURL;
+    
+    // Check if it's the default placeholder URL
+    if (sttURL.includes('toolkit.jarvis.ai')) {
+      return false;
+    }
+    
+    // Check if it's empty or undefined
+    if (!sttURL || sttURL.trim() === '') {
+      return false;
+    }
+    
+    // Validate it's a proper URL
+    try {
+      new URL(sttURL);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async startContinuousListening(): Promise<void> {
     if (this.continuousMode) {
       console.log('[JarvisListener] Continuous mode already active');
+      return;
+    }
+
+    // Check if on Web platform where we can use Web Speech API
+    if (Platform.OS === 'web') {
+      console.log('[JarvisListener] Starting continuous listening for wake word...');
+      this.continuousMode = true;
+      this.config.continuous = true;
+      
+      await JarvisVoiceService.speak('Continuous listening activated, sir. I will respond when you say Jarvis.');
+      
+      // Start the continuous listening loop
+      this.runContinuousLoop();
+      return;
+    }
+
+    // For native platforms, check if STT is configured
+    if (!this.isSTTConfigured()) {
+      console.warn('[JarvisListener] Continuous listening requires STT endpoint configuration');
+      await JarvisVoiceService.speak('My apologies, sir. Continuous listening requires Speech-to-Text configuration. Please configure EXPO_PUBLIC_STT_URL in your environment.');
       return;
     }
 
@@ -127,6 +169,15 @@ class JarvisListenerService {
   }
 
   private async runContinuousLoop(): Promise<void> {
+    // Check if we should actually run continuous mode
+    const canUseContinuous = Platform.OS === 'web' || this.isSTTConfigured();
+
+    if (!canUseContinuous) {
+      console.warn('[JarvisListener] Cannot run continuous mode without STT configuration');
+      this.continuousMode = false;
+      return;
+    }
+
     while (this.continuousMode && this.config.enabled) {
       try {
         // Don't listen while speaking to avoid self-triggering
@@ -517,8 +568,18 @@ class JarvisListenerService {
     try {
       console.log('[JarvisListener] Transcribing audio...');
 
-      // For Termux environment, use Google Cloud Speech-to-Text API
-      // You can also integrate with other STT services here
+      // Check if STT endpoint is configured and reachable
+      if (!this.isSTTConfigured()) {
+        console.warn('[JarvisListener] STT endpoint not configured. Please set up EXPO_PUBLIC_STT_URL in your .env file.');
+        console.info('[JarvisListener] You can use OpenAI Whisper API, Google Speech-to-Text, or other STT services.');
+        console.info('[JarvisListener] For now, using Web Speech API fallback when available.');
+        return null;
+      }
+
+      const sttURL = AI_CONFIG.toolkit.sttURL;
+
+      // For Termux environment, use configured Speech-to-Text API
+      // This could be Google Cloud Speech API, OpenAI Whisper, or custom endpoint
       const formData = new FormData();
 
       const uriParts = audioUri.split('.');
@@ -532,9 +593,7 @@ class JarvisListenerService {
 
       formData.append('language', this.config.language);
 
-      // TODO: Replace with your actual transcription endpoint
-      // This could be Google Speech API, OpenAI Whisper, or custom endpoint
-      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
+      const response = await fetch(sttURL, {
         method: 'POST',
         body: formData,
         headers: {
@@ -557,6 +616,7 @@ class JarvisListenerService {
       };
     } catch (error) {
       console.error('[JarvisListener] Transcription error:', error);
+      console.info('[JarvisListener] To enable voice transcription, configure a Speech-to-Text service in your .env file.');
       return null;
     }
   }

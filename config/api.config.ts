@@ -8,7 +8,7 @@ export const API_CONFIG = {
 export const FREE_AI_MODELS = {
   huggingface: {
     baseURL: 'https://api-inference.huggingface.co/models',
-    apiKey: process.env.EXPO_PUBLIC_HF_API_TOKEN || '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',
+    apiKey: process.env.EXPO_PUBLIC_HF_API_TOKEN || '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', // Burner key for development - will be removed before production
     models: {
       text: {
         'mistral-7b': 'mistralai/Mistral-7B-Instruct-v0.2',
@@ -64,7 +64,7 @@ export const FREE_AI_MODELS = {
   },
   groq: {
     baseURL: 'https://api.groq.com/openai/v1',
-    apiKey: process.env.EXPO_PUBLIC_GROQ_API_KEY || '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',
+    apiKey: process.env.EXPO_PUBLIC_GROQ_API_KEY || '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', // Burner key for development - will be removed before production
     models: {
       text: {
         'llama-3.1-70b': 'llama-3.1-70b-versatile',
