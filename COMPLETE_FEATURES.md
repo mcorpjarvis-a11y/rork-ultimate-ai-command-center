@@ -33,7 +33,7 @@ Features:
 - ✅ Speech-to-text (voice input)
 - ✅ Text-to-speech (Jarvis voice)
 - ✅ Voice settings (pitch, rate, volume)
-- ✅ Auto-transcription via toolkit.rork.com/stt
+- ✅ Auto-transcription via toolkit.jarvis.ai/stt
 - ✅ Web & mobile compatibility
 - ✅ Recording controls (start/stop)
 - ✅ Voice activation in chat

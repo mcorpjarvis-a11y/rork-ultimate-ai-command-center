@@ -362,7 +362,7 @@ JARVIS automatically uses FREE models first!
 - AsyncStorage (persistence)
 
 **AI Integration:**
-- @rork/toolkit-sdk
+- @jarvis/toolkit
 - AI SDK (@ai-sdk/react)
 - Multiple provider support
 

@@ -359,7 +359,7 @@ expo install expo-av expo-speech
 
 **Test transcription endpoint:**
 ```bash
-curl -X POST https://toolkit.rork.com/stt/transcribe/ \
+curl -X POST https://toolkit.jarvis.ai/stt/transcribe/ \
   -F "audio=@test.m4a" \
   -F "language=en-US"
 ```

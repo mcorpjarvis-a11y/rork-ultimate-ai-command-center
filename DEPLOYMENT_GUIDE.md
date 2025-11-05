@@ -315,7 +315,7 @@ Onboarding only shows once. To see it again:
 - **Framework**: React Native (Expo SDK 53)
 - **Router**: Expo Router (file-based)
 - **State**: @nkzw/create-context-hook + AsyncStorage
-- **AI**: Rork Toolkit SDK (@rork/toolkit-sdk)
+- **AI**: Rork Toolkit SDK (@jarvis/toolkit)
 - **Voice**: expo-speech + expo-av
 - **Storage**: expo-file-system + expo-media-library
 - **Theme**: Custom Iron Man colors

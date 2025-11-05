@@ -250,7 +250,7 @@ The entire redesign follows these principles:
 - `app/index.tsx` - Integration of new components
 
 ### Dependencies Used:
-- `@rork/toolkit-sdk` - AI agent functionality
+- `@jarvis/toolkit` - AI agent functionality
 - `expo-speech` - Text-to-speech
 - `expo-av` - Audio recording
 - `@react-native-async-storage/async-storage` - Settings persistence

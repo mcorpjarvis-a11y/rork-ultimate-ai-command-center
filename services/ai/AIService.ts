@@ -1,6 +1,6 @@
 import { generateObject, generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
-import { createRorkTool, useRorkAgent } from "@rork/toolkit-sdk";
+import { createJarvisTool, useJarvisAgent } from "@jarvis/toolkit";
 import { AI_CONFIG, FREE_AI_MODELS } from '@/config/api.config';
 import APIClient from '@/services/core/APIClient';
 import CacheManager from '@/services/storage/CacheManager';

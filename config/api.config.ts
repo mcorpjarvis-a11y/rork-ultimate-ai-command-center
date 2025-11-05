@@ -113,10 +113,11 @@ export const AI_CONFIG = {
     tier: 'free',
   },
   toolkit: {
-    chatURL: new URL("/agent/chat", process.env["EXPO_PUBLIC_TOOLKIT_URL"] || 'https://toolkit.rork.com').toString(),
-    imageGenURL: 'https://toolkit.rork.com/images/generate/',
-    imageEditURL: 'https://toolkit.rork.com/images/edit/',
-    sttURL: 'https://toolkit.rork.com/stt/transcribe/',
+    chatURL: process.env["EXPO_PUBLIC_TOOLKIT_URL"] ? new URL("/agent/chat", process.env["EXPO_PUBLIC_TOOLKIT_URL"]).toString() : 'https://toolkit.jarvis.ai/agent/chat',
+    imageGenURL: process.env["EXPO_PUBLIC_IMAGE_GEN_URL"] || 'https://toolkit.jarvis.ai/images/generate/',
+    imageEditURL: process.env["EXPO_PUBLIC_IMAGE_EDIT_URL"] || 'https://toolkit.jarvis.ai/images/edit/',
+    sttURL: process.env["EXPO_PUBLIC_STT_URL"] || 'https://toolkit.jarvis.ai/stt/transcribe/',
+    ttsURL: process.env["EXPO_PUBLIC_TTS_URL"] || 'https://toolkit.jarvis.ai/tts/synthesize/',
   },
 };
 

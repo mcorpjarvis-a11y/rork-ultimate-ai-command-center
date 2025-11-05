@@ -1,6 +1,7 @@
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import { Platform } from 'react-native';
+import { AI_CONFIG } from '@/config/api.config';
 
 export interface VoiceSettings {
   enabled: boolean;
@@ -179,7 +180,7 @@ class VoiceService {
 
       formData.append('language', this.settings.language);
 
-      const response = await fetch('https://toolkit.rork.com/stt/transcribe/', {
+      const response = await fetch(AI_CONFIG.toolkit.sttURL, {
         method: 'POST',
         body: formData,
       });

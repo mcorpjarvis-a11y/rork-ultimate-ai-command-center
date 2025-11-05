@@ -71,7 +71,7 @@ class CodebaseAnalysisService {
         path: 'components/EnhancedAIAssistantModal.tsx',
         type: 'component',
         description: 'Advanced AI assistant (JARVIS) with voice, chat, and autonomous capabilities',
-        dependencies: ['useRorkAgent', 'createRorkTool', 'Speech', 'Audio', 'AppContext'],
+        dependencies: ['useJarvisAgent', 'createJarvisTool', 'Speech', 'Audio', 'AppContext'],
         exports: ['EnhancedAIAssistantModal'],
         linesOfCode: 1342,
         complexity: 'high',
