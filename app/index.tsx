@@ -29,6 +29,11 @@ import CloudStorage from '@/components/pages/CloudStorage';
 import Security from '@/components/pages/Security';
 import IoTDevices from '@/components/pages/IoTDevices';
 import CodeModifications from '@/components/pages/CodeModifications';
+import EmailMarketing from '@/components/pages/EmailMarketing';
+import CompetitorRadar from '@/components/pages/CompetitorRadar';
+import CollabFinder from '@/components/pages/CollabFinder';
+import BrandMarketplace from '@/components/pages/BrandMarketplace';
+import SmartVideoEditor from '@/components/pages/SmartVideoEditor';
 import FloatingButtons from '@/components/FloatingButtons';
 import EnhancedAIAssistantModal from '@/components/EnhancedAIAssistantModal';
 import { JarvisOnboarding } from '@/components/JarvisOnboarding';
@@ -114,6 +119,11 @@ export default function Index() {
       'tools-security': { title: 'AI Influencer', section: 'Tools / Security' },
       'tools-iot-devices': { title: 'AI Influencer', section: 'Tools / IoT Devices' },
       'tools-code-modifications': { title: 'AI Influencer', section: 'Tools / Code Modifications' },
+      'growth-email-marketing': { title: 'AI Influencer', section: 'Growth / Email Marketing' },
+      'growth-competitor-radar': { title: 'AI Influencer', section: 'Growth / Competitor Radar' },
+      'growth-collab-finder': { title: 'AI Influencer', section: 'Growth / Collab Finder' },
+      'growth-brand-marketplace': { title: 'AI Influencer', section: 'Growth / Brand Marketplace' },
+      'ai-video-editor': { title: 'AI Influencer', section: 'AI Modules / Smart Video Editor' },
     };
 
     const info = pageMap[currentPage] || { title: 'AI Influencer', section: 'Dashboard' };
@@ -170,6 +180,16 @@ export default function Index() {
         return <IoTDevices />;
       case 'tools-code-modifications':
         return <CodeModifications />;
+      case 'growth-email-marketing':
+        return <EmailMarketing />;
+      case 'growth-competitor-radar':
+        return <CompetitorRadar />;
+      case 'growth-collab-finder':
+        return <CollabFinder />;
+      case 'growth-brand-marketplace':
+        return <BrandMarketplace />;
+      case 'ai-video-editor':
+        return <SmartVideoEditor />;
       default:
         return <OverviewDashboard />;
     }
