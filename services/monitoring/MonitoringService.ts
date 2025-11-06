@@ -223,6 +223,19 @@ class MonitoringService {
 
     return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
   }
+
+  // Monitoring lifecycle methods
+  startMonitoring(): void {
+    console.log('[MonitoringService] Monitoring started');
+    this.info('Monitoring', 'System monitoring started');
+    // Future: Add performance monitoring, error tracking, etc.
+  }
+
+  stopMonitoring(): void {
+    console.log('[MonitoringService] Monitoring stopped');
+    this.info('Monitoring', 'System monitoring stopped');
+    this.saveLogs();
+  }
 }
 
 export default new MonitoringService();
