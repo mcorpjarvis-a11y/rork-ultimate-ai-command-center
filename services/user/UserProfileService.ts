@@ -18,6 +18,7 @@ export interface UserProfile {
   createdAt: number;
   lastLogin: number;
   setupCompleted: boolean;
+  isGuestUser?: boolean;
 }
 
 /**
@@ -28,6 +29,29 @@ export interface UserProfile {
 class UserProfileService {
   private currentProfile: UserProfile | null = null;
   private readonly PROFILE_KEY = 'user_profile';
+
+  /**
+   * Create a guest profile for testing without authentication
+   */
+  async createGuestProfile(): Promise<UserProfile> {
+    const guestId = `guest-${Date.now()}`;
+    const profile: UserProfile = {
+      userId: guestId,
+      email: 'guest@localhost',
+      name: 'Guest User',
+      apiKeys: {},
+      createdAt: Date.now(),
+      lastLogin: Date.now(),
+      setupCompleted: false,
+      isGuestUser: true,
+    };
+
+    await this.saveProfile(profile);
+    this.currentProfile = profile;
+    
+    console.log('[UserProfileService] Created guest profile for testing');
+    return profile;
+  }
 
   /**
    * Create a new user profile from Google user data
