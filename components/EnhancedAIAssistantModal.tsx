@@ -1841,7 +1841,6 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
       <View style={styles.modalOverlay}>
         <KeyboardAvoidingView 
           style={styles.modalContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={0}
         >
           <View style={[styles.modalContent, { paddingTop: insets.top + 16, paddingBottom: insets.bottom }]}>

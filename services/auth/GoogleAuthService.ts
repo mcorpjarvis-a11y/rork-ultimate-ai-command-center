@@ -7,7 +7,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 const GOOGLE_CLIENT_IDS = {
   android: '623163723625-f8vjcngl8qvpupeqn3cb0l9vn1u9d09t.apps.googleusercontent.com',
-  ios: '623163723625-f8vjcngl8qvpupeqn3cb0l9vn1u9d09t.apps.googleusercontent.com',
   web: '623163723625-f8vjcngl8qvpupeqn3cb0l9vn1u9d09t.apps.googleusercontent.com',
 };
 
@@ -35,8 +34,6 @@ class GoogleAuthService {
   private getClientId(): string {
     if (Platform.OS === 'android') {
       return GOOGLE_CLIENT_IDS.android;
-    } else if (Platform.OS === 'ios') {
-      return GOOGLE_CLIENT_IDS.ios;
     } else {
       return GOOGLE_CLIENT_IDS.web;
     }

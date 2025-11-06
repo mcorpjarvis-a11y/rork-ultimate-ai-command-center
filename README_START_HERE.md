@@ -125,7 +125,6 @@ npm run start-web
 ### Mobile
 ```bash
 npm run android    # Run on Android
-npm run ios        # Run on iOS
 ```
 
 ---

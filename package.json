@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
+    "prestart": "node scripts/prevent-ios.js",
     "start": "expo start --tunnel",
     "start:all": "node scripts/start-all.js",
     "start:backend": "tsx backend/server.express.ts",
@@ -16,7 +17,7 @@
     "test:expo-go": "node scripts/test-expo-go.js",
     "lint": "expo lint",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "build:apk": "expo run:android --variant release"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.62",
