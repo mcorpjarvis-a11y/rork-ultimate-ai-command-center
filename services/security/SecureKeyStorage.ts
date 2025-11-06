@@ -15,6 +15,8 @@ export interface SecureKeyOptions {
 class SecureKeyStorage {
   private readonly prefix: string = '@jarvis:secure:';
   private readonly isSecureStoreAvailable: boolean;
+  private readonly MAX_RETRIES = 3;
+  private readonly RETRY_BASE_DELAY_MS = 100;
 
   constructor() {
     // SecureStore is only available on native platforms
@@ -33,7 +35,7 @@ class SecureKeyStorage {
       const fullKey = this.buildKey(key, options.userId);
       
       // Validate data size (SecureStore has ~2KB limit)
-      const sizeInBytes = new Blob([value]).size;
+      const sizeInBytes = new TextEncoder().encode(value).length;
       const maxSize = 2048; // 2KB limit
       
       if (sizeInBytes > maxSize) {
@@ -54,15 +56,15 @@ class SecureKeyStorage {
         
         // Retry logic with exponential backoff
         let lastError: Error | null = null;
-        for (let attempt = 0; attempt < 3; attempt++) {
+        for (let attempt = 0; attempt < this.MAX_RETRIES; attempt++) {
           try {
             await SecureStore.setItemAsync(fullKey, value, secureOptions);
             console.log(`[SecureKeyStorage] Saved ${key} securely (${sizeInBytes} bytes)`);
             return;
           } catch (error) {
             lastError = error as Error;
-            if (attempt < 2) {
-              const delay = Math.pow(2, attempt) * 100; // 100ms, 200ms
+            if (attempt < this.MAX_RETRIES - 1) {
+              const delay = Math.pow(2, attempt) * this.RETRY_BASE_DELAY_MS;
               await new Promise(resolve => setTimeout(resolve, delay));
             }
           }

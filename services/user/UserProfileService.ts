@@ -185,10 +185,11 @@ class UserProfileService {
         if (profile.isGuestUser) {
           console.warn('[UserProfileService] Guest profile save failed, continuing anyway:', storageError);
           // For guest users, don't throw - they can work in-memory only
-          return;
+          // Continue to try saving API keys below
+        } else {
+          // For real users, this is a critical error
+          throw storageError;
         }
-        // For real users, this is a critical error
-        throw storageError;
       }
 
       // Save each API key separately in secure storage
