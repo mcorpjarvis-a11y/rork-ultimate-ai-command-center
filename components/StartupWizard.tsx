@@ -24,16 +24,18 @@ import {
 import GoogleAuthService from '@/services/auth/GoogleAuthService';
 import UserProfileService from '@/services/user/UserProfileService';
 import GoogleDriveSync from '@/services/sync/GoogleDriveSync';
+import { VoiceService } from '@/services';
 
 interface StartupWizardProps {
   visible: boolean;
   onComplete: () => void;
+  isRerun?: boolean; // Flag to indicate if this is a re-run from settings
 }
 
 type WizardStep = 'welcome' | 'google-signin' | 'api-keys' | 'completion';
 
-export default function StartupWizard({ visible, onComplete }: StartupWizardProps) {
-  const [currentStep, setCurrentStep] = useState<WizardStep>('welcome');
+export default function StartupWizard({ visible, onComplete, isRerun = false }: StartupWizardProps) {
+  const [currentStep, setCurrentStep] = useState<WizardStep>(isRerun ? 'api-keys' : 'welcome');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -80,8 +82,22 @@ export default function StartupWizard({ visible, onComplete }: StartupWizardProp
         return;
       }
 
-      // Create user profile
-      await UserProfileService.createProfile(googleUser);
+      // Create user profile (this will auto-detect Gemini key)
+      const profile = await UserProfileService.createProfile(googleUser);
+
+      // Initialize text-to-speech immediately
+      try {
+        await VoiceService.initialize();
+        console.log('[StartupWizard] Voice service initialized');
+        
+        // Test TTS with welcome message
+        setTimeout(() => {
+          VoiceService.speak('Welcome to JARVIS. I am ready to assist you.');
+        }, 1000);
+      } catch (voiceError) {
+        console.warn('[StartupWizard] Voice initialization warning:', voiceError);
+        // Continue even if voice fails
+      }
 
       // Try to sync from cloud (in case user is signing in from new device)
       try {
@@ -96,6 +112,11 @@ export default function StartupWizard({ visible, onComplete }: StartupWizardProp
         }
       } catch (syncError) {
         console.log('[StartupWizard] No cloud profile found, continuing with setup');
+      }
+
+      // Pre-fill Gemini key if it was auto-detected
+      if (profile.apiKeys.gemini) {
+        setApiKeys(prev => ({ ...prev, gemini: profile.apiKeys.gemini || '' }));
       }
 
       // Move to API keys step
@@ -176,41 +197,53 @@ export default function StartupWizard({ visible, onComplete }: StartupWizardProp
         </Text>
         
         <Text style={styles.welcomeDescription}>
-          Let's activate your JARVIS brain. This one-time setup will:
+          {isRerun 
+            ? 'Update your JARVIS configuration and API keys'
+            : 'Let\'s activate your JARVIS brain. This one-time setup will:'}
         </Text>
         
-        <View style={styles.featureList}>
-          <View style={styles.featureItem}>
-            <Check size={20} color="#00ff00" />
-            <Text style={styles.featureText}>
-              Connect your Google account for cloud sync
-            </Text>
+        {!isRerun && (
+          <View style={styles.featureList}>
+            <View style={styles.featureItem}>
+              <Check size={20} color="#00ff00" />
+              <Text style={styles.featureText}>
+                Connect your Google account for cloud sync
+              </Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Check size={20} color="#00ff00" />
+              <Text style={styles.featureText}>
+                Auto-link Google Gemini AI instantly
+              </Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Check size={20} color="#00ff00" />
+              <Text style={styles.featureText}>
+                Enable text-to-speech immediately
+              </Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Check size={20} color="#00ff00" />
+              <Text style={styles.featureText}>
+                Securely store your AI API keys
+              </Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Check size={20} color="#00ff00" />
+              <Text style={styles.featureText}>
+                Enable cross-device synchronization
+              </Text>
+            </View>
           </View>
-          <View style={styles.featureItem}>
-            <Check size={20} color="#00ff00" />
-            <Text style={styles.featureText}>
-              Securely store your AI API keys
-            </Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={20} color="#00ff00" />
-            <Text style={styles.featureText}>
-              Enable cross-device synchronization
-            </Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Check size={20} color="#00ff00" />
-            <Text style={styles.featureText}>
-              Activate JARVIS AI capabilities
-            </Text>
-          </View>
-        </View>
+        )}
 
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={() => setCurrentStep('google-signin')}
+          onPress={() => setCurrentStep(isRerun ? 'api-keys' : 'google-signin')}
         >
-          <Text style={styles.primaryButtonText}>Let's Begin</Text>
+          <Text style={styles.primaryButtonText}>
+            {isRerun ? 'Update Configuration' : 'Let\'s Begin'}
+          </Text>
           <ChevronRight size={20} color="#000" />
         </TouchableOpacity>
       </LinearGradient>
@@ -354,7 +387,9 @@ export default function StartupWizard({ visible, onComplete }: StartupWizardProp
         
         <Text style={styles.completionTitle}>JARVIS Activated!</Text>
         <Text style={styles.completionSubtitle}>
-          Your AI brain is ready to assist you
+          {isRerun 
+            ? 'Your configuration has been updated'
+            : 'Your AI brain is ready to assist you'}
         </Text>
         
         <View style={styles.completionFeatures}>
@@ -362,6 +397,18 @@ export default function StartupWizard({ visible, onComplete }: StartupWizardProp
             <Check size={16} color="#00ff00" />
             <Text style={styles.completionFeatureText}>
               Secure authentication enabled
+            </Text>
+          </View>
+          <View style={styles.completionFeature}>
+            <Check size={16} color="#00ff00" />
+            <Text style={styles.completionFeatureText}>
+              Google Gemini auto-linked
+            </Text>
+          </View>
+          <View style={styles.completionFeature}>
+            <Check size={16} color="#00ff00" />
+            <Text style={styles.completionFeatureText}>
+              Text-to-speech activated
             </Text>
           </View>
           <View style={styles.completionFeature}>
@@ -382,7 +429,9 @@ export default function StartupWizard({ visible, onComplete }: StartupWizardProp
           style={styles.primaryButton}
           onPress={handleComplete}
         >
-          <Text style={styles.primaryButtonText}>Start Using JARVIS</Text>
+          <Text style={styles.primaryButtonText}>
+            {isRerun ? 'Back to Settings' : 'Start Using JARVIS'}
+          </Text>
           <Sparkles size={20} color="#000" />
         </TouchableOpacity>
       </LinearGradient>

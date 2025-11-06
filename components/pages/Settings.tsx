@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import {
   User,
@@ -18,10 +19,12 @@ import {
   Shield,
   Trash2,
   Settings as SettingsIcon,
+  Wand2,
 } from 'lucide-react-native';
 import GoogleAuthService from '@/services/auth/GoogleAuthService';
 import UserProfileService, { UserProfile } from '@/services/user/UserProfileService';
 import GoogleDriveSync from '@/services/sync/GoogleDriveSync';
+import StartupWizard from '@/components/StartupWizard';
 
 export default function Settings() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -29,6 +32,7 @@ export default function Settings() {
   const [syncing, setSyncing] = useState(false);
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [keyValue, setKeyValue] = useState('');
+  const [showWizard, setShowWizard] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -37,6 +41,16 @@ export default function Settings() {
   const loadProfile = async () => {
     const currentProfile = UserProfileService.getCurrentProfile();
     setProfile(currentProfile);
+  };
+
+  const handleRerunWizard = () => {
+    setShowWizard(true);
+  };
+
+  const handleWizardComplete = async () => {
+    setShowWizard(false);
+    await loadProfile();
+    Alert.alert('Success', 'Configuration updated successfully');
   };
 
   const handleSync = async () => {
@@ -170,46 +184,65 @@ export default function Settings() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <User size={24} color="#00f2ff" />
-            <View style={styles.cardHeaderText}>
-              <Text style={styles.cardTitle}>{profile.name}</Text>
-              <Text style={styles.cardSubtitle}>{profile.email}</Text>
+    <>
+      <ScrollView style={styles.container}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <User size={24} color="#00f2ff" />
+              <View style={styles.cardHeaderText}>
+                <Text style={styles.cardTitle}>{profile.name}</Text>
+                <Text style={styles.cardSubtitle}>{profile.email}</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Cloud Sync</Text>
-        
-        <View style={styles.card}>
-          <View style={styles.syncStatus}>
-            <Cloud size={20} color="#00f2ff" />
-            <Text style={styles.syncStatusText}>{getSyncStatus()}</Text>
-          </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
           
           <TouchableOpacity
-            style={[styles.button, syncing && styles.buttonDisabled]}
-            onPress={handleSync}
-            disabled={syncing}
+            style={styles.actionButton}
+            onPress={handleRerunWizard}
           >
-            {syncing ? (
-              <ActivityIndicator size="small" color="#000" />
-            ) : (
-              <>
-                <RefreshCw size={18} color="#000" />
-                <Text style={styles.buttonText}>Sync Now</Text>
-              </>
-            )}
+            <Wand2 size={18} color="#00f2ff" />
+            <Text style={[styles.actionButtonText, styles.primaryActionText]}>
+              Run Setup Wizard
+            </Text>
           </TouchableOpacity>
+          
+          <Text style={styles.helpText}>
+            💡 Use this to update your API keys or reconfigure JARVIS at any time
+          </Text>
         </View>
-      </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Cloud Sync</Text>
+          
+          <View style={styles.card}>
+            <View style={styles.syncStatus}>
+              <Cloud size={20} color="#00f2ff" />
+              <Text style={styles.syncStatusText}>{getSyncStatus()}</Text>
+            </View>
+            
+            <TouchableOpacity
+              style={[styles.button, syncing && styles.buttonDisabled]}
+              onPress={handleSync}
+              disabled={syncing}
+            >
+              {syncing ? (
+                <ActivityIndicator size="small" color="#000" />
+              ) : (
+                <>
+                  <RefreshCw size={18} color="#000" />
+                  <Text style={styles.buttonText}>Sync Now</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>API Keys</Text>
@@ -322,6 +355,19 @@ export default function Settings() {
         </Text>
       </View>
     </ScrollView>
+
+    <Modal
+      visible={showWizard}
+      animationType="slide"
+      presentationStyle="fullScreen"
+    >
+      <StartupWizard 
+        visible={showWizard} 
+        onComplete={handleWizardComplete}
+        isRerun={true}
+      />
+    </Modal>
+  </>
   );
 }
 
@@ -506,6 +552,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '600',
+  },
+  primaryActionText: {
+    color: '#00f2ff',
+  },
+  helpText: {
+    color: '#888',
+    fontSize: 12,
+    marginTop: 8,
+    fontStyle: 'italic',
   },
   dangerButton: {
     borderColor: '#ff4444',

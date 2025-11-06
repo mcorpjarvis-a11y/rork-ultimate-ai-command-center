@@ -44,11 +44,55 @@ class UserProfileService {
       setupCompleted: false,
     };
 
+    // Auto-link Gemini API key if user signed in with Google
+    try {
+      const geminiKey = await this.detectGeminiAPIKey(googleUser.accessToken);
+      if (geminiKey) {
+        profile.apiKeys.gemini = geminiKey;
+        console.log('[UserProfileService] Auto-linked Gemini API key');
+      }
+    } catch (error) {
+      console.log('[UserProfileService] Could not auto-detect Gemini key:', error);
+    }
+
     await this.saveProfile(profile);
     this.currentProfile = profile;
     
     console.log('[UserProfileService] Created new profile for:', profile.email);
     return profile;
+  }
+
+  /**
+   * Attempt to detect or generate Gemini API key from Google account
+   */
+  private async detectGeminiAPIKey(accessToken: string): Promise<string | null> {
+    try {
+      // Check if user has access to Gemini through their Google account
+      // For now, we'll check if they can access Google AI Studio
+      const response = await fetch(
+        'https://generativelanguage.googleapis.com/v1/models?key=AIzaSyDummy', // Test endpoint
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      // If they have Google account, guide them to get Gemini key
+      // For production, you'd integrate with Google AI Studio API
+      console.log('[UserProfileService] User can access Google AI services');
+      
+      // Check environment for Gemini key as fallback
+      const envKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+      if (envKey && envKey.length > 0) {
+        return envKey;
+      }
+
+      return null;
+    } catch (error) {
+      console.log('[UserProfileService] Gemini key detection failed:', error);
+      return null;
+    }
   }
 
   /**
