@@ -728,6 +728,41 @@ class PlugAndPlayService {
 
     return steps;
   }
+
+  // =============== BACKEND CONNECTIVITY ===============
+
+  async checkBackendConnection(): Promise<boolean> {
+    try {
+      const response = await fetch(`${FREE_AI_MODELS.backend.url}/api/system/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      });
+      
+      const isHealthy = response.ok;
+      console.log(`[PlugAndPlay] Backend connectivity: ${isHealthy ? 'CONNECTED ✓' : 'OFFLINE ✗'}`);
+      return isHealthy;
+    } catch (error) {
+      console.warn('[PlugAndPlay] Backend offline - using fallback mode');
+      return false;
+    }
+  }
+
+  async initialize(): Promise<void> {
+    try {
+      const connected = await this.checkBackendConnection();
+      if (connected) {
+        console.log('[PlugAndPlay] Backend connected ✓ - Full features available');
+      } else {
+        console.warn('[PlugAndPlay] Backend offline - Operating in fallback mode');
+        console.warn('[PlugAndPlay] Some features may use mock data until backend is available');
+      }
+    } catch (error) {
+      console.error('[PlugAndPlay] Initialization error:', error);
+    }
+  }
 }
 
 export default PlugAndPlayService.getInstance();

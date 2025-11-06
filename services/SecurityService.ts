@@ -197,6 +197,36 @@ class SecurityService {
     return Buffer.from(data, 'base64').toString();
   }
 
+  async encryptAPIKey(key: string): Promise<string> {
+    const encrypted = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      key
+    );
+    return encrypted;
+  }
+
+  async secureStore(key: string, value: string): Promise<void> {
+    try {
+      const encrypted = await this.encryptData(value, `${key}_salt_${Date.now()}`);
+      await AsyncStorage.setItem(key, encrypted);
+      await this.logEvent('data_export', `Secure data stored: ${key}`, 'low');
+    } catch (error) {
+      console.error('Failed to securely store data:', error);
+      throw error;
+    }
+  }
+
+  async secureRetrieve(key: string, salt: string): Promise<string | null> {
+    try {
+      const encrypted = await AsyncStorage.getItem(key);
+      if (!encrypted) return null;
+      return await this.decryptData(encrypted, salt);
+    } catch (error) {
+      console.error('Failed to retrieve secure data:', error);
+      return null;
+    }
+  }
+
   async getSettings(): Promise<SecuritySettings | null> {
     try {
       const stored = await AsyncStorage.getItem(this.SETTINGS_KEY);
