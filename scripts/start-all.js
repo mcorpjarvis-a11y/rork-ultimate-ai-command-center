@@ -70,7 +70,7 @@ setTimeout(() => {
   
   const frontend = spawn(
     isWindows ? 'npx.cmd' : 'npx',
-    ['expo', 'start', '--tunnel'],
+    ['expo', 'start'],
     { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
   );
 
