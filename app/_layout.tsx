@@ -7,7 +7,15 @@ import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { trpc, trpcClient } from "@/lib/trpc";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import JarvisInitializationService from "@/services/JarvisInitializationService";
-import { SchedulerService, WebSocketService, MonitoringService, PlugAndPlayService } from "@/services";
+import { 
+  SchedulerService, 
+  WebSocketService, 
+  MonitoringService, 
+  PlugAndPlayService,
+  JarvisVoiceService,
+  JarvisListenerService,
+  VoiceService
+} from "@/services";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -33,6 +41,16 @@ export default function RootLayout() {
         
         // Initialize backend connectivity
         await PlugAndPlayService.initialize();
+        
+        // Initialize speech services
+        await VoiceService.initialize();
+        console.log('[App] VoiceService initialized');
+        
+        // JarvisVoiceService and JarvisListenerService auto-initialize in their constructors
+        // Just access them to ensure they're loaded
+        JarvisVoiceService;
+        JarvisListenerService;
+        console.log('[App] Speech services initialized');
         
         // Start scheduler for automated tasks
         SchedulerService.start();
