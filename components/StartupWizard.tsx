@@ -8,7 +8,6 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  Platform,
   Switch,
   Linking,
 } from 'react-native';
@@ -148,7 +147,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
             return;
           }
         }
-      } catch (syncError) {
+      } catch {
         console.log('[StartupWizard] No cloud profile found, continuing with setup');
       }
 
@@ -180,6 +179,39 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
     }
   };
 
+  const handleSkipSignIn = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Create guest profile for testing
+      await UserProfileService.createGuestProfile();
+      console.log('[StartupWizard] Created guest profile, skipping to voice preferences');
+
+      // Initialize text-to-speech
+      try {
+        await VoiceService.initialize();
+        console.log('[StartupWizard] Voice service initialized');
+        
+        // Welcome guest user
+        setTimeout(() => {
+          VoiceService.speak('Welcome Guest User. You can test JARVIS without signing in.');
+        }, 1000);
+      } catch (voiceError) {
+        console.warn('[StartupWizard] Voice initialization warning:', voiceError);
+        // Continue even if voice fails
+      }
+
+      // Skip API keys step and go directly to voice preferences
+      setCurrentStep('voice-preferences');
+    } catch (err) {
+      console.error('[StartupWizard] Skip sign-in error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to create guest profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSaveAPIKeys = async () => {
     try {
       setLoading(true);
@@ -194,9 +226,8 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
         setCurrentStep('voice-preferences');
         return;
       }
-
       // Save API keys to profile
-      const keysToSave: any = {};
+      const keysToSave: Record<string, string> = {};
       for (const [service, key] of Object.entries(apiKeys)) {
         if (key.trim()) {
           keysToSave[service] = key.trim();
@@ -253,12 +284,17 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       // Mark setup as complete
       await UserProfileService.markSetupComplete();
 
-      // Sync to cloud
-      try {
-        await GoogleDriveSync.uploadProfile();
-        console.log('[StartupWizard] Profile synced to cloud');
-      } catch (syncError) {
-        console.warn('[StartupWizard] Cloud sync failed, but setup is complete:', syncError);
+      // Sync to cloud only if not a guest user
+      const profile = UserProfileService.getCurrentProfile();
+      if (profile && !profile.isGuestUser) {
+        try {
+          await GoogleDriveSync.uploadProfile();
+          console.log('[StartupWizard] Profile synced to cloud');
+        } catch (syncError) {
+          console.warn('[StartupWizard] Cloud sync failed, but setup is complete:', syncError);
+        }
+      } else {
+        console.log('[StartupWizard] Guest user - skipping cloud sync');
       }
 
       setCurrentStep('completion');
@@ -275,12 +311,17 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       // Mark setup as complete even if voice is skipped
       await UserProfileService.markSetupComplete();
 
-      // Sync to cloud
-      try {
-        await GoogleDriveSync.uploadProfile();
-        console.log('[StartupWizard] Profile synced to cloud');
-      } catch (syncError) {
-        console.warn('[StartupWizard] Cloud sync failed, but setup is complete:', syncError);
+      // Sync to cloud only if not a guest user
+      const profile = UserProfileService.getCurrentProfile();
+      if (profile && !profile.isGuestUser) {
+        try {
+          await GoogleDriveSync.uploadProfile();
+          console.log('[StartupWizard] Profile synced to cloud');
+        } catch (syncError) {
+          console.warn('[StartupWizard] Cloud sync failed, but setup is complete:', syncError);
+        }
+      } else {
+        console.log('[StartupWizard] Guest user - skipping cloud sync');
       }
 
       setCurrentStep('completion');
@@ -385,6 +426,13 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
         </View>
       </View>
 
+      <View style={styles.infoBox}>
+        <AlertCircle size={16} color="#00f2ff" />
+        <Text style={styles.infoText}>
+          💡 You can skip sign-in to test the app. Sign in later to enable cloud sync and backup.
+        </Text>
+      </View>
+
       {error && (
         <View style={styles.errorContainer}>
           <AlertCircle size={16} color="#ff4444" />
@@ -405,6 +453,14 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
             <ChevronRight size={20} color="#000" />
           </>
         )}
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.secondaryButton, styles.skipButton, loading && styles.buttonDisabled]}
+        onPress={handleSkipSignIn}
+        disabled={loading}
+      >
+        <Text style={styles.secondaryButtonText}>Skip for Now - Test Without Account</Text>
       </TouchableOpacity>
 
       <Text style={styles.privacyNote}>
@@ -539,7 +595,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
               <Text style={styles.voiceCardTitle}>Wake Word</Text>
             </View>
             <Text style={styles.voiceCardDescription}>
-              Say this word to activate voice listening (lowercase only, default: "{DEFAULT_WAKE_WORD}")
+              Say this word to activate voice listening (lowercase only, default: &quot;{DEFAULT_WAKE_WORD}&quot;)
             </Text>
             <TextInput
               style={styles.voiceInput}
@@ -619,62 +675,80 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
     </ScrollView>
   );
 
-  const renderCompletionStep = () => (
-    <View style={styles.stepContainer}>
-      <LinearGradient
-        colors={['#1a1a1a', '#0a0a0a']}
-        style={styles.completionGradient}
-      >
-        <CheckCircle size={64} color="#00ff00" style={styles.completionIcon} />
-        
-        <Text style={styles.completionTitle}>JARVIS Activated!</Text>
-        <Text style={styles.completionSubtitle}>
-          {isRerun 
-            ? 'Your configuration has been updated'
-            : 'Your AI brain is ready to assist you'}
-        </Text>
-        
-        <View style={styles.completionFeatures}>
-          <View style={styles.completionFeature}>
-            <Check size={16} color="#00ff00" />
-            <Text style={styles.completionFeatureText}>
-              Secure authentication enabled
-            </Text>
-          </View>
-          {Object.values(apiKeys).some(key => key.trim().length > 0) && (
-            <View style={styles.completionFeature}>
-              <Check size={16} color="#00ff00" />
-              <Text style={styles.completionFeatureText}>
-                {Object.entries(apiKeys).filter(([_, key]) => key.trim().length > 0).length} API key(s) configured
+  const renderCompletionStep = () => {
+    const profile = UserProfileService.getCurrentProfile();
+    const isGuest = profile?.isGuestUser || false;
+
+    return (
+      <View style={styles.stepContainer}>
+        <LinearGradient
+          colors={['#1a1a1a', '#0a0a0a']}
+          style={styles.completionGradient}
+        >
+          <CheckCircle size={64} color="#00ff00" style={styles.completionIcon} />
+          
+          <Text style={styles.completionTitle}>JARVIS Activated!</Text>
+          <Text style={styles.completionSubtitle}>
+            {isRerun 
+              ? 'Your configuration has been updated'
+              : isGuest
+              ? 'Testing mode is ready - Sign in later for full features'
+              : 'Your AI brain is ready to assist you'}
+          </Text>
+          
+          {isGuest && (
+            <View style={styles.infoBox}>
+              <AlertCircle size={16} color="#00f2ff" />
+              <Text style={styles.infoText}>
+                🔒 You&apos;re in guest mode. Sign in from Settings to enable cloud sync and backup.
               </Text>
             </View>
           )}
-          <View style={styles.completionFeature}>
-            <Check size={16} color="#00ff00" />
-            <Text style={styles.completionFeatureText}>
-              {voiceEnabled ? `Voice assistant enabled (wake word: "${wakeWord}")` : 'Voice assistant disabled'}
-            </Text>
+          
+          <View style={styles.completionFeatures}>
+            <View style={styles.completionFeature}>
+              <Check size={16} color="#00ff00" />
+              <Text style={styles.completionFeatureText}>
+                {isGuest ? 'Guest mode enabled' : 'Secure authentication enabled'}
+              </Text>
+            </View>
+            {Object.values(apiKeys).some(key => key.trim().length > 0) && (
+              <View style={styles.completionFeature}>
+                <Check size={16} color="#00ff00" />
+                <Text style={styles.completionFeatureText}>
+                  {Object.entries(apiKeys).filter(([_, key]) => key.trim().length > 0).length} API key(s) configured
+                </Text>
+              </View>
+            )}
+            <View style={styles.completionFeature}>
+              <Check size={16} color="#00ff00" />
+              <Text style={styles.completionFeatureText}>
+                {voiceEnabled ? `Voice assistant enabled (wake word: &quot;${wakeWord}&quot;)` : 'Voice assistant disabled'}
+              </Text>
+            </View>
+            {!isGuest && (
+              <View style={styles.completionFeature}>
+                <Check size={16} color="#00ff00" />
+                <Text style={styles.completionFeatureText}>
+                  Cloud sync activated
+                </Text>
+              </View>
+            )}
           </View>
-          <View style={styles.completionFeature}>
-            <Check size={16} color="#00ff00" />
-            <Text style={styles.completionFeatureText}>
-              Cloud sync activated
-            </Text>
-          </View>
-        </View>
 
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={handleComplete}
-        >
-          <Text style={styles.primaryButtonText}>
-            {isRerun ? 'Back to Settings' : 'Start Using JARVIS'}
-          </Text>
-          <Sparkles size={20} color="#000" />
-        </TouchableOpacity>
-      </LinearGradient>
-    </View>
-  );
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={handleComplete}
+          >
+            <Text style={styles.primaryButtonText}>
+              {isRerun ? 'Back to Settings' : 'Start Using JARVIS'}
+            </Text>
+            <Sparkles size={20} color="#000" />
+          </TouchableOpacity>
+        </LinearGradient>
+      </View>
+    );
+  };
 
   const renderProgressIndicator = () => {
     const steps = ['welcome', 'google-signin', 'api-keys', 'voice-preferences', 'completion'];
@@ -955,6 +1029,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#333',
+  },
+  skipButton: {
+    marginTop: 12,
   },
   secondaryButtonText: {
     color: '#fff',

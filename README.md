@@ -4,11 +4,26 @@
 
 This is a native Android mobile app - the Ultimate AI Command Center powered by JARVIS.
 
-**Platform**: Native Android app (iOS not supported)
-**Framework**: Expo Router + React Native
+**Platform**: Native Android app (iOS not supported)  
+**Framework**: Expo Router + React Native  
 **Distribution**: APK for sideloading on Android devices
 
-> **Note**: This project is Android-only by design. All iOS/Apple platform support has been removed. See [ANDROID_ONLY.md](ANDROID_ONLY.md) for details.
+> **Note**: This project is Android-only by design. All iOS/Apple platform support has been removed. See [docs/development/ANDROID_ONLY.md](docs/development/ANDROID_ONLY.md) for details.
+
+## 🚀 Quick Start
+
+### New Users
+1. **Try without signing in**: Use guest mode to test the app
+2. **Or sign in with Google**: Enable cloud sync and full features
+3. **Configure voice**: Set up JARVIS voice assistant
+4. **Add API keys**: Connect your AI services (optional)
+
+### Documentation
+- 📖 [Quick Start Guide](docs/guides/QUICK_START.md)
+- 🔧 [Setup Instructions](docs/setup/SETUP_GUIDE.md) 
+- 📋 [Project Status](MASTER_CHECKLIST.md)
+- 🔑 [API Keys Setup](AI_KEYS_NEEDED.md)
+- 👨‍💻 [Development Docs](docs/development/)
 
 ## How can I edit this code?
 

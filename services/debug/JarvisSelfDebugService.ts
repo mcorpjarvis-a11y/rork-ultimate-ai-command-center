@@ -288,6 +288,13 @@ class JarvisSelfDebugService {
   }
 
   private async diagnoseIssue(issue: SystemIssue): Promise<string> {
+    // Check if API key is available before attempting diagnosis
+    const apiKey = FREE_AI_MODELS.groq.apiKey;
+    if (!apiKey || apiKey.length < 10 || apiKey.includes('your_') || apiKey === 'undefined') {
+      console.log('[Jarvis Debug] No valid Groq API key available, skipping AI diagnosis');
+      return this.provideFallbackDiagnosis(issue);
+    }
+
     const prompt = `You are JARVIS, an advanced debugging AI system. Analyze this issue and provide a diagnosis:
 
 Issue: ${issue.description}
@@ -310,9 +317,46 @@ Be specific and actionable.`;
       
       return result.text;
     } catch (error) {
-      console.error('[Jarvis Debug] Diagnosis failed:', error);
-      return 'Unable to diagnose automatically. Manual investigation required.';
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[Jarvis Debug] Diagnosis failed:', errorMessage);
+      // Don't try to diagnose the diagnosis error itself
+      return this.provideFallbackDiagnosis(issue);
     }
+  }
+
+  private provideFallbackDiagnosis(issue: SystemIssue): string {
+    // Provide basic diagnosis without AI
+    let diagnosis = `Issue detected: ${issue.description}\n\n`;
+    
+    diagnosis += `Category: ${issue.category}\n`;
+    diagnosis += `Severity: ${issue.severity}\n`;
+    
+    if (issue.affectedComponents.length > 0) {
+      diagnosis += `Affected: ${issue.affectedComponents.join(', ')}\n\n`;
+    }
+    
+    // Provide basic recommendations based on category
+    switch (issue.category) {
+      case 'network':
+        diagnosis += 'Recommended action: Check network connection, verify API endpoints, and implement retry logic.';
+        break;
+      case 'memory':
+        diagnosis += 'Recommended action: Clear caches, reduce memory usage, and check for memory leaks.';
+        break;
+      case 'data':
+        diagnosis += 'Recommended action: Validate data structures, check parsing logic, and ensure data integrity.';
+        break;
+      case 'performance':
+        diagnosis += 'Recommended action: Profile performance, optimize critical paths, and reduce unnecessary operations.';
+        break;
+      case 'ui':
+        diagnosis += 'Recommended action: Check component lifecycle, verify state management, and review render logic.';
+        break;
+      default:
+        diagnosis += 'Recommended action: Review error logs, check recent changes, and verify configuration.';
+    }
+    
+    return diagnosis;
   }
 
   private async applyFix(issue: SystemIssue, diagnosis: string): Promise<boolean> {
