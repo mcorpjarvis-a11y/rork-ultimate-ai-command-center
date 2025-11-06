@@ -21,7 +21,7 @@ export interface UserPreferences {
 export interface VoiceSettings {
   enabled: boolean;
   wakeWord: string;
-  voice: 'jarvis' | 'default';
+  voice: 'jarvis'; // Fixed to JARVIS voice only
   speed: number;
   pitch: number;
   volume: number;
