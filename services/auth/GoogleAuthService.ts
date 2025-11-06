@@ -1,7 +1,7 @@
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import SecureKeyStorage from '@/services/security/SecureKeyStorage';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -12,7 +12,7 @@ const GOOGLE_CLIENT_IDS = {
 
 const GOOGLE_CLIENT_SECRET = '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';
 
-const STORAGE_KEY = '@google_auth_tokens';
+const STORAGE_KEY = 'google_auth_tokens';
 
 export interface GoogleUser {
   id: string;
@@ -23,6 +23,7 @@ export interface GoogleUser {
   familyName?: string;
   accessToken: string;
   refreshToken?: string;
+  expiresAt?: number;
 }
 
 class GoogleAuthService {
@@ -63,9 +64,9 @@ class GoogleAuthService {
           'https://www.googleapis.com/auth/drive.file',
           'https://www.googleapis.com/auth/drive.appdata',
         ],
-        responseType: AuthSession.ResponseType.Token,
+        responseType: AuthSession.ResponseType.Code,
         redirectUri: this.redirectUri,
-        usePKCE: false,
+        usePKCE: true,
       });
 
       const result = await request.promptAsync({
@@ -75,13 +76,16 @@ class GoogleAuthService {
       console.log('[GoogleAuthService] Auth result:', result.type);
 
       if (result.type === 'success') {
-        const accessToken = result.params.access_token;
+        const code = result.params.code;
         
-        if (!accessToken) {
-          throw new Error('No access token received');
+        if (!code) {
+          throw new Error('No authorization code received');
         }
 
-        const userInfo = await this.fetchGoogleUserInfo(accessToken);
+        // Exchange code for tokens
+        const tokens = await this.exchangeCodeForTokens(code, request.codeVerifier!);
+        
+        const userInfo = await this.fetchGoogleUserInfo(tokens.access_token);
         
         const googleUser: GoogleUser = {
           id: userInfo.id,
@@ -90,7 +94,9 @@ class GoogleAuthService {
           picture: userInfo.picture,
           givenName: userInfo.given_name,
           familyName: userInfo.family_name,
-          accessToken,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+          expiresAt: Date.now() + (tokens.expires_in * 1000),
         };
 
         await this.saveTokens(googleUser);
@@ -131,9 +137,99 @@ class GoogleAuthService {
     }
   }
 
+  /**
+   * Exchange authorization code for access and refresh tokens
+   */
+  private async exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+    try {
+      const tokenEndpoint = 'https://oauth2.googleapis.com/token';
+      
+      const params = new URLSearchParams({
+        code,
+        client_id: this.getClientId(),
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: this.redirectUri,
+        grant_type: 'authorization_code',
+        code_verifier: codeVerifier,
+      });
+
+      const response = await fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        console.error('[GoogleAuthService] Token exchange error:', error);
+        throw new Error('Failed to exchange code for tokens');
+      }
+
+      const tokens = await response.json();
+      console.log('[GoogleAuthService] Tokens obtained');
+      return tokens;
+    } catch (error) {
+      console.error('[GoogleAuthService] Token exchange failed:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Refresh access token using refresh token
+   */
+  async refreshAccessToken(): Promise<string | null> {
+    try {
+      const stored = await this.getStoredTokens();
+      
+      if (!stored || !stored.refreshToken) {
+        console.log('[GoogleAuthService] No refresh token available');
+        return null;
+      }
+
+      const params = new URLSearchParams({
+        client_id: this.getClientId(),
+        client_secret: GOOGLE_CLIENT_SECRET,
+        refresh_token: stored.refreshToken,
+        grant_type: 'refresh_token',
+      });
+
+      const response = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      });
+
+      if (!response.ok) {
+        console.error('[GoogleAuthService] Token refresh failed');
+        return null;
+      }
+
+      const tokens = await response.json();
+      
+      // Update stored tokens
+      const updatedUser: GoogleUser = {
+        ...stored,
+        accessToken: tokens.access_token,
+        expiresAt: Date.now() + (tokens.expires_in * 1000),
+      };
+
+      await this.saveTokens(updatedUser);
+      
+      console.log('[GoogleAuthService] Access token refreshed');
+      return tokens.access_token;
+    } catch (error) {
+      console.error('[GoogleAuthService] Token refresh error:', error);
+      return null;
+    }
+  }
+
   async getStoredTokens(): Promise<GoogleUser | null> {
     try {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      const stored = await SecureKeyStorage.getKey(STORAGE_KEY);
       if (stored) {
         const googleUser = JSON.parse(stored);
         console.log('[GoogleAuthService] Loaded stored tokens for:', googleUser.email);
@@ -148,8 +244,8 @@ class GoogleAuthService {
 
   private async saveTokens(googleUser: GoogleUser): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(googleUser));
-      console.log('[GoogleAuthService] Tokens saved');
+      await SecureKeyStorage.saveKey(STORAGE_KEY, JSON.stringify(googleUser));
+      console.log('[GoogleAuthService] Tokens saved securely');
     } catch (error) {
       console.error('[GoogleAuthService] Failed to save tokens:', error);
     }
@@ -157,7 +253,7 @@ class GoogleAuthService {
 
   async signOut(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEY);
+      await SecureKeyStorage.deleteKey(STORAGE_KEY);
       console.log('[GoogleAuthService] Signed out');
     } catch (error) {
       console.error('[GoogleAuthService] Sign-out error:', error);
@@ -166,7 +262,18 @@ class GoogleAuthService {
 
   async getAccessToken(): Promise<string | null> {
     const tokens = await this.getStoredTokens();
-    return tokens?.accessToken || null;
+    
+    if (!tokens) {
+      return null;
+    }
+
+    // Check if token is expired or about to expire (within 5 minutes)
+    if (tokens.expiresAt && tokens.expiresAt < Date.now() + 300000) {
+      console.log('[GoogleAuthService] Token expired or about to expire, refreshing...');
+      return await this.refreshAccessToken();
+    }
+
+    return tokens.accessToken;
   }
 
   async isSignedIn(): Promise<boolean> {
