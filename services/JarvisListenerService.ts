@@ -30,13 +30,14 @@ class JarvisListenerService {
   private isListening: boolean = false;
   private isSpeaking: boolean = false;
   private continuousMode: boolean = false;
+  // JARVIS wake word configuration
   private config: ListenerConfig = {
     enabled: true,
-    language: 'en-US',
+    language: 'en-US', // Changed to US for better wake word detection
     wakeWord: 'jarvis',
-    autoRespond: true,
+    autoRespond: true, // Always respond when JARVIS is called
     continuous: false,
-    wakeWordConfidenceThreshold: 0.7,
+    wakeWordConfidenceThreshold: 0.6, // Lowered for better detection (was 0.7)
     wakeWordListenDuration: 3000, // 3 seconds for wake word detection
     commandListenDuration: 10000, // 10 seconds for full command
   };
@@ -284,10 +285,11 @@ class JarvisListenerService {
         const transcript = event.results[0][0].transcript.toLowerCase();
         const confidence = event.results[0][0].confidence;
 
-        console.log('[JarvisListener] Detected:', transcript);
+        console.log('[JarvisListener] Detected:', transcript, 'Confidence:', confidence);
 
-        if (transcript.includes(this.config.wakeWord) && confidence >= this.config.wakeWordConfidenceThreshold) {
-          console.log('[JarvisListener] Wake word detected!');
+        // Check for wake word with variations and flexible matching
+        if (this.isWakeWordDetected(transcript) && confidence >= this.config.wakeWordConfidenceThreshold) {
+          console.log('[JarvisListener] ✅ JARVIS wake word confirmed!');
           await this.handleWakeWordDetected();
         }
         resolve();
@@ -345,10 +347,15 @@ class JarvisListenerService {
 
       if (uri) {
         const transcription = await this.transcribeAudio(uri);
-        if (transcription && transcription.text.toLowerCase().includes(this.config.wakeWord)) {
-          if (!transcription.confidence || transcription.confidence >= this.config.wakeWordConfidenceThreshold) {
-            console.log('[JarvisListener] Wake word detected!');
-            await this.handleWakeWordDetected();
+        if (transcription) {
+          const transcript = transcription.text.toLowerCase();
+          
+          // Check for wake word with variations
+          if (this.isWakeWordDetected(transcript)) {
+            if (!transcription.confidence || transcription.confidence >= this.config.wakeWordConfidenceThreshold) {
+              console.log('[JarvisListener] ✅ JARVIS wake word confirmed!');
+              await this.handleWakeWordDetected();
+            }
           }
         }
       }
@@ -358,11 +365,23 @@ class JarvisListenerService {
   }
 
   private async handleWakeWordDetected(): Promise<void> {
-    console.log('[JarvisListener] Processing wake word activation...');
+    console.log('[JarvisListener] JARVIS wake word detected! Activating...');
     
-    // Acknowledge wake word
+    // Acknowledge wake word - JARVIS always responds when called
     this.isSpeaking = true;
-    await JarvisVoiceService.speak('Yes, sir?');
+    
+    // Randomly choose from authentic JARVIS acknowledgments
+    const acknowledgments = [
+      'Yes, sir?',
+      'At your service, sir.',
+      'How may I help you, sir?',
+      'I\'m here, sir.',
+      'Yes, sir. I\'m listening.',
+      'Ready, sir.',
+    ];
+    
+    const acknowledgment = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
+    await JarvisVoiceService.speak(acknowledgment);
     this.isSpeaking = false;
     
     // Now listen for the actual command with full recognition
@@ -758,6 +777,50 @@ class JarvisListenerService {
     }
     
     return response;
+  }
+
+  /**
+   * Check if wake word is detected with flexible matching
+   * Handles common variations and pronunciation issues
+   */
+  private isWakeWordDetected(transcript: string): boolean {
+    const lowerTranscript = transcript.toLowerCase().trim();
+    
+    // Direct match
+    if (lowerTranscript.includes(this.config.wakeWord)) {
+      return true;
+    }
+    
+    // Common variations and mispronunciations of "jarvis"
+    const variations = [
+      'jarvis',
+      'jarvas',
+      'jarvus',
+      'jarves',
+      'jar vis',
+      'jar-vis',
+      'hey jarvis',
+      'ok jarvis',
+      'jarvis,',
+      'jarvis.',
+    ];
+    
+    for (const variation of variations) {
+      if (lowerTranscript.includes(variation)) {
+        console.log(`[JarvisListener] Matched wake word variation: "${variation}"`);
+        return true;
+      }
+    }
+    
+    // Check if transcript starts with jarvis (even if followed by command)
+    if (lowerTranscript.startsWith('jarvis ') || 
+        lowerTranscript.startsWith('jarvis,') ||
+        lowerTranscript.startsWith('hey jarvis') ||
+        lowerTranscript.startsWith('ok jarvis')) {
+      return true;
+    }
+    
+    return false;
   }
 
   private extractTopics(text: string): string[] {

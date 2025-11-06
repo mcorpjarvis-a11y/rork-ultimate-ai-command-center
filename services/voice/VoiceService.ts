@@ -5,7 +5,7 @@ import { AI_CONFIG } from '@/config/api.config';
 
 export interface VoiceSettings {
   enabled: boolean;
-  voice: string;
+  voice: string; // Fixed to JARVIS voice, not user-configurable
   pitch: number;
   rate: number;
   volume: number;
@@ -21,13 +21,15 @@ export interface TranscriptionResult {
 class VoiceService {
   private recording: Audio.Recording | null = null;
   private isRecording: boolean = false;
+  // JARVIS voice configuration - optimized for natural, human-like British male voice
+  // These settings create a voice as close as possible to the Iron Man JARVIS
   private settings: VoiceSettings = {
     enabled: true,
-    voice: 'en-gb-x-rjs',
-    pitch: 0.9,
-    rate: 1.1,
+    voice: 'com.apple.voice.compact.en-GB.Daniel', // British male voice (iOS)
+    pitch: 0.95, // Slightly lower for more authoritative, calm tone
+    rate: 1.05, // Slightly faster for intelligent, efficient speech
     volume: 1.0,
-    language: 'en-US',
+    language: 'en-GB', // British English like JARVIS
   };
 
   async initialize(): Promise<void> {
@@ -49,24 +51,42 @@ class VoiceService {
       return;
     }
 
+    // JARVIS voice is fixed - using British male voice for authentic JARVIS experience
     const speechOptions = {
-      voice: options?.voice || this.settings.voice,
+      voice: this.settings.voice, // Always use JARVIS voice, ignore options
       pitch: options?.pitch || this.settings.pitch,
       rate: options?.rate || this.settings.rate,
       volume: options?.volume || this.settings.volume,
-      language: options?.language || this.settings.language,
+      language: this.settings.language, // Always British English
     };
 
-    console.log('[VoiceService] Speaking:', text.substring(0, 50));
+    console.log('[VoiceService] JARVIS speaking:', text.substring(0, 50));
 
     if (Platform.OS === 'web') {
+      // For web, use British English with best available voice
       await Speech.speak(text, {
+        language: 'en-GB',
+        pitch: speechOptions.pitch,
+        rate: speechOptions.rate,
+        // On web, we can't specify exact voice, but browser will pick best British male voice
+      });
+    } else {
+      // For iOS/Android, use specific voice identifier
+      const nativeOptions: any = {
         language: speechOptions.language,
         pitch: speechOptions.pitch,
         rate: speechOptions.rate,
-      });
-    } else {
-      await Speech.speak(text, speechOptions);
+        volume: speechOptions.volume,
+      };
+
+      // On Android, try to use a high-quality British male voice
+      if (Platform.OS === 'android') {
+        nativeOptions.voice = 'en-gb-x-rjs#male_2-local'; // Google TTS British male voice
+      } else if (Platform.OS === 'ios') {
+        nativeOptions.voice = 'com.apple.voice.compact.en-GB.Daniel'; // iOS British male voice
+      }
+
+      await Speech.speak(text, nativeOptions);
     }
   }
 
@@ -211,8 +231,21 @@ class VoiceService {
   }
 
   updateSettings(settings: Partial<VoiceSettings>): void {
-    this.settings = { ...this.settings, ...settings };
-    console.log('[VoiceService] Settings updated:', this.settings);
+    // Voice and language are fixed for JARVIS - only allow updating volume, pitch, rate, enabled
+    const allowedSettings = {
+      enabled: settings.enabled,
+      pitch: settings.pitch,
+      rate: settings.rate,
+      volume: settings.volume,
+    };
+    
+    // Filter out undefined values
+    const filteredSettings = Object.fromEntries(
+      Object.entries(allowedSettings).filter(([_, v]) => v !== undefined)
+    );
+    
+    this.settings = { ...this.settings, ...filteredSettings };
+    console.log('[VoiceService] JARVIS voice settings updated (voice/language locked):', this.settings);
   }
 
   getSettings(): VoiceSettings {

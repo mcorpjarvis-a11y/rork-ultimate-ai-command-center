@@ -28,6 +28,7 @@ import AIAssistant from '@/components/pages/AIAssistant';
 import Tutorial from '@/components/pages/Tutorial';
 import CloudStorage from '@/components/pages/CloudStorage';
 import Security from '@/components/pages/Security';
+import Settings from '@/components/pages/Settings';
 import IoTDevices from '@/components/pages/IoTDevices';
 import CodeModifications from '@/components/pages/CodeModifications';
 import EmailMarketing from '@/components/pages/EmailMarketing';
@@ -112,6 +113,7 @@ export default function Index() {
       'monetization': { title: 'AI Influencer', section: 'Monetization / Dashboard' },
       'tools-backup-restore': { title: 'AI Influencer', section: 'Tools / Backup & Restore' },
       'tools-developer-console': { title: 'AI Influencer', section: 'Tools / Developer Console' },
+      'tools-settings': { title: 'AI Influencer', section: 'Tools / Settings' },
       'profiles': { title: 'AI Influencer', section: 'Profiles / Management' },
       'analytics': { title: 'AI Influencer', section: 'Analytics / Dashboard' },
       'ai-assistant': { title: 'AI Influencer', section: 'AI Assistant / Chat' },
@@ -165,6 +167,8 @@ export default function Index() {
         return <BackupRestore />;
       case 'tools-developer-console':
         return <DeveloperConsole />;
+      case 'tools-settings':
+        return <Settings />;
       case 'profiles':
         return <Profiles />;
       case 'analytics':

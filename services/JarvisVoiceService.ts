@@ -17,15 +17,17 @@ export interface VoiceSettings {
 class JarvisVoiceService {
   private static instance: JarvisVoiceService;
   private recording: Audio.Recording | null = null;
+  // JARVIS voice configuration - optimized for natural, human-like British male voice
+  // These settings create a voice as close as possible to the Iron Man JARVIS
   private settings: VoiceSettings = {
     enabled: true,
-    voice: 'com.apple.speech.synthesis.voice.daniel',
-    rate: 1.1,
-    pitch: 0.9,
-    language: 'en-GB', // British English
+    voice: 'com.apple.voice.compact.en-GB.Daniel', // British male voice (iOS)
+    rate: 1.05, // Slightly faster for intelligent, efficient speech
+    pitch: 0.95, // Slightly lower for more authoritative, calm tone
+    language: 'en-GB', // British English like JARVIS
     autoSpeak: true,
-    useGoogleCloudTTS: false, // Can be enabled if Google Cloud TTS API is available
-    googleVoiceName: 'en-GB-Wavenet-D', // British male voice, Jarvis-like
+    useGoogleCloudTTS: false, // Disabled by default, can be enabled for even more natural voice
+    googleVoiceName: 'en-GB-Neural2-D', // Google Cloud Neural2 British male voice (most natural)
   };
 
   private constructor() {
@@ -64,19 +66,19 @@ class JarvisVoiceService {
         await Speech.stop();
       }
 
-      // Try to use Google Cloud TTS if enabled and available
+      // Try to use Google Cloud TTS if enabled and available for most natural voice
       if ((options?.useGoogleCloudTTS || this.settings.useGoogleCloudTTS)) {
         try {
           await this.speakWithGoogleCloud(text, options);
           return;
         } catch (googleError) {
-          console.warn('[JARVIS] Google Cloud TTS failed, falling back to expo-speech:', googleError);
+          console.warn('[JARVIS] Google Cloud TTS failed, falling back to native voice:', googleError);
         }
       }
 
-      // Fallback to expo-speech with British voice settings (Android-only)
+      // Use native voice with JARVIS-optimized settings
       const voiceOptions: Speech.SpeechOptions = {
-        language: options?.language || this.settings.language,
+        language: this.settings.language, // Always British English
         pitch: options?.pitch || this.settings.pitch,
         rate: options?.rate || this.settings.rate,
         onDone: () => {
@@ -87,16 +89,26 @@ class JarvisVoiceService {
         },
       };
 
+      // Platform-specific voice selection for most natural JARVIS-like voice
+      if (Platform.OS === 'ios') {
+        // iOS: Use high-quality Daniel voice (British male)
+        (voiceOptions as any).voice = 'com.apple.voice.compact.en-GB.Daniel';
+      } else if (Platform.OS === 'android') {
+        // Android: Use Google TTS British male voice
+        (voiceOptions as any).voice = 'en-gb-x-rjs#male_2-local';
+      }
+      // Web will use browser's default British English voice
+
       Speech.speak(text, voiceOptions);
     } catch (error) {
-      console.error('Failed to speak:', error);
+      console.error('[JARVIS] Failed to speak:', error);
     }
   }
 
   private async speakWithGoogleCloud(text: string, options?: Partial<VoiceSettings>): Promise<void> {
     // This uses the JARVIS toolkit endpoint which provides Google Cloud TTS integration
-    // Note: For production, consider using the official Google Cloud TTS API directly
-    // with proper authentication if you have a Google Cloud account
+    // Google Cloud Neural2 voices provide the most natural, human-like speech
+    // en-GB-Neural2-D is a British male voice that sounds very close to JARVIS
     const voiceName = options?.googleVoiceName || this.settings.googleVoiceName;
     
     try {
@@ -108,8 +120,10 @@ class JarvisVoiceService {
         body: JSON.stringify({
           text,
           languageCode: 'en-GB',
-          voiceName: voiceName,
+          voiceName: voiceName, // Neural2-D for most natural voice
           audioEncoding: 'MP3',
+          pitch: this.settings.pitch,
+          speakingRate: this.settings.rate,
         }),
       });
 
@@ -134,7 +148,7 @@ class JarvisVoiceService {
         }
       });
       
-      console.log('[JARVIS] Spoke using Google Cloud TTS via JARVIS toolkit');
+      console.log('[JARVIS] Spoke using Google Cloud Neural2 TTS (most natural voice)');
     } catch (error) {
       console.error('[JARVIS] Google Cloud TTS error:', error);
       throw error;
@@ -261,7 +275,22 @@ class JarvisVoiceService {
   }
 
   updateSettings(settings: Partial<VoiceSettings>): void {
-    this.settings = { ...this.settings, ...settings };
+    // Voice and language are locked to JARVIS - only allow fine-tuning of delivery
+    const allowedSettings = {
+      enabled: settings.enabled,
+      rate: settings.rate,
+      pitch: settings.pitch,
+      autoSpeak: settings.autoSpeak,
+      useGoogleCloudTTS: settings.useGoogleCloudTTS,
+    };
+    
+    // Filter out undefined values
+    const filteredSettings = Object.fromEntries(
+      Object.entries(allowedSettings).filter(([_, v]) => v !== undefined)
+    );
+    
+    this.settings = { ...this.settings, ...filteredSettings };
+    console.log('[JARVIS] Voice settings updated (voice/language locked to British male)');
   }
 
   getSettings(): VoiceSettings {
