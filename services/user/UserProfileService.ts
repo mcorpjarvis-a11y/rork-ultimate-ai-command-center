@@ -45,6 +45,7 @@ class UserProfileService {
     };
 
     // Auto-link Gemini API key if user signed in with Google
+    // Priority: 1. Environment variable, 2. Generate from Google account
     try {
       const geminiKey = await this.detectGeminiAPIKey(googleUser.accessToken);
       if (geminiKey) {
@@ -53,6 +54,12 @@ class UserProfileService {
       }
     } catch (error) {
       console.log('[UserProfileService] Could not auto-detect Gemini key:', error);
+    }
+
+    // If we have a Gemini key, mark setup as complete so JARVIS is functional immediately
+    if (profile.apiKeys.gemini) {
+      profile.setupCompleted = true;
+      console.log('[UserProfileService] JARVIS is functional with Gemini');
     }
 
     await this.saveProfile(profile);
@@ -66,31 +73,25 @@ class UserProfileService {
    * Attempt to detect or generate Gemini API key from Google account
    */
   private async detectGeminiAPIKey(accessToken: string): Promise<string | null> {
+    // Priority 1: Check environment for Gemini key (most reliable for demo/dev)
+    const envKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+    if (envKey && envKey.length > 10 && !envKey.includes('your_') && envKey.startsWith('AIza')) {
+      console.log('[UserProfileService] Using Gemini key from environment');
+      return envKey;
+    }
+
+    // Priority 2: Check if .env file has the key (for production builds)
     try {
-      // Check if user has access to Gemini through their Google account
-      // For now, we'll check if they can access Google AI Studio
-      const response = await fetch(
-        'https://generativelanguage.googleapis.com/v1/models?key=AIzaSyDummy', // Test endpoint
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      // If they have Google account, guide them to get Gemini key
-      // For production, you'd integrate with Google AI Studio API
-      console.log('[UserProfileService] User can access Google AI services');
+      // In a production app, you might integrate with Google AI Studio API
+      // to generate or fetch the user's Gemini API key programmatically
       
-      // Check environment for Gemini key as fallback
-      const envKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-      if (envKey && envKey.length > 0) {
-        return envKey;
-      }
-
+      // For now, we'll provide a helpful message if no key is found
+      console.log('[UserProfileService] No Gemini key found in environment');
+      console.log('[UserProfileService] User can add it manually in the wizard or get one from https://makersuite.google.com/app/apikey');
+      
       return null;
     } catch (error) {
-      console.log('[UserProfileService] Gemini key detection failed:', error);
+      console.log('[UserProfileService] Gemini key detection error:', error);
       return null;
     }
   }

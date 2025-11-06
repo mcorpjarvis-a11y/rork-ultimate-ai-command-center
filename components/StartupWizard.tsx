@@ -82,7 +82,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
         return;
       }
 
-      // Create user profile (this will auto-detect Gemini key)
+      // Create user profile (this will auto-detect Gemini key and mark setup complete if found)
       const profile = await UserProfileService.createProfile(googleUser);
 
       // Initialize text-to-speech immediately
@@ -112,6 +112,19 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
         }
       } catch (syncError) {
         console.log('[StartupWizard] No cloud profile found, continuing with setup');
+      }
+
+      // If Gemini was auto-linked and setup is complete, skip to completion
+      if (profile.setupCompleted && profile.apiKeys.gemini) {
+        console.log('[StartupWizard] Gemini auto-linked, JARVIS is functional! Skipping to completion.');
+        setCurrentStep('completion');
+        
+        // Speak confirmation
+        setTimeout(() => {
+          VoiceService.speak('Google Gemini has been automatically linked. I am fully operational.');
+        }, 2000);
+        
+        return;
       }
 
       // Pre-fill Gemini key if it was auto-detected
