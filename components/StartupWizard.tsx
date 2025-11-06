@@ -42,6 +42,10 @@ interface StartupWizardProps {
 
 type WizardStep = 'welcome' | 'google-signin' | 'api-keys' | 'voice-preferences' | 'completion';
 
+const DEFAULT_VOICE = 'jarvis';
+const DEFAULT_WAKE_WORD = 'jarvis';
+const VOICE_TEST_TIMEOUT = 3000;
+
 export default function StartupWizard({ visible, onComplete, isRerun = false }: StartupWizardProps) {
   const [currentStep, setCurrentStep] = useState<WizardStep>(isRerun ? 'api-keys' : 'welcome');
   const [loading, setLoading] = useState(false);
@@ -58,7 +62,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
 
   // Voice preferences state
   const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [wakeWord, setWakeWord] = useState('jarvis');
+  const [wakeWord, setWakeWord] = useState(DEFAULT_WAKE_WORD);
   const [testingVoice, setTestingVoice] = useState(false);
 
   const services = [
@@ -228,7 +232,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       console.error('[StartupWizard] Voice test error:', err);
       Alert.alert('Voice Test Failed', 'Unable to test voice. Please check your device settings.');
     } finally {
-      setTimeout(() => setTestingVoice(false), 3000);
+      setTimeout(() => setTestingVoice(false), VOICE_TEST_TIMEOUT);
     }
   };
 
@@ -240,8 +244,8 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       // Update voice settings in UserService
       const voiceSettings: Partial<VoiceSettings> = {
         enabled: voiceEnabled,
-        wakeWord: wakeWord.toLowerCase(),
-        voice: 'jarvis', // Always jarvis
+        wakeWord: wakeWord.trim().toLowerCase() || DEFAULT_WAKE_WORD,
+        voice: DEFAULT_VOICE, // Always jarvis
       };
 
       await UserService.updateVoiceSettings(voiceSettings);
@@ -535,13 +539,13 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
               <Text style={styles.voiceCardTitle}>Wake Word</Text>
             </View>
             <Text style={styles.voiceCardDescription}>
-              Say this word to activate voice listening (default: "jarvis")
+              Say this word to activate voice listening (lowercase only, default: "{DEFAULT_WAKE_WORD}")
             </Text>
             <TextInput
               style={styles.voiceInput}
               value={wakeWord}
-              onChangeText={setWakeWord}
-              placeholder="jarvis"
+              onChangeText={(text) => setWakeWord(text.toLowerCase())}
+              placeholder={DEFAULT_WAKE_WORD}
               placeholderTextColor="#666"
               autoCapitalize="none"
               autoCorrect={false}
