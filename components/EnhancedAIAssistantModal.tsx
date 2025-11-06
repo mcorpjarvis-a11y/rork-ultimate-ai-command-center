@@ -19,6 +19,8 @@ import { Audio } from 'expo-av';
 import { IronManTheme } from '@/constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AI_CONFIG } from '@/config/api.config';
+import { AutonomousEngine } from '@/services/AutonomousEngine';
+import JarvisSelfDebugService from '@/services/debug/JarvisSelfDebugService';
 
 interface AIAssistantModalProps {
   visible: boolean;
@@ -872,6 +874,86 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
       }),
 
       // =============== END SELF-MODIFICATION TOOLS ===============
+
+      // =============== AUTONOMOUS ENGINE TOOLS ===============
+      
+      getCampaigns: createJarvisTool({
+        description: 'Get all active marketing campaigns with ROI data',
+        zodSchema: z.object({}),
+        execute() {
+          const engine = AutonomousEngine.getInstance();
+          const campaigns = engine.getCampaigns();
+          const performance = engine.getPerformanceMetrics();
+          addSystemLog('info', `Retrieved ${campaigns.length} active campaigns`, 'Autonomous');
+          addInsight(`AI analyzed ${campaigns.length} marketing campaigns with current revenue: $${performance.revenue.today}`);
+          return `Found ${campaigns.length} campaigns, sir. Today's revenue: $${performance.revenue.today}. I can provide detailed analytics on any specific campaign.`;
+        },
+      }),
+
+      getOpportunities: createJarvisTool({
+        description: 'Discover new revenue opportunities',
+        zodSchema: z.object({
+          minROI: z.number().optional().describe('Minimum ROI percentage filter'),
+        }),
+        execute(input: any) {
+          const engine = AutonomousEngine.getInstance();
+          const opportunities = engine.getOpportunities();
+          const filtered = input.minROI 
+            ? opportunities.filter((o: any) => o.roi >= input.minROI)
+            : opportunities;
+          addSystemLog('info', `Discovered ${filtered.length} opportunities`, 'Autonomous');
+          addInsight(`AI found ${filtered.length} revenue opportunities${input.minROI ? ` with ROI >= ${input.minROI}%` : ''}`);
+          return `Found ${filtered.length} opportunities with projected revenue, sir. ${filtered.length > 0 ? 'Shall I provide details on the highest-priority opportunities?' : 'I recommend expanding search criteria.'}`;
+        },
+      }),
+
+      optimizeCampaign: createJarvisTool({
+        description: 'Optimize campaign performance automatically',
+        zodSchema: z.object({
+          campaignId: z.string().describe('Campaign ID to optimize'),
+        }),
+        execute(input: any) {
+          const engine = AutonomousEngine.getInstance();
+          const result = engine.optimizeCampaign(input.campaignId);
+          addSystemLog('success', `Optimized campaign: ${input.campaignId}`, 'Autonomous');
+          addInsight(`AI optimized campaign ${input.campaignId} automatically`);
+          return `Campaign optimized, sir. ${result.message}`;
+        },
+      }),
+
+      // =============== DEBUG & DIAGNOSTICS TOOLS ===============
+      
+      detectIssues: createJarvisTool({
+        description: 'Scan system for issues and problems',
+        zodSchema: z.object({}),
+        execute() {
+          const debugService = JarvisSelfDebugService.getInstance();
+          const issues = debugService.getIssues();
+          const critical = issues.filter((i: any) => i.severity === 'critical');
+          addSystemLog('info', `System scan found ${issues.length} issues`, 'Debug');
+          if (critical.length > 0) {
+            addSystemLog('warning', `${critical.length} critical issues detected`, 'Debug');
+          }
+          return `Found ${issues.length} issues (${critical.length} critical), sir. ${critical.length > 0 ? 'I recommend immediate attention to critical issues.' : 'All systems operating within normal parameters.'}`;
+        },
+      }),
+
+      runSystemDiagnostics: createJarvisTool({
+        description: 'Run complete system health check',
+        zodSchema: z.object({}),
+        async execute() {
+          const debugService = JarvisSelfDebugService.getInstance();
+          const health = await debugService.runDiagnostics();
+          addSystemLog('info', `System diagnostics: ${health.systemHealth}`, 'Debug');
+          addInsight(`JARVIS completed full system health check: ${health.systemHealth}`);
+          const details = health.recommendations.length > 0 
+            ? `Recommendations: ${health.recommendations.join(', ')}` 
+            : 'No immediate action required.';
+          return `System health: ${health.systemHealth}, sir. ${details}`;
+        },
+      }),
+
+      // =============== END TOOLS ===============
     },
   });
 
@@ -1059,20 +1141,6 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
     } catch (error) {
       console.error('[JARVIS] Speech error:', error);
       setIsSpeaking(false);
-    }
-  };
-      } else if (Platform.OS === 'ios') {
-        // Use British voice on iOS (Daniel is close, but prefer British)
-        speechOptions.voice = 'com.apple.ttsbundle.Daniel-compact'; // British male voice
-        // Alternative: 'com.apple.ttsbundle.Samantha-compact' for clearer British accent
-      }
-
-      await Speech.speak(text, speechOptions);
-      console.log('[JARVIS] Speech.speak() called successfully');
-    } catch (error) {
-      console.error('[JARVIS] ===== Speech critical error =====', error);
-      setIsSpeaking(false);
-      Alert.alert('Voice Error', 'Failed to play voice. Check console for details.');
     }
   };
 

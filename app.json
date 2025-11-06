@@ -31,25 +31,25 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
-      "package": "app.jarvis.command_center",
+      "package": "com.mcorpjarvis.aicommandcenter",
       "versionCode": 1,
       "useNextNotificationsApi": true,
       "permissions": [
+        "INTERNET",
         "CAMERA",
         "MICROPHONE",
+        "RECORD_AUDIO",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "INTERNET",
         "BLUETOOTH_CONNECT",
         "BLUETOOTH_ADMIN",
         "VIBRATE",
         "WAKE_LOCK",
         "FOREGROUND_SERVICE",
-        "RECORD_AUDIO",
         "BODY_SENSORS",
         "USE_FULL_SCREEN_INTENT",
         "POST_NOTIFICATIONS",

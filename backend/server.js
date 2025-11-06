@@ -14,6 +14,9 @@ const mediaRoutes = require('./routes/media');
 const logsRoutes = require('./routes/logs');
 const settingsRoutes = require('./routes/settings');
 const systemRoutes = require('./routes/system');
+const analyticsRoutes = require('./routes/analytics');
+const trendsRoutes = require('./routes/trends');
+const contentRoutes = require('./routes/content');
 
 // Import tRPC server for backwards compatibility
 const { trpcServer } = require('@hono/trpc-server');
@@ -57,6 +60,9 @@ app.use('/api/media', mediaRoutes);
 app.use('/api/logs', logsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/system', systemRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/trends', trendsRoutes);
+app.use('/api/content', contentRoutes);
 
 // tRPC support (backwards compatibility)
 app.use('/trpc', (req, res, next) => {
@@ -101,13 +107,16 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`📡 API Base: http://${HOST}:${PORT}/api`);
   console.log(`🩺 Health: http://${HOST}:${PORT}/`);
   console.log('\n💡 Available Endpoints:');
-  console.log('   • /api/voice       - Text-to-speech and speech-to-text');
-  console.log('   • /api/ask         - AI reasoning (Gemini, Hugging Face, OpenAI)');
-  console.log('   • /api/integrations - Connected APIs (Google, Discord, YouTube)');
-  console.log('   • /api/media       - Upload, storage, transcription');
-  console.log('   • /api/logs        - System and user logs');
-  console.log('   • /api/settings    - App configuration');
-  console.log('   • /api/system      - System status and info');
+  console.log('   • /api/voice        - Text-to-speech and speech-to-text');
+  console.log('   • /api/ask          - AI reasoning (Gemini, Hugging Face, OpenAI)');
+  console.log('   • /api/integrations - Social accounts and connected APIs');
+  console.log('   • /api/analytics    - Performance analytics and insights');
+  console.log('   • /api/trends       - Trend discovery and analysis');
+  console.log('   • /api/content      - Content management');
+  console.log('   • /api/media        - Upload, storage, transcription');
+  console.log('   • /api/logs         - System and user logs');
+  console.log('   • /api/settings     - App configuration');
+  console.log('   • /api/system       - System status and info');
   console.log('\n📝 Logs will appear below...\n');
 });
 

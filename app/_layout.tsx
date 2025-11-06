@@ -7,6 +7,15 @@ import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { trpc, trpcClient } from "@/lib/trpc";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import JarvisInitializationService from "@/services/JarvisInitializationService";
+import { 
+  SchedulerService, 
+  WebSocketService, 
+  MonitoringService, 
+  PlugAndPlayService,
+  JarvisVoiceService,
+  JarvisListenerService,
+  VoiceService
+} from "@/services";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -29,6 +38,32 @@ export default function RootLayout() {
       try {
         console.log('[App] Initializing Jarvis...');
         await JarvisInitializationService.initialize();
+        
+        // Initialize backend connectivity
+        await PlugAndPlayService.initialize();
+        
+        // Initialize speech services
+        await VoiceService.initialize();
+        console.log('[App] VoiceService initialized');
+        
+        // JarvisVoiceService and JarvisListenerService auto-initialize in their constructors
+        // Access them to ensure they're loaded (they're singleton instances)
+        const speechServices = [JarvisVoiceService, JarvisListenerService];
+        console.log('[App] Speech services initialized:', speechServices.length);
+        
+        // Start scheduler for automated tasks
+        SchedulerService.start();
+        console.log('[App] Scheduler service started');
+        
+        // Connect WebSocket for real-time updates
+        WebSocketService.connect().catch((error) => {
+          console.warn('[App] WebSocket connection failed (will retry):', error);
+        });
+        
+        // Start system monitoring
+        MonitoringService.startMonitoring();
+        console.log('[App] Monitoring service started');
+        
         setJarvisReady(true);
         console.log('[App] Jarvis initialization complete');
       } catch (error) {
@@ -41,6 +76,13 @@ export default function RootLayout() {
     }
 
     initializeJarvis();
+    
+    // Cleanup on unmount
+    return () => {
+      SchedulerService.stop();
+      WebSocketService.disconnect();
+      MonitoringService.stopMonitoring();
+    };
   }, []);
 
   if (!jarvisReady) {
