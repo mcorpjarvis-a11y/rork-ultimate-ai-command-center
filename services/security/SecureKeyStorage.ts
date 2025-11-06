@@ -32,6 +32,19 @@ class SecureKeyStorage {
     try {
       const fullKey = this.buildKey(key, options.userId);
       
+      // Validate data size (SecureStore has ~2KB limit)
+      const sizeInBytes = new Blob([value]).size;
+      const maxSize = 2048; // 2KB limit
+      
+      if (sizeInBytes > maxSize) {
+        console.error(`[SecureKeyStorage] Value for ${key} exceeds size limit: ${sizeInBytes} bytes (max: ${maxSize})`);
+        throw new Error(`Value too large for secure storage: ${sizeInBytes} bytes (max: ${maxSize})`);
+      }
+      
+      if (sizeInBytes > maxSize * 0.8) {
+        console.warn(`[SecureKeyStorage] Value for ${key} is close to size limit: ${sizeInBytes}/${maxSize} bytes`);
+      }
+      
       if (this.isSecureStoreAvailable) {
         const secureOptions: SecureStore.SecureStoreOptions = {};
         
@@ -39,16 +52,33 @@ class SecureKeyStorage {
           secureOptions.requireAuthentication = true;
         }
         
-        await SecureStore.setItemAsync(fullKey, value, secureOptions);
-        console.log(`[SecureKeyStorage] Saved ${key} securely`);
+        // Retry logic with exponential backoff
+        let lastError: Error | null = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            await SecureStore.setItemAsync(fullKey, value, secureOptions);
+            console.log(`[SecureKeyStorage] Saved ${key} securely (${sizeInBytes} bytes)`);
+            return;
+          } catch (error) {
+            lastError = error as Error;
+            if (attempt < 2) {
+              const delay = Math.pow(2, attempt) * 100; // 100ms, 200ms
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        }
+        
+        // All retries failed
+        throw lastError;
       } else {
         // Fallback to AsyncStorage for web
         await AsyncStorage.setItem(fullKey, value);
-        console.log(`[SecureKeyStorage] Saved ${key} to AsyncStorage (fallback)`);
+        console.log(`[SecureKeyStorage] Saved ${key} to AsyncStorage (fallback, ${sizeInBytes} bytes)`);
       }
     } catch (error) {
       console.error(`[SecureKeyStorage] Error saving ${key}:`, error);
-      throw new Error(`Failed to save secure key: ${key}`);
+      console.error(`[SecureKeyStorage] Error details:`, JSON.stringify(error));
+      throw new Error(`Failed to save secure key: ${key} - ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -285,6 +315,24 @@ class SecureKeyStorage {
    */
   isAvailable(): boolean {
     return this.isSecureStoreAvailable;
+  }
+
+  /**
+   * Test SecureStorage to verify it's working properly
+   * Returns true if storage is functional, false otherwise
+   */
+  async testSecureStorage(): Promise<boolean> {
+    try {
+      const testKey = '__test_key__';
+      const testValue = 'test';
+      await this.saveKey(testKey, testValue);
+      const retrieved = await this.getKey(testKey);
+      await this.deleteKey(testKey);
+      return retrieved === testValue;
+    } catch (error) {
+      console.error('[SecureKeyStorage] SecureStorage test failed:', error);
+      return false;
+    }
   }
 }
 

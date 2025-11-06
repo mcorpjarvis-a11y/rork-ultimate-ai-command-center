@@ -46,19 +46,22 @@ class UserProfileService {
       isGuestUser: true,
     };
 
-    // Try to save to secure storage, but don't fail if it's not available
+    // For guest users, secure storage is completely optional
+    // Guest profile exists in memory, secure storage is just a nice-to-have
     try {
       await this.saveProfile(profile);
       console.log('[UserProfileService] Guest profile saved to secure storage');
     } catch (error) {
+      // Guest profile failures are non-critical - just log and continue
       console.warn('[UserProfileService] Could not save guest profile to secure storage:', error);
-      console.log('[UserProfileService] Guest profile will be stored in memory only');
-      // Continue anyway - guest profile will exist in memory
+      console.warn('[UserProfileService] Error details:', error instanceof Error ? error.message : 'Unknown error');
+      console.log('[UserProfileService] Guest profile will be stored in memory only - this is OK');
+      // DO NOT throw - guest mode should work without secure storage
     }
     
     this.currentProfile = profile;
     
-    console.log('[UserProfileService] Created guest profile for testing');
+    console.log('[UserProfileService] Created guest profile for testing (memory-backed)');
     return profile;
   }
 
@@ -171,17 +174,36 @@ class UserProfileService {
       const apiKeys = profileToSave.apiKeys;
       profileToSave.apiKeys = {}; // Clear API keys from profile JSON
       
-      await SecureKeyStorage.saveKey(
-        this.PROFILE_KEY,
-        JSON.stringify(profileToSave),
-        { userId: profile.userId }
-      );
+      // For guest users, if save fails, that's acceptable
+      try {
+        await SecureKeyStorage.saveKey(
+          this.PROFILE_KEY,
+          JSON.stringify(profileToSave),
+          { userId: profile.userId }
+        );
+      } catch (storageError) {
+        if (profile.isGuestUser) {
+          console.warn('[UserProfileService] Guest profile save failed, continuing anyway:', storageError);
+          // For guest users, don't throw - they can work in-memory only
+          return;
+        }
+        // For real users, this is a critical error
+        throw storageError;
+      }
 
       // Save each API key separately in secure storage
       if (apiKeys) {
         for (const [service, key] of Object.entries(apiKeys)) {
           if (key) {
-            await SecureKeyStorage.saveAPIKey(service, key, profile.userId);
+            try {
+              await SecureKeyStorage.saveAPIKey(service, key, profile.userId);
+            } catch (apiKeyError) {
+              console.error(`[UserProfileService] Failed to save API key for ${service}:`, apiKeyError);
+              if (!profile.isGuestUser) {
+                throw apiKeyError;
+              }
+              // For guest users, continue even if API key save fails
+            }
           }
         }
       }
@@ -189,7 +211,9 @@ class UserProfileService {
       console.log('[UserProfileService] Saved profile for:', profile.email);
     } catch (error) {
       console.error('[UserProfileService] Error saving profile:', error);
-      throw error;
+      if (!profile.isGuestUser) {
+        throw error;
+      }
     }
   }
 
