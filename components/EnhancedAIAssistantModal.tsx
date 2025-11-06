@@ -928,7 +928,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({}),
         execute() {
           const debugService = JarvisSelfDebugService.getInstance();
-          const issues = debugService.getActiveIssues();
+          const issues = debugService.getIssues();
           const critical = issues.filter((i: any) => i.severity === 'critical');
           addSystemLog('info', `System scan found ${issues.length} issues`, 'Debug');
           if (critical.length > 0) {
@@ -944,9 +944,12 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         async execute() {
           const debugService = JarvisSelfDebugService.getInstance();
           const health = await debugService.runDiagnostics();
-          addSystemLog('info', `System diagnostics: ${health.status}`, 'Debug');
-          addInsight(`JARVIS completed full system health check: ${health.status}`);
-          return `System health: ${health.status}, sir. ${health.details}`;
+          addSystemLog('info', `System diagnostics: ${health.systemHealth}`, 'Debug');
+          addInsight(`JARVIS completed full system health check: ${health.systemHealth}`);
+          const details = health.recommendations.length > 0 
+            ? `Recommendations: ${health.recommendations.join(', ')}` 
+            : 'No immediate action required.';
+          return `System health: ${health.systemHealth}, sir. ${details}`;
         },
       }),
 

@@ -207,8 +207,16 @@ class SecurityService {
 
   async secureStore(key: string, value: string): Promise<void> {
     try {
-      const encrypted = await this.encryptData(value, `${key}_salt_${Date.now()}`);
+      // Generate a random salt using crypto for better security
+      const randomBytes = await Crypto.getRandomBytesAsync(16);
+      const salt = Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+      
+      const encrypted = await this.encryptData(value, `${key}_${salt}`);
+      
+      // Store both encrypted data and salt
       await AsyncStorage.setItem(key, encrypted);
+      await AsyncStorage.setItem(`${key}_salt`, salt);
+      
       await this.logEvent('data_export', `Secure data stored: ${key}`, 'low');
     } catch (error) {
       console.error('Failed to securely store data:', error);
@@ -216,11 +224,14 @@ class SecurityService {
     }
   }
 
-  async secureRetrieve(key: string, salt: string): Promise<string | null> {
+  async secureRetrieve(key: string): Promise<string | null> {
     try {
       const encrypted = await AsyncStorage.getItem(key);
-      if (!encrypted) return null;
-      return await this.decryptData(encrypted, salt);
+      const salt = await AsyncStorage.getItem(`${key}_salt`);
+      
+      if (!encrypted || !salt) return null;
+      
+      return await this.decryptData(encrypted, `${key}_${salt}`);
     } catch (error) {
       console.error('Failed to retrieve secure data:', error);
       return null;

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from '@/types';
-import { FREE_AI_MODELS } from '@/config/api.config';
+import { FREE_AI_MODELS, API_CONFIG } from '@/config/api.config';
 
 export interface IntegrationConfig {
   id: string;
@@ -733,7 +733,8 @@ class PlugAndPlayService {
 
   async checkBackendConnection(): Promise<boolean> {
     try {
-      const response = await fetch(`${FREE_AI_MODELS.backend.url}/api/system/health`, {
+      const backendUrl = process.env.EXPO_PUBLIC_API_URL || API_CONFIG.baseURL;
+      const response = await fetch(`${backendUrl}/api/system/health`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
