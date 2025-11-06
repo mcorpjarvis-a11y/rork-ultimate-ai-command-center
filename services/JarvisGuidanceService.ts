@@ -1,4 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { queryJarvis } from './JarvisAPIRouter'; // <-- IMPORT THE NEW ROUTER
+
+const GUIDANCE_MODEL_PROVIDER = 'groq'; // Use a fast model for guidance
 
 export interface SetupRequirement {
   id: string;
@@ -347,6 +350,41 @@ HuggingFace provides free access to many open-source models, sir.`,
     };
 
     return guides[service] || `API key setup guidance not available for ${service}, sir. Please consult the service documentation.`;
+  }
+
+  /**
+   * Provides guidance or suggestions based on the user's current context.
+   * @param context A string describing the current user activity or screen.
+   * @returns A promise that resolves to a helpful suggestion string.
+   */
+  async getSuggestion(context: string): Promise<string> {
+    const prompt = `User is currently in this context: "${context}". Provide a brief, helpful tip or suggestion.`;
+
+    try {
+      // Use the unified query function for guidance
+      const result = await queryJarvis(prompt, GUIDANCE_MODEL_PROVIDER);
+
+      if (result.success && result.content) {
+        return result.content;
+      } else {
+        console.error('[JarvisGuidanceService] Failed to get suggestion:', result.error);
+        return 'Could not retrieve a suggestion at this time.';
+      }
+    } catch (error) {
+      console.error('[JarvisGuidanceService] Error:', error);
+      return 'An error occurred while fetching guidance.';
+    }
+  }
+
+  /**
+   * Analyzes text for sentiment.
+   * @param text The text to analyze.
+   * @returns A promise that resolves to the sentiment (e.g., "positive", "negative").
+   */
+  async analyzeSentiment(text: string): Promise<string> {
+    const prompt = `Analyze the sentiment of the following text and return only one word (Positive, Negative, or Neutral): "${text}"`;
+    const result = await queryJarvis(prompt, GUIDANCE_MODEL_PROVIDER);
+    return result.success ? result.content || 'Neutral' : 'Neutral';
   }
 }
 
