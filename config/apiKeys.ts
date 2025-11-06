@@ -5,6 +5,9 @@
  * These keys are associated with burner accounts and will be deleted or rotated.
  * DO NOT use these in production.
  *
+ * These keys are included so the program works out-of-the-box during development
+ * without requiring manual API key entry for every build/test.
+ *
  * This file will be replaced by a secure key management system (.env loading or a startup wizard) in the future.
  */
 export const API_KEYS = {
@@ -14,9 +17,10 @@ export const API_KEYS = {
   // Hardcoded burner key found in the repository
   GROQ: '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',
 
+  // Hardcoded burner key from api.config.ts
+  HUGGING_FACE: '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',
+
   // Add other keys here for testing as needed.
-  // Using empty strings as a safe default instead of placeholders.
-  HUGGING_FACE: '',
   TOGETHER_AI: '',
   DEEPSEEK: '',
 };
