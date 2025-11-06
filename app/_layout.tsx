@@ -11,6 +11,7 @@ import JarvisInitializationService from "@/services/JarvisInitializationService"
 import GoogleAuthService from "@/services/auth/GoogleAuthService";
 import UserProfileService from "@/services/user/UserProfileService";
 import GoogleDriveSync from "@/services/sync/GoogleDriveSync";
+import SecureKeyStorage from "@/services/security/SecureKeyStorage";
 import { 
   SchedulerService, 
   WebSocketService, 
@@ -43,6 +44,14 @@ export default function RootLayout() {
     async function initializeApp() {
       try {
         console.log('[App] Starting app initialization...');
+        
+        // Step 0: Test SecureStorage on app startup
+        const storageWorks = await SecureKeyStorage.testSecureStorage();
+        if (!storageWorks) {
+          console.warn('[App] SecureStorage not fully functional, some features may be limited');
+        } else {
+          console.log('[App] SecureStorage test passed');
+        }
         
         // Step 1: Check authentication and load user profile
         const isAuthenticated = await checkAuthentication();
