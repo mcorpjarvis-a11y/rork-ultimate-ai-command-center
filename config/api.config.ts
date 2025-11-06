@@ -5,10 +5,13 @@ export const API_CONFIG = {
   retryDelay: 1000,
 };
 
+// Import centralized API keys
+import { API_KEYS } from './apiKeys';
+
 export const FREE_AI_MODELS = {
   huggingface: {
     baseURL: 'https://api-inference.huggingface.co/models',
-    apiKey: process.env.EXPO_PUBLIC_HF_API_TOKEN || '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', // Burner key for development - will be removed before production
+    apiKey: process.env.EXPO_PUBLIC_HF_API_TOKEN || API_KEYS.HUGGING_FACE,
     models: {
       text: {
         'mistral-7b': 'mistralai/Mistral-7B-Instruct-v0.2',
@@ -30,7 +33,7 @@ export const FREE_AI_MODELS = {
   },
   togetherai: {
     baseURL: 'https://api.together.xyz/v1',
-    apiKey: process.env.EXPO_PUBLIC_TOGETHER_API_KEY || '',
+    apiKey: process.env.EXPO_PUBLIC_TOGETHER_API_KEY || API_KEYS.TOGETHER_AI,
     models: {
       text: {
         'llama-3.1-70b': 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
@@ -52,7 +55,7 @@ export const FREE_AI_MODELS = {
   },
   deepseek: {
     baseURL: 'https://api.deepseek.com/v1',
-    apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY || '',
+    apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY || API_KEYS.DEEPSEEK,
     models: {
       code: {
         'deepseek-coder': 'deepseek-coder',
@@ -64,7 +67,7 @@ export const FREE_AI_MODELS = {
   },
   groq: {
     baseURL: 'https://api.groq.com/openai/v1',
-    apiKey: process.env.EXPO_PUBLIC_GROQ_API_KEY || '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', // Burner key for development - will be removed before production
+    apiKey: process.env.EXPO_PUBLIC_GROQ_API_KEY || API_KEYS.GROQ,
     models: {
       text: {
         'llama-3.1-70b': 'llama-3.1-70b-versatile',
@@ -109,7 +112,7 @@ export const AI_CONFIG = {
   gemini: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta',
     model: 'gemini-pro',
-    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY || '',
+    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY || API_KEYS.GOOGLE_GEMINI,
     tier: 'free',
   },
   toolkit: {
@@ -161,4 +164,54 @@ export const RATE_LIMITS = {
   ai: { requests: 100, window: 60000 },
   social: { requests: 50, window: 60000 },
   analytics: { requests: 200, window: 60000 },
+};
+
+// Unified API configuration for JarvisAPIRouter
+export const apiConfig = {
+  google: {
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/models',
+    models: {
+      text: {
+        'gemini-1.5-pro': 'gemini-1.5-pro',
+        'gemini-pro': 'gemini-pro',
+      },
+    },
+  },
+  groq: {
+    baseURL: 'https://api.groq.com/openai/v1',
+    models: {
+      text: {
+        'llama-3.1-70b': 'llama-3.1-70b-versatile',
+        'llama-3.1-8b': 'llama-3.1-8b-instant',
+        'mixtral-8x7b': 'mixtral-8x7b-32768',
+      },
+    },
+  },
+  huggingface: {
+    baseURL: 'https://api-inference.huggingface.co/models',
+    models: {
+      text: {
+        'mistral-7b': 'mistralai/Mistral-7B-Instruct-v0.2',
+        'llama2-7b': 'meta-llama/Llama-2-7b-chat-hf',
+      },
+    },
+  },
+  togetherai: {
+    baseURL: 'https://api.together.xyz/v1',
+    models: {
+      text: {
+        'llama-3.1-70b': 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
+        'llama-3.1-8b': 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+      },
+    },
+  },
+  deepseek: {
+    baseURL: 'https://api.deepseek.com/v1',
+    models: {
+      code: {
+        'deepseek-coder': 'deepseek-coder',
+        'deepseek-chat': 'deepseek-chat',
+      },
+    },
+  },
 };
