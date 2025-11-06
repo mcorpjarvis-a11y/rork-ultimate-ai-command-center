@@ -15,6 +15,8 @@
     "start-web-dev": "DEBUG=expo* expo start --web --tunnel",
     "test:startup": "node scripts/test-startup.js",
     "test:expo-go": "node scripts/test-expo-go.js",
+    "test:api-keys": "node scripts/test-api-keys.js",
+    "verify:api-config": "node scripts/verify-api-config.js",
     "lint": "expo lint",
     "android": "expo run:android",
     "build:apk": "expo run:android --variant release"
