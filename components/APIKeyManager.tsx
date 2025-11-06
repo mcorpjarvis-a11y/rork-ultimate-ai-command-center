@@ -13,6 +13,7 @@ import {
 import { Check, X, Eye, EyeOff, ExternalLink, RefreshCw, Save, Trash2, Plus } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IronManTheme } from '@/constants/colors';
+import { testAPIKey as testKey } from '@/services/JarvisAPIRouter';
 
 interface APIKey {
   id: string;
@@ -220,24 +221,17 @@ export default function APIKeyManager({ onKeysUpdated }: APIKeyManagerProps) {
     setTesting(prev => ({ ...prev, [keyId]: true }));
 
     try {
-      // Simple test based on service
       let isValid = false;
       
-      if (key.service === 'groq') {
-        // Test Groq API
-        const response = await fetch('https://api.groq.com/openai/v1/models', {
-          headers: { 'Authorization': `Bearer ${key.key}` }
-        });
-        isValid = response.ok;
+      // For supported services in the unified router, use the testKey function
+      if (key.service === 'groq' || key.service === 'gemini') {
+        const provider = key.service === 'groq' ? 'groq' : (key.service === 'gemini' ? 'google' : key.service as any);
+        isValid = await testKey(provider, key.key);
       } else if (key.service === 'openai') {
         // Test OpenAI API
         const response = await fetch('https://api.openai.com/v1/models', {
           headers: { 'Authorization': `Bearer ${key.key}` }
         });
-        isValid = response.ok;
-      } else if (key.service === 'gemini') {
-        // Test Gemini API
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${key.key}`);
         isValid = response.ok;
       } else if (key.service === 'huggingface') {
         // Test HuggingFace API

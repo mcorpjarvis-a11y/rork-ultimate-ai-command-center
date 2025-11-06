@@ -1,4 +1,5 @@
 import express, { Request, Response, Router } from 'express';
+import { queryJarvis } from '../../services/JarvisAPIRouter';
 
 const router: Router = express.Router();
 
@@ -24,111 +25,49 @@ router.post('/', async (req: Request<{}, {}, AskRequestBody>, res: Response) => 
       return res.status(400).json({ error: 'Question is required' });
     }
 
-    // Check available AI services
-    const geminiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
-    const openaiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
-    const hfKey = process.env.EXPO_PUBLIC_HF_API_TOKEN || process.env.HUGGINGFACE_API_KEY;
-    const groqKey = process.env.EXPO_PUBLIC_GROQ_API_KEY;
+    // Construct the prompt with context
+    const prompt = context 
+      ? `${context}\n\nUser: ${question}` 
+      : question;
 
-    let response: string | undefined;
-    let usedService: string | undefined;
+    // Determine which provider to use based on model preference
+    const providers: Array<'groq' | 'google'> = [];
+    
+    if (!model || model === 'groq') {
+      providers.push('groq');
+    }
+    if (!model || model === 'gemini' || model === 'google') {
+      providers.push('google');
+    }
+    
+    // If no specific model requested, try in order of preference
+    if (!model) {
+      providers.splice(0, providers.length, 'groq', 'google');
+    }
 
-    // Try Groq first (fastest free option)
-    if (groqKey && (!model || model === 'groq')) {
-      try {
-        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${groqKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
-            messages: [
-              { role: 'system', content: context || 'You are JARVIS, a helpful AI assistant.' },
-              { role: 'user', content: question }
-            ],
-            temperature: temperature || 0.7,
-            max_tokens: maxTokens || 500
-          })
-        });
+    let result;
+    let usedProvider;
 
-        if (groqResponse.ok) {
-          const data: any = await groqResponse.json();
-          response = data.choices[0].message.content;
-          usedService = 'Groq';
-        }
-      } catch (error) {
-        console.error('[Ask] Groq error:', error);
+    // Try each provider in order until one succeeds
+    for (const provider of providers) {
+      result = await queryJarvis(prompt, provider);
+      if (result.success) {
+        usedProvider = provider;
+        break;
       }
     }
 
-    // Try Gemini if Groq failed or not available
-    if (!response && geminiKey && (!model || model === 'gemini')) {
-      try {
-        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${geminiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: `${context || 'You are JARVIS, a helpful AI assistant.'}\n\nUser: ${question}` }]
-            }],
-            generationConfig: {
-              temperature: temperature || 0.7,
-              maxOutputTokens: maxTokens || 500
-            }
-          })
-        });
-
-        if (geminiResponse.ok) {
-          const data: any = await geminiResponse.json();
-          response = data.candidates[0].content.parts[0].text;
-          usedService = 'Gemini';
-        }
-      } catch (error) {
-        console.error('[Ask] Gemini error:', error);
-      }
-    }
-
-    // Try Hugging Face if others failed
-    if (!response && hfKey && (!model || model === 'huggingface')) {
-      try {
-        const hfResponse = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${hfKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            inputs: `${context || 'You are JARVIS, a helpful AI assistant.'}\n\nUser: ${question}\nAssistant:`,
-            parameters: {
-              max_new_tokens: maxTokens || 500,
-              temperature: temperature || 0.7
-            }
-          })
-        });
-
-        if (hfResponse.ok) {
-          const data: any = await hfResponse.json();
-          response = data[0].generated_text.split('Assistant:')[1]?.trim();
-          usedService = 'HuggingFace';
-        }
-      } catch (error) {
-        console.error('[Ask] HuggingFace error:', error);
-      }
-    }
-
-    if (response) {
+    if (result && result.success && result.content) {
       res.json({
         success: true,
-        answer: response,
-        service: usedService,
+        answer: result.content,
+        service: usedProvider === 'google' ? 'Gemini' : usedProvider === 'groq' ? 'Groq' : usedProvider,
         model: model || 'auto'
       });
     } else {
       res.json({
         success: false,
-        message: 'No AI service available. Please add API keys.',
+        message: result?.error || 'No AI service available. Please add API keys.',
         guidance: {
           services: [
             { name: 'Groq', env: 'EXPO_PUBLIC_GROQ_API_KEY', url: 'https://console.groq.com', tier: 'free' },
