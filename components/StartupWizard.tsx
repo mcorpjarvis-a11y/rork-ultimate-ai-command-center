@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  Switch,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
@@ -19,12 +20,17 @@ import {
   Shield,
   Zap,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Volume2,
+  VolumeX,
+  Mic
 } from 'lucide-react-native';
 import GoogleAuthService from '@/services/auth/GoogleAuthService';
 import UserProfileService from '@/services/user/UserProfileService';
 import GoogleDriveSync from '@/services/sync/GoogleDriveSync';
 import { VoiceService } from '@/services';
+import UserService from '@/services/user/UserService';
+import { VoiceSettings } from '@/types/models.types';
 
 interface StartupWizardProps {
   visible: boolean;
@@ -32,7 +38,7 @@ interface StartupWizardProps {
   isRerun?: boolean; // Flag to indicate if this is a re-run from settings
 }
 
-type WizardStep = 'welcome' | 'google-signin' | 'api-keys' | 'completion';
+type WizardStep = 'welcome' | 'google-signin' | 'api-keys' | 'voice-preferences' | 'completion';
 
 export default function StartupWizard({ visible, onComplete, isRerun = false }: StartupWizardProps) {
   const [currentStep, setCurrentStep] = useState<WizardStep>(isRerun ? 'api-keys' : 'welcome');
@@ -45,6 +51,11 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
     gemini: '',
     huggingface: '',
   });
+
+  // Voice preferences state
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [wakeWord, setWakeWord] = useState('jarvis');
+  const [testingVoice, setTestingVoice] = useState(false);
 
   const services = [
     { 
@@ -164,6 +175,53 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       }
 
       await UserProfileService.updateAPIKeys(keysToSave);
+
+      // Move to voice preferences step
+      setCurrentStep('voice-preferences');
+    } catch (err) {
+      console.error('[StartupWizard] Save API keys error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save API keys');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSkipAPIKeys = async () => {
+    try {
+      // Move to voice preferences instead of completion
+      setCurrentStep('voice-preferences');
+    } catch (err) {
+      console.error('[StartupWizard] Skip error:', err);
+    }
+  };
+
+  const handleTestVoice = async () => {
+    try {
+      setTestingVoice(true);
+      await VoiceService.speak('Hello, I am JARVIS, your personal AI assistant. How may I assist you today?');
+    } catch (err) {
+      console.error('[StartupWizard] Voice test error:', err);
+      Alert.alert('Voice Test Failed', 'Unable to test voice. Please check your device settings.');
+    } finally {
+      setTimeout(() => setTestingVoice(false), 3000);
+    }
+  };
+
+  const handleSaveVoicePreferences = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Update voice settings in UserService
+      const voiceSettings: Partial<VoiceSettings> = {
+        enabled: voiceEnabled,
+        wakeWord: wakeWord.toLowerCase(),
+        voice: 'jarvis', // Always jarvis
+      };
+
+      await UserService.updateVoiceSettings(voiceSettings);
+
+      // Mark setup as complete
       await UserProfileService.markSetupComplete();
 
       // Sync to cloud
@@ -176,19 +234,29 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
 
       setCurrentStep('completion');
     } catch (err) {
-      console.error('[StartupWizard] Save API keys error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save API keys');
+      console.error('[StartupWizard] Save voice preferences error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to save voice preferences');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSkipAPIKeys = async () => {
+  const handleSkipVoicePreferences = async () => {
     try {
+      // Mark setup as complete even if voice is skipped
       await UserProfileService.markSetupComplete();
+
+      // Sync to cloud
+      try {
+        await GoogleDriveSync.uploadProfile();
+        console.log('[StartupWizard] Profile synced to cloud');
+      } catch (syncError) {
+        console.warn('[StartupWizard] Cloud sync failed, but setup is complete:', syncError);
+      }
+
       setCurrentStep('completion');
     } catch (err) {
-      console.error('[StartupWizard] Skip error:', err);
+      console.error('[StartupWizard] Skip voice preferences error:', err);
     }
   };
 
@@ -390,6 +458,123 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
     </ScrollView>
   );
 
+  const renderVoicePreferencesStep = () => (
+    <ScrollView style={styles.stepContainer}>
+      <Text style={styles.stepTitle}>Step 3: Voice Preferences</Text>
+      <Text style={styles.stepDescription}>
+        Configure JARVIS voice assistant to your liking
+      </Text>
+
+      <View style={styles.voiceCard}>
+        <View style={styles.voiceHeader}>
+          <View style={styles.voiceHeaderLeft}>
+            {voiceEnabled ? (
+              <Volume2 size={24} color="#00f2ff" />
+            ) : (
+              <VolumeX size={24} color="#666" />
+            )}
+            <Text style={styles.voiceTitle}>Enable Voice Assistant</Text>
+          </View>
+          <Switch
+            value={voiceEnabled}
+            onValueChange={setVoiceEnabled}
+            trackColor={{ false: '#333', true: '#00f2ff' }}
+            thumbColor={voiceEnabled ? '#fff' : '#666'}
+          />
+        </View>
+        <Text style={styles.voiceDescription}>
+          Enable JARVIS to speak responses and interact with you using voice
+        </Text>
+      </View>
+
+      {voiceEnabled && (
+        <>
+          <View style={styles.voiceCard}>
+            <View style={styles.voiceCardHeader}>
+              <Mic size={20} color="#00f2ff" />
+              <Text style={styles.voiceCardTitle}>Wake Word</Text>
+            </View>
+            <Text style={styles.voiceCardDescription}>
+              Say this word to activate voice listening (default: "jarvis")
+            </Text>
+            <TextInput
+              style={styles.voiceInput}
+              value={wakeWord}
+              onChangeText={setWakeWord}
+              placeholder="jarvis"
+              placeholderTextColor="#666"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+
+          <View style={styles.voiceCard}>
+            <View style={styles.voiceCardHeader}>
+              <Sparkles size={20} color="#00f2ff" />
+              <Text style={styles.voiceCardTitle}>Voice Type</Text>
+            </View>
+            <Text style={styles.voiceCardDescription}>
+              JARVIS uses a British male voice optimized for natural, intelligent speech
+            </Text>
+            <View style={styles.voiceTypeBox}>
+              <Text style={styles.voiceTypeText}>🎙️ JARVIS (British Male)</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.testButton, testingVoice && styles.buttonDisabled]}
+            onPress={handleTestVoice}
+            disabled={testingVoice}
+          >
+            {testingVoice ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <>
+                <Volume2 size={20} color="#000" />
+                <Text style={styles.testButtonText}>Test Voice</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </>
+      )}
+
+      {error && (
+        <View style={styles.errorContainer}>
+          <AlertCircle size={16} color="#ff4444" />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={handleSkipVoicePreferences}
+        >
+          <Text style={styles.secondaryButtonText}>Skip</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.primaryButton, styles.flexButton, loading && styles.buttonDisabled]}
+          onPress={handleSaveVoicePreferences}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <>
+              <Text style={styles.primaryButtonText}>Save & Continue</Text>
+              <ChevronRight size={20} color="#000" />
+            </>
+          )}
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.helpText}>
+        💡 Tip: You can change these settings anytime in Settings
+      </Text>
+    </ScrollView>
+  );
+
   const renderCompletionStep = () => (
     <View style={styles.stepContainer}>
       <LinearGradient
@@ -427,6 +612,12 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
           <View style={styles.completionFeature}>
             <Check size={16} color="#00ff00" />
             <Text style={styles.completionFeatureText}>
+              {voiceEnabled ? 'Voice assistant enabled' : 'Voice assistant disabled'}
+            </Text>
+          </View>
+          <View style={styles.completionFeature}>
+            <Check size={16} color="#00ff00" />
+            <Text style={styles.completionFeatureText}>
               API keys encrypted and stored
             </Text>
           </View>
@@ -452,7 +643,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
   );
 
   const renderProgressIndicator = () => {
-    const steps = ['welcome', 'google-signin', 'api-keys', 'completion'];
+    const steps = ['welcome', 'google-signin', 'api-keys', 'voice-preferences', 'completion'];
     const currentIndex = steps.indexOf(currentStep);
 
     return (
@@ -496,6 +687,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       {currentStep === 'welcome' && renderWelcomeStep()}
       {currentStep === 'google-signin' && renderGoogleSignInStep()}
       {currentStep === 'api-keys' && renderAPIKeysStep()}
+      {currentStep === 'voice-preferences' && renderVoicePreferencesStep()}
       {currentStep === 'completion' && renderCompletionStep()}
     </View>
   );
@@ -773,5 +965,87 @@ const styles = StyleSheet.create({
     color: '#ccc',
     fontSize: 14,
     marginLeft: 12,
+  },
+  voiceCard: {
+    backgroundColor: '#1a1a1a',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#333',
+    marginBottom: 16,
+  },
+  voiceHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  voiceHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  voiceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  voiceDescription: {
+    fontSize: 13,
+    color: '#aaa',
+    marginTop: 8,
+  },
+  voiceCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  voiceCardTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  voiceCardDescription: {
+    fontSize: 13,
+    color: '#aaa',
+    marginBottom: 12,
+  },
+  voiceInput: {
+    backgroundColor: '#0a0a0a',
+    color: '#fff',
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  voiceTypeBox: {
+    backgroundColor: '#00f2ff10',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00f2ff30',
+    alignItems: 'center',
+  },
+  voiceTypeText: {
+    color: '#00f2ff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  testButton: {
+    backgroundColor: '#00f2ff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 14,
+    borderRadius: 8,
+    marginBottom: 16,
+    gap: 8,
+  },
+  testButtonText: {
+    color: '#000',
+    fontSize: 15,
+    fontWeight: 'bold',
   },
 });
