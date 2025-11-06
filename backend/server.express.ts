@@ -5,6 +5,12 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+// Validate environment before importing routes
+import { validateEnvironment, logEnvironmentInfo } from './config/environment';
+
+const envConfig = validateEnvironment();
+logEnvironmentInfo(envConfig);
+
 // Import routes
 import voiceRoutes from './routes/voice';
 import askRoutes from './routes/ask';
@@ -18,8 +24,8 @@ import trendsRoutes from './routes/trends';
 import contentRoutes from './routes/content';
 
 const app: Express = express();
-const PORT = parseInt(process.env.PORT || '3000', 10);
-const HOST = process.env.HOST || '0.0.0.0';
+const PORT = envConfig.PORT;
+const HOST = envConfig.HOST;
 
 // Middleware
 app.use(cors({
