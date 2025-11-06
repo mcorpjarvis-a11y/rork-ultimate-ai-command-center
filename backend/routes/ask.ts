@@ -16,6 +16,15 @@ interface AskRequestBody {
   maxTokens?: number;
 }
 
+// Provider to display name mapping
+const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
+  'google': 'Gemini',
+  'groq': 'Groq',
+  'huggingface': 'HuggingFace',
+  'togetherai': 'Together.ai',
+  'deepseek': 'DeepSeek',
+};
+
 // Main reasoning endpoint
 router.post('/', async (req: Request<{}, {}, AskRequestBody>, res: Response) => {
   try {
@@ -61,7 +70,7 @@ router.post('/', async (req: Request<{}, {}, AskRequestBody>, res: Response) => 
       res.json({
         success: true,
         answer: result.content,
-        service: usedProvider === 'google' ? 'Gemini' : usedProvider === 'groq' ? 'Groq' : usedProvider,
+        service: usedProvider ? PROVIDER_DISPLAY_NAMES[usedProvider] || usedProvider : 'Unknown',
         model: model || 'auto'
       });
     } else {

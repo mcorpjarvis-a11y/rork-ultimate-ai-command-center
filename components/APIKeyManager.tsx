@@ -223,10 +223,18 @@ export default function APIKeyManager({ onKeysUpdated }: APIKeyManagerProps) {
     try {
       let isValid = false;
       
+      // Map service ID to provider type
+      const serviceToProvider: Record<string, 'groq' | 'google'> = {
+        'groq': 'groq',
+        'gemini': 'google',
+      };
+      
       // For supported services in the unified router, use the testKey function
       if (key.service === 'groq' || key.service === 'gemini') {
-        const provider = key.service === 'groq' ? 'groq' : (key.service === 'gemini' ? 'google' : key.service as any);
-        isValid = await testKey(provider, key.key);
+        const provider = serviceToProvider[key.service];
+        if (provider) {
+          isValid = await testKey(provider, key.key);
+        }
       } else if (key.service === 'openai') {
         // Test OpenAI API
         const response = await fetch('https://api.openai.com/v1/models', {

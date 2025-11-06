@@ -62,8 +62,8 @@ async function useGroq(prompt: string, apiKey?: string): Promise<JarvisQueryResu
       }),
     });
     if (!response.ok) {
-        const errorText = await response.text();
-        return { success: false, error: `Groq API Error: ${errorText}`, provider: 'groq' };
+      const errorText = await response.text();
+      return { success: false, error: `Groq API Error: ${errorText}`, provider: 'groq' };
     }
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
