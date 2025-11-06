@@ -181,11 +181,12 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       setLoading(true);
       setError(null);
 
-      // Validate at least one API key is provided
+      // Validate at least one API key is provided - if not, just move to next step
       const hasAtLeastOneKey = Object.values(apiKeys).some(key => key.trim().length > 0);
       
       if (!hasAtLeastOneKey) {
-        // Allow skipping if no keys provided - they are all optional
+        // No keys provided - skip to voice preferences
+        console.log('[StartupWizard] No API keys provided, continuing to voice preferences');
         setCurrentStep('voice-preferences');
         return;
       }
@@ -357,7 +358,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
 
   const renderGoogleSignInStep = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Step 1: Connect Your Account</Text>
+      <Text style={styles.stepTitle}>Connect Your Account</Text>
       <Text style={styles.stepDescription}>
         Sign in with Google to enable cloud sync and cross-device access
       </Text>
@@ -410,10 +411,17 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
 
   const renderAPIKeysStep = () => (
     <ScrollView style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Step 2: Add AI API Keys (Optional)</Text>
+      <Text style={styles.stepTitle}>Add AI API Keys (Optional)</Text>
       <Text style={styles.stepDescription}>
-        Add API keys to enable AI features. All keys are optional - you can skip and add them later.
+        Add API keys to enable AI features. All keys are optional - you can skip this step and add them later in Settings.
       </Text>
+
+      <View style={styles.infoBox}>
+        <AlertCircle size={16} color="#00f2ff" />
+        <Text style={styles.infoText}>
+          💡 You can start using JARVIS without any API keys and add them later when needed.
+        </Text>
+      </View>
 
       {services.map((service) => (
         <View key={service.id} style={styles.apiKeyCard}>
@@ -492,7 +500,7 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
 
   const renderVoicePreferencesStep = () => (
     <ScrollView style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Step 3: Voice Preferences</Text>
+      <Text style={styles.stepTitle}>Voice Preferences</Text>
       <Text style={styles.stepDescription}>
         Configure JARVIS voice assistant to your liking
       </Text>
@@ -898,6 +906,22 @@ const styles = StyleSheet.create({
     color: '#00f2ff',
     fontSize: 13,
     fontWeight: '600',
+  },
+  infoBox: {
+    flexDirection: 'row',
+    backgroundColor: '#00f2ff10',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00f2ff30',
+    marginBottom: 16,
+    gap: 10,
+  },
+  infoText: {
+    flex: 1,
+    color: '#00f2ff',
+    fontSize: 13,
+    lineHeight: 18,
   },
   buttonRow: {
     flexDirection: 'row',
