@@ -10,6 +10,9 @@ const groq = createOpenAI({
   apiKey: FREE_AI_MODELS.groq.apiKey,
 });
 
+// Minimum reasonable length for API keys
+const MIN_API_KEY_LENGTH = 10;
+
 export interface DebugSession {
   id: string;
   startTime: number;
@@ -144,7 +147,6 @@ class JarvisSelfDebugService {
         lowerError.includes('missing api key') ||
         lowerError.includes('api key is required')) {
       const apiKey = FREE_AI_MODELS.groq.apiKey;
-      const MIN_API_KEY_LENGTH = 10; // Minimum reasonable length for API keys
       if (!apiKey || apiKey.length < MIN_API_KEY_LENGTH || apiKey.includes('your_') || apiKey === 'undefined') {
         console.log('[Jarvis Debug] Skipping analysis of API key error during initial setup');
         return;
