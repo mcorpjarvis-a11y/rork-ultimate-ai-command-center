@@ -1,30 +1,24 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const path = require('path');
+import express, { Express, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
 
 // Import routes
-const voiceRoutes = require('./routes/voice');
-const askRoutes = require('./routes/ask');
-const integrationsRoutes = require('./routes/integrations');
-const mediaRoutes = require('./routes/media');
-const logsRoutes = require('./routes/logs');
-const settingsRoutes = require('./routes/settings');
-const systemRoutes = require('./routes/system');
-const analyticsRoutes = require('./routes/analytics');
-const trendsRoutes = require('./routes/trends');
-const contentRoutes = require('./routes/content');
+import voiceRoutes from './routes/voice';
+import askRoutes from './routes/ask';
+import integrationsRoutes from './routes/integrations';
+import mediaRoutes from './routes/media';
+import logsRoutes from './routes/logs';
+import settingsRoutes from './routes/settings';
+import systemRoutes from './routes/system';
+import analyticsRoutes from './routes/analytics';
+import trendsRoutes from './routes/trends';
+import contentRoutes from './routes/content';
 
-// Import tRPC server for backwards compatibility
-const { trpcServer } = require('@hono/trpc-server');
-const { appRouter } = require('./trpc/app-router');
-const { createContext } = require('./trpc/create-context');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
+const app: Express = express();
+const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 
 // Middleware
@@ -36,14 +30,14 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Request logging middleware
-app.use((req, res, next) => {
+app.use((_req: Request, _res: Response, next: NextFunction) => {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] ${req.method} ${req.path}`);
+  console.log(`[${timestamp}] ${_req.method} ${_req.path}`);
   next();
 });
 
 // Health check
-app.get('/', (req, res) => {
+app.get('/', (_req: Request, res: Response) => {
   res.json({
     status: 'online',
     message: 'JARVIS Backend API is running',
@@ -65,31 +59,28 @@ app.use('/api/trends', trendsRoutes);
 app.use('/api/content', contentRoutes);
 
 // tRPC support (backwards compatibility)
-app.use('/trpc', (req, res, next) => {
-  // Convert Express req/res to Hono-compatible format
-  const context = createContext({ req, res });
-  
-  // Simple tRPC handler
-  const path = req.path.replace('/trpc/', '');
-  const [namespace, procedure] = path.split('.');
+app.use('/trpc', (req: Request, res: Response) => {
+  // Simple tRPC placeholder
+  const pathParts = req.path.replace('/trpc/', '').split('.');
+  const [namespace, procedure] = pathParts;
   
   res.json({
-    message: `tRPC endpoint: ${namespace}.${procedure}`,
+    message: `tRPC endpoint: ${namespace}.${procedure || 'unknown'}`,
     note: 'Use /api routes for full functionality'
   });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Error:', err);
-  res.status(err.status || 500).json({
+  res.status(500).json({
     error: err.message || 'Internal server error',
-    status: err.status || 500
+    status: 500
   });
 });
 
 // 404 handler
-app.use((req, res) => {
+app.use((req: Request, res: Response) => {
   res.status(404).json({
     error: 'Endpoint not found',
     path: req.path
@@ -138,3 +129,4 @@ process.on('SIGTERM', () => {
 });
 
 module.exports = app;
+export default app;
