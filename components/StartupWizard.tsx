@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Platform,
   Switch,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
@@ -23,7 +24,8 @@ import {
   AlertCircle,
   Volume2,
   VolumeX,
-  Mic
+  Mic,
+  ExternalLink
 } from 'lucide-react-native';
 import GoogleAuthService from '@/services/auth/GoogleAuthService';
 import UserProfileService from '@/services/user/UserProfileService';
@@ -50,6 +52,8 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
     groq: '',
     gemini: '',
     huggingface: '',
+    openai: '',
+    anthropic: '',
   });
 
   // Voice preferences state
@@ -63,21 +67,40 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       name: 'Groq', 
       tier: 'Free', 
       description: 'Lightning-fast inference with LLaMA models',
-      required: true 
+      required: false,
+      getKeyUrl: 'https://console.groq.com/keys'
     },
     { 
       id: 'gemini', 
       name: 'Google Gemini', 
       tier: 'Free Tier', 
       description: 'Multimodal AI by Google',
-      required: false 
+      required: false,
+      getKeyUrl: 'https://makersuite.google.com/app/apikey'
     },
     { 
       id: 'huggingface', 
       name: 'HuggingFace', 
       tier: 'Free', 
       description: 'Access to thousands of open-source models',
-      required: false 
+      required: false,
+      getKeyUrl: 'https://huggingface.co/settings/tokens'
+    },
+    { 
+      id: 'openai', 
+      name: 'OpenAI', 
+      tier: 'Paid', 
+      description: 'GPT models from OpenAI',
+      required: false,
+      getKeyUrl: 'https://platform.openai.com/api-keys'
+    },
+    { 
+      id: 'anthropic', 
+      name: 'Anthropic', 
+      tier: 'Paid', 
+      description: 'Claude models from Anthropic',
+      required: false,
+      getKeyUrl: 'https://console.anthropic.com/settings/keys'
     },
   ];
 
@@ -162,7 +185,8 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       const hasAtLeastOneKey = Object.values(apiKeys).some(key => key.trim().length > 0);
       
       if (!hasAtLeastOneKey) {
-        setError('Please enter at least one API key to continue');
+        // Allow skipping if no keys provided - they are all optional
+        setCurrentStep('voice-preferences');
         return;
       }
 
@@ -386,9 +410,9 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
 
   const renderAPIKeysStep = () => (
     <ScrollView style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Step 2: Add AI API Keys</Text>
+      <Text style={styles.stepTitle}>Step 2: Add AI API Keys (Optional)</Text>
       <Text style={styles.stepDescription}>
-        Connect at least one AI service to activate JARVIS
+        Add API keys to enable AI features. All keys are optional - you can skip and add them later.
       </Text>
 
       {services.map((service) => (
@@ -407,6 +431,14 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
           </View>
           
           <Text style={styles.apiKeyDescription}>{service.description}</Text>
+          
+          <TouchableOpacity
+            style={styles.getKeyButton}
+            onPress={() => Linking.openURL(service.getKeyUrl)}
+          >
+            <ExternalLink size={16} color="#00f2ff" />
+            <Text style={styles.getKeyButtonText}>Get API Key</Text>
+          </TouchableOpacity>
           
           <TextInput
             style={styles.apiKeyInput}
@@ -597,28 +629,18 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
               Secure authentication enabled
             </Text>
           </View>
+          {Object.values(apiKeys).some(key => key.trim().length > 0) && (
+            <View style={styles.completionFeature}>
+              <Check size={16} color="#00ff00" />
+              <Text style={styles.completionFeatureText}>
+                {Object.entries(apiKeys).filter(([_, key]) => key.trim().length > 0).length} API key(s) configured
+              </Text>
+            </View>
+          )}
           <View style={styles.completionFeature}>
             <Check size={16} color="#00ff00" />
             <Text style={styles.completionFeatureText}>
-              Google Gemini auto-linked
-            </Text>
-          </View>
-          <View style={styles.completionFeature}>
-            <Check size={16} color="#00ff00" />
-            <Text style={styles.completionFeatureText}>
-              Text-to-speech activated
-            </Text>
-          </View>
-          <View style={styles.completionFeature}>
-            <Check size={16} color="#00ff00" />
-            <Text style={styles.completionFeatureText}>
-              {voiceEnabled ? 'Voice assistant enabled' : 'Voice assistant disabled'}
-            </Text>
-          </View>
-          <View style={styles.completionFeature}>
-            <Check size={16} color="#00ff00" />
-            <Text style={styles.completionFeatureText}>
-              API keys encrypted and stored
+              {voiceEnabled ? `Voice assistant enabled (wake word: "${wakeWord}")` : 'Voice assistant disabled'}
             </Text>
           </View>
           <View style={styles.completionFeature}>
@@ -864,6 +886,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderWidth: 1,
     borderColor: '#333',
+  },
+  getKeyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  getKeyButtonText: {
+    color: '#00f2ff',
+    fontSize: 13,
+    fontWeight: '600',
   },
   buttonRow: {
     flexDirection: 'row',
