@@ -185,8 +185,16 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       setError(null);
 
       // Create guest profile for testing
-      await UserProfileService.createGuestProfile();
-      console.log('[StartupWizard] Created guest profile, skipping to voice preferences');
+      try {
+        await UserProfileService.createGuestProfile();
+        console.log('[StartupWizard] Created guest profile, skipping to voice preferences');
+      } catch (profileError) {
+        // Log the error but allow user to proceed anyway
+        console.warn('[StartupWizard] Guest profile creation encountered an issue:', profileError);
+        console.log('[StartupWizard] Continuing with guest mode anyway');
+        // Show a warning but don't block the skip action
+        setError('Guest mode is running with limited storage, but you can still test the app');
+      }
 
       // Initialize text-to-speech
       try {
@@ -206,7 +214,12 @@ export default function StartupWizard({ visible, onComplete, isRerun = false }: 
       setCurrentStep('voice-preferences');
     } catch (err) {
       console.error('[StartupWizard] Skip sign-in error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create guest profile');
+      // Even if everything fails, still allow user to proceed
+      setError('Starting guest mode with limited features');
+      // Still move to next step after a short delay to show the warning
+      setTimeout(() => {
+        setCurrentStep('voice-preferences');
+      }, 2000);
     } finally {
       setLoading(false);
     }
