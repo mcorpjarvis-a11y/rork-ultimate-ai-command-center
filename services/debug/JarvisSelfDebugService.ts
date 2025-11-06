@@ -136,6 +136,17 @@ class JarvisSelfDebugService {
   private async analyzeError(error: any, context: any): Promise<void> {
     const errorString = error?.toString() || 'Unknown error';
     
+    // Skip analysis for "Invalid API key" errors when no valid key is configured
+    // This prevents error loops during onboarding before API keys are set up
+    if (errorString.toLowerCase().includes('invalid api key') || 
+        errorString.toLowerCase().includes('api key')) {
+      const apiKey = FREE_AI_MODELS.groq.apiKey;
+      if (!apiKey || apiKey.length < 10 || apiKey.includes('your_') || apiKey === 'undefined') {
+        console.log('[Jarvis Debug] Skipping analysis of API key error during initial setup');
+        return;
+      }
+    }
+    
     const issue: SystemIssue = {
       id: `issue_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       severity: this.determineSeverity(errorString),

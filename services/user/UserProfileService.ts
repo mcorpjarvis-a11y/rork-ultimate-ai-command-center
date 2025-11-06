@@ -46,7 +46,16 @@ class UserProfileService {
       isGuestUser: true,
     };
 
-    await this.saveProfile(profile);
+    // Try to save to secure storage, but don't fail if it's not available
+    try {
+      await this.saveProfile(profile);
+      console.log('[UserProfileService] Guest profile saved to secure storage');
+    } catch (error) {
+      console.warn('[UserProfileService] Could not save guest profile to secure storage:', error);
+      console.log('[UserProfileService] Guest profile will be stored in memory only');
+      // Continue anyway - guest profile will exist in memory
+    }
+    
     this.currentProfile = profile;
     
     console.log('[UserProfileService] Created guest profile for testing');
