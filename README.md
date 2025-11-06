@@ -2,10 +2,13 @@
 
 ## Project info
 
-This is a native cross-platform mobile app - the Ultimate AI Command Center powered by JARVIS.
+This is a native Android mobile app - the Ultimate AI Command Center powered by JARVIS.
 
-**Platform**: Native iOS & Android app, exportable to web
+**Platform**: Native Android app (iOS not supported)
 **Framework**: Expo Router + React Native
+**Distribution**: APK for sideloading on Android devices
+
+> **Note**: This project is Android-only by design. All iOS/Apple platform support has been removed. See [ANDROID_ONLY.md](ANDROID_ONLY.md) for details.
 
 ## How can I edit this code?
 
@@ -34,11 +37,10 @@ npm install
 # Step 4: Start the instant web preview of your app in your browser, with auto-reloading of your changes
 npm run start-web
 
-# Step 5: Start iOS/Android preview
+# Step 5: Start Android preview
 # Option A (recommended):
-npm run start  # then press "i" for iOS or "a" for Android
+npm run start  # then press "a" for Android
 # Option B (if supported by your environment):
-npm run ios
 npm run android
 ```
 
@@ -50,12 +52,12 @@ npm run android
 
 ## What technologies are used for this project?
 
-This project is built with the most popular native mobile cross-platform technical stack:
+This project is built with native mobile development for Android:
 
 ### Frontend
-- **React Native** - Cross-platform native mobile development framework created by Meta and used for Instagram, Airbnb, and lots of top apps in the App Store
-- **Expo** - Extension of React Native + platform used by Discord, Shopify, Coinbase, Telsa, Starlink, Eightsleep, and more
-- **Expo Router** - File-based routing system for React Native with support for web, server functions and SSR
+- **React Native** - Native mobile development framework created by Meta
+- **Expo** - Extension of React Native used by Discord, Shopify, Coinbase, and more
+- **Expo Router** - File-based routing system for React Native
 - **TypeScript** - Type-safe JavaScript
 - **React Query** - Server state management
 - **Lucide React Native** - Beautiful icons
@@ -137,45 +139,46 @@ See the full [Backend Documentation](backend/README.md) for:
 
 ### **On your phone (Recommended)**
 
-1. **iOS**: Download [Expo Go](https://apps.apple.com/app/expo-go/id982107779) from the App Store
-2. **Android**: Download the [Expo Go app from Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
-3. Run `npm run start` and scan the QR code from your development server
+1. **Android**: Download the [Expo Go app from Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
+2. Run `npm run start` and scan the QR code from your development server
+
+> **Note**: iOS is not supported. This is an Android-only project.
 
 ### **In your browser**
 
 Run `npm run start-web` to test in a web browser. Note: The browser preview is great for quick testing, but some native features may not be available.
 
-### **iOS Simulator / Android Emulator**
+### **Android Emulator**
 
-You can test apps in Expo Go. You don't need XCode or Android Studio for most features.
+You can test apps in Expo Go. You don't need Android Studio for most features.
 
 **When do you need Custom Development Builds?**
 
-- Native authentication (Face ID, Touch ID, Apple Sign In)
+- Native authentication (Fingerprint, biometric)
 - In-app purchases and subscriptions
 - Push notifications
 - Custom native modules
 
 Learn more: [Expo Custom Development Builds Guide](https://docs.expo.dev/develop/development-builds/introduction/)
 
-If you have XCode (iOS) or Android Studio installed:
+If you have Android Studio installed:
 
 ```bash
-# iOS Simulator
-npm run ios
-
 # Android Emulator
 npm run android
+
+# Build release APK
+npm run build:apk
 ```
 
 ## How can I deploy this project?
 
-### **Publish to App Store (iOS)**
+### **Publish to Google Play (Android)**
 
 1. **Install EAS CLI**:
 
    ```bash
-   bun i -g @expo/eas-cli
+   npm i -g eas-cli
    ```
 
 2. **Configure your project**:
@@ -184,33 +187,31 @@ npm run android
    eas build:configure
    ```
 
-3. **Build for iOS**:
-
-   ```bash
-   eas build --platform ios
-   ```
-
-4. **Submit to App Store**:
-   ```bash
-   eas submit --platform ios
-   ```
-
-For detailed instructions, visit [Expo's App Store deployment guide](https://docs.expo.dev/submit/ios/).
-
-### **Publish to Google Play (Android)**
-
-1. **Build for Android**:
+3. **Build for Android**:
 
    ```bash
    eas build --platform android
    ```
 
-2. **Submit to Google Play**:
+4. **Submit to Google Play**:
    ```bash
    eas submit --platform android
    ```
 
 For detailed instructions, visit [Expo's Google Play deployment guide](https://docs.expo.dev/submit/android/).
+
+### **Sideload APK (Recommended)**
+
+Build and distribute APKs directly for sideloading on Android devices:
+
+```bash
+# Build release APK locally
+npm run build:apk
+```
+
+The APK can then be shared and installed directly on Android devices without going through Google Play.
+
+> **Note**: iOS/App Store deployment is not supported. This is an Android-only project. See [ANDROID_ONLY.md](ANDROID_ONLY.md) for details.
 
 ### **Publish as a Website**
 
@@ -237,7 +238,7 @@ Alternative web deployment options:
 
 This template includes:
 
-- **Cross-platform compatibility** - Works on iOS, Android, and Web
+- **Android native compatibility** - Optimized for Android devices
 - **File-based routing** with Expo Router
 - **Tab navigation** with customizable tabs
 - **Modal screens** for overlays and dialogs
@@ -269,9 +270,9 @@ For advanced native features, you'll need to create a Custom Development Build i
 
 ### **When do you need a Custom Development Build?**
 
-- **Native Authentication**: Face ID, Touch ID, Apple Sign In, Google Sign In
-- **In-App Purchases**: App Store and Google Play subscriptions
-- **Advanced Native Features**: Third-party SDKs, platform-specifc features (e.g. Widgets on iOS)
+- **Native Authentication**: Fingerprint, biometric authentication
+- **In-App Purchases**: Google Play subscriptions
+- **Advanced Native Features**: Third-party SDKs, Android-specific features (e.g. Widgets)
 - **Background Processing**: Background tasks, location tracking
 
 ### **Creating a Custom Development Build**
@@ -284,11 +285,10 @@ bun i -g @expo/eas-cli
 eas build:configure
 
 # Create a development build for your device
-eas build --profile development --platform ios
 eas build --profile development --platform android
 
 # Install the development build on your device and start developing
-bun start --dev-client
+npm start --dev-client
 ```
 
 **Learn more:**
@@ -319,7 +319,6 @@ Implement user authentication:
 
 **Native Authentication (requires Custom Development Build):**
 
-- **Apple Sign In** - Native Apple authentication - [Implementation Guide](https://docs.expo.dev/versions/latest/sdk/apple-authentication/)
 - **Google Sign In** - Native Google authentication - [Setup Guide](https://docs.expo.dev/guides/google-authentication/)
 
 ### **Add Push Notifications**
@@ -333,15 +332,15 @@ Send notifications to your users:
 
 Monetize your app:
 
-**Web & Credit Card Payments (works in Expo Go):**
+**Web & Credit Card Payments:**
 
 - **Stripe** - Credit card payments and subscriptions - [Expo + Stripe Guide](https://docs.expo.dev/guides/using-stripe/)
 - **PayPal** - PayPal payments integration - [Setup Guide](https://developer.paypal.com/docs/checkout/mobile/react-native/)
 
 **Native In-App Purchases (requires Custom Development Build):**
 
-- **RevenueCat** - Cross-platform in-app purchases and subscriptions - [Expo Integration Guide](https://www.revenuecat.com/docs/expo)
-- **Expo In-App Purchases** - Direct App Store/Google Play integration - [Implementation Guide](https://docs.expo.dev/versions/latest/sdk/in-app-purchases/)
+- **RevenueCat** - In-app purchases and subscriptions for Android - [Expo Integration Guide](https://www.revenuecat.com/docs/expo)
+- **Expo In-App Purchases** - Direct Google Play integration - [Implementation Guide](https://docs.expo.dev/versions/latest/sdk/in-app-purchases/)
 
 **Paywall Optimization:**
 
@@ -379,6 +378,8 @@ For mobile apps, you'll configure your app's deep linking scheme in `app.json`.
 
 ## About this app
 
-This is a fully native mobile app built using React Native and Expo - the same technology stack used by Discord, Shopify, Coinbase, Instagram, and nearly 30% of the top 100 apps on the App Store.
+This is a fully native mobile app built using React Native and Expo - the same technology stack used by Discord, Shopify, Coinbase, Instagram, and many popular Android apps.
 
-This app is production-ready and can be published to both the App Store and Google Play Store. You can also export your app to run on the web, making it truly cross-platform.
+This app is production-ready and can be published to Google Play Store or distributed as an APK for sideloading on Android devices.
+
+> **Note**: This is an Android-only project. iOS/Apple platforms are not supported. See [ANDROID_ONLY.md](ANDROID_ONLY.md) for details.

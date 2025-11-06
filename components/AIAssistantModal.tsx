@@ -451,8 +451,8 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
       <View style={styles.modalOverlay}>
         <KeyboardAvoidingView 
           style={styles.modalContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          behavior="height"
+          keyboardVerticalOffset={20}
         >
           <View style={[styles.modalContent, { paddingTop: insets.top + 16, paddingBottom: insets.bottom }]}>
             <View style={styles.modalHeader}>

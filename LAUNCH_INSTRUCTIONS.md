@@ -25,9 +25,10 @@ Before we start, make sure you have:
 ### Required Software:
 - **Node.js** (v18 or higher) - [Download here](https://nodejs.org/)
 - **Bun** (Latest version) - Install with: `curl -fsSL https://bun.sh/install | bash`
-- **Expo Go App** on your phone:
-  - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
+- **Expo Go App** on your Android phone:
   - [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+
+> **Note**: This project is Android-only. iOS is not supported. See [ANDROID_ONLY.md](ANDROID_ONLY.md) for details.
 
 ### Required Accounts (Free to start):
 - **Expo Account** (Free) - [Sign up here](https://expo.dev/signup)
@@ -118,10 +119,9 @@ bun start
 **What you'll see:**
 ```
 Metro waiting on exp://192.168.1.100:8081
-› Scan the QR code above with Expo Go (Android) or the Camera app (iOS)
+› Scan the QR code above with Expo Go (Android)
 
 › Press a │ open Android
-› Press i │ open iOS simulator
 › Press w │ open web
 
 › Press r │ reload app
@@ -130,15 +130,7 @@ Metro waiting on exp://192.168.1.100:8081
 
 ---
 
-### Step 5: Connect Your Phone
-
-#### For iOS (iPhone/iPad):
-
-1. Open your **Camera app** (default camera)
-2. Point it at the QR code in your terminal
-3. A notification will pop up: "Open in Expo Go"
-4. Tap the notification
-5. **Expo Go will open and load your app** (takes 10-30 seconds first time)
+### Step 5: Connect Your Android Phone
 
 #### For Android:
 
@@ -294,8 +286,7 @@ bunx expo start --clear
 ### Problem: Voice/Microphone Not Working
 
 **Solutions:**
-1. Check microphone permissions:
-   - iOS: Settings → Privacy → Microphone → Expo Go → Enable
+1. Check microphone permissions on Android:
    - Android: Settings → Apps → Expo Go → Permissions → Microphone → Allow
 2. Restart app after granting permissions
 3. Test with text input first to verify AI is working

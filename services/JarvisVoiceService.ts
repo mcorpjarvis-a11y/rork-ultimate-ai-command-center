@@ -74,12 +74,11 @@ class JarvisVoiceService {
         }
       }
 
-      // Fallback to expo-speech with British voice settings
+      // Fallback to expo-speech with British voice settings (Android-only)
       const voiceOptions: Speech.SpeechOptions = {
         language: options?.language || this.settings.language,
         pitch: options?.pitch || this.settings.pitch,
         rate: options?.rate || this.settings.rate,
-        voice: Platform.OS === 'ios' ? (options?.voice || this.settings.voice) : undefined,
         onDone: () => {
           console.log('[JARVIS] Finished speaking');
         },
