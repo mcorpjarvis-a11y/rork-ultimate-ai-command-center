@@ -47,10 +47,9 @@ export default function RootLayout() {
         console.log('[App] VoiceService initialized');
         
         // JarvisVoiceService and JarvisListenerService auto-initialize in their constructors
-        // Just access them to ensure they're loaded
-        JarvisVoiceService;
-        JarvisListenerService;
-        console.log('[App] Speech services initialized');
+        // Access them to ensure they're loaded (they're singleton instances)
+        const speechServices = [JarvisVoiceService, JarvisListenerService];
+        console.log('[App] Speech services initialized:', speechServices.length);
         
         // Start scheduler for automated tasks
         SchedulerService.start();
