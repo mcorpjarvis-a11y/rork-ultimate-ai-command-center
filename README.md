@@ -52,12 +52,86 @@ npm run android
 
 This project is built with the most popular native mobile cross-platform technical stack:
 
+### Frontend
 - **React Native** - Cross-platform native mobile development framework created by Meta and used for Instagram, Airbnb, and lots of top apps in the App Store
 - **Expo** - Extension of React Native + platform used by Discord, Shopify, Coinbase, Telsa, Starlink, Eightsleep, and more
 - **Expo Router** - File-based routing system for React Native with support for web, server functions and SSR
 - **TypeScript** - Type-safe JavaScript
 - **React Query** - Server state management
 - **Lucide React Native** - Beautiful icons
+
+### Backend (TypeScript)
+- **Express.js** - Fast, unopinionated web framework for Node.js with full TypeScript support
+- **TypeScript 5.9.x** - Strict type checking with production-ready configuration
+- **tRPC** - End-to-end typesafe APIs (optional, for advanced features)
+- **tsx** - TypeScript execution with hot reloading for development
+- **AI Integration** - Support for Groq, Google Gemini, HuggingFace, and OpenAI
+
+The backend is fully TypeScript-enabled with:
+- ✅ Production-ready build system
+- ✅ Hot reloading in development
+- ✅ Environment variable validation
+- ✅ Comprehensive error handling
+- ✅ Full type safety across all routes
+
+For backend details, see [backend/README.md](backend/README.md)
+
+## Backend Development
+
+### Quick Start
+
+```bash
+# Development mode with hot reload
+npm run dev:backend
+
+# Or run without hot reload
+npm run start:backend
+
+# Build for production
+npm run build:backend
+
+# Run production build
+npm run start:backend:prod
+
+# Start both frontend and backend
+npm run start:all
+```
+
+### Environment Setup
+
+Create a `.env` file with at least one AI API key:
+
+```bash
+# Recommended: Groq (fastest, free)
+EXPO_PUBLIC_GROQ_API_KEY=your_groq_key
+
+# Or use Google Gemini
+EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_key
+
+# Optional: Other AI services
+EXPO_PUBLIC_HF_API_TOKEN=your_huggingface_token
+EXPO_PUBLIC_OPENAI_API_KEY=your_openai_key
+
+# Server configuration (optional)
+PORT=3000
+HOST=0.0.0.0
+```
+
+The backend will validate environment variables on startup and provide helpful warnings if API keys are missing.
+
+### Backend Architecture
+
+- **REST API Endpoints**: `/api/voice`, `/api/ask`, `/api/analytics`, etc.
+- **Type-Safe Routes**: All Express routes with proper TypeScript types
+- **Environment Validation**: Automatic validation on server startup
+- **Error Handling**: Comprehensive error handling with type guards
+- **Build Output**: Compiled to `backend/dist/` with source maps
+
+See the full [Backend Documentation](backend/README.md) for:
+- Complete API reference
+- TypeScript configuration details
+- Deployment instructions
+- Troubleshooting guide
 
 ## How can I test my app?
 

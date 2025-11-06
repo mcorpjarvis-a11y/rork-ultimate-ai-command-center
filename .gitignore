@@ -9,6 +9,14 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Backend build output
+backend/dist/
+backend/**/*.js
+backend/**/*.js.map
+backend/**/*.d.ts
+!backend/hono.ts
+!backend/server.ts
+
 # Native
 *.orig.*
 *.jks

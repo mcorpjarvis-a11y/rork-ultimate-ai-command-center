@@ -34,8 +34,8 @@ function log(prefix, color, message) {
 
 console.log('📡 Starting Backend Server...\n');
 const backend = spawn(
-  isWindows ? 'node' : 'node',
-  ['backend/server.js'],
+  isWindows ? 'npx.cmd' : 'npx',
+  ['tsx', 'backend/server.express.ts'],
   { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
 );
 

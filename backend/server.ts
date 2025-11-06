@@ -6,7 +6,7 @@
  */
 
 import { serve } from '@hono/node-server';
-import app from './hono';
+import honoApp from './hono';
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -20,7 +20,7 @@ console.log('⚙️  Initializing backend services...');
 console.log(`📡 Starting server on ${HOST}:${PORT}`);
 
 const server = serve({
-  fetch: app.fetch,
+  fetch: honoApp.fetch,
   port: Number(PORT),
   hostname: HOST,
 });
