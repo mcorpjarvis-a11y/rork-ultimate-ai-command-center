@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
+import { fileOperationsLimiter, writeLimiter } from '../middleware/rateLimiting';
 
 const router: Router = express.Router();
 
@@ -26,7 +27,7 @@ interface LogRequestBody {
 fs.mkdir(LOGS_DIR, { recursive: true }).catch(console.error);
 
 // Add log entry
-router.post('/', async (req: Request<{}, {}, LogRequestBody>, res: Response) => {
+router.post('/', writeLimiter, async (req: Request<{}, {}, LogRequestBody>, res: Response) => {
   try {
     const { level, message, category, metadata } = req.body;
 
@@ -50,7 +51,7 @@ router.post('/', async (req: Request<{}, {}, LogRequestBody>, res: Response) => 
 });
 
 // Get logs
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', fileOperationsLimiter, async (req: Request, res: Response) => {
   try {
     const { limit = '100', level, category } = req.query;
 
@@ -88,7 +89,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Clear logs
-router.delete('/', async (req: Request, res: Response) => {
+router.delete('/', writeLimiter, async (req: Request, res: Response) => {
   try {
     await fs.writeFile(LOGS_FILE, '');
     res.json({ success: true, message: 'Logs cleared' });

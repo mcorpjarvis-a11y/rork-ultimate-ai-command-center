@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
+import { fileOperationsLimiter, writeLimiter } from '../middleware/rateLimiting';
 
 const router: Router = express.Router();
 
@@ -19,7 +20,7 @@ interface Settings {
 fs.mkdir(DATA_DIR, { recursive: true }).catch(console.error);
 
 // Get all settings
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', fileOperationsLimiter, async (req: Request, res: Response) => {
   try {
     const exists = await fs.access(SETTINGS_FILE).then(() => true).catch(() => false);
     
@@ -45,7 +46,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Update settings
-router.post('/', async (req: Request<{}, {}, Settings>, res: Response) => {
+router.post('/', writeLimiter, async (req: Request<{}, {}, Settings>, res: Response) => {
   try {
     const settings = req.body;
 
@@ -60,7 +61,7 @@ router.post('/', async (req: Request<{}, {}, Settings>, res: Response) => {
 });
 
 // Get specific setting
-router.get('/:key', async (req: Request<{ key: string }>, res: Response) => {
+router.get('/:key', fileOperationsLimiter, async (req: Request<{ key: string }>, res: Response) => {
   try {
     const exists = await fs.access(SETTINGS_FILE).then(() => true).catch(() => false);
     
@@ -84,7 +85,7 @@ router.get('/:key', async (req: Request<{ key: string }>, res: Response) => {
 });
 
 // Update specific setting
-router.put('/:key', async (req: Request<{ key: string }, {}, { value: any }>, res: Response) => {
+router.put('/:key', writeLimiter, async (req: Request<{ key: string }, {}, { value: any }>, res: Response) => {
   try {
     const exists = await fs.access(SETTINGS_FILE).then(() => true).catch(() => false);
     let settings: Settings = {};

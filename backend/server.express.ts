@@ -7,6 +7,7 @@ dotenv.config();
 
 // Validate environment before importing routes
 import { validateEnvironment, logEnvironmentInfo } from './config/environment';
+import { apiLimiter } from './middleware/rateLimiting';
 
 const envConfig = validateEnvironment();
 logEnvironmentInfo(envConfig);
@@ -29,11 +30,34 @@ const HOST = envConfig.HOST;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Get allowed origins from env or use safe defaults
+    const allowedOrigins = process.env.FRONTEND_URL 
+      ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
+      : ['http://localhost:8081', 'http://localhost:19006', 'exp://'];
+    
+    // Check if origin is allowed or starts with exp:// (Expo)
+    const isAllowed = allowedOrigins.some(allowed => 
+      allowed === '*' || origin === allowed || origin.startsWith('exp://')
+    );
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS] Blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Apply rate limiting to all API routes
+app.use('/api', apiLimiter);
 
 // Request logging middleware
 app.use((_req: Request, _res: Response, next: NextFunction) => {
