@@ -59,13 +59,24 @@ class MasterProfileManager {
 
   /**
    * Add a connected provider to the profile
+   * Creates a default profile if one doesn't exist
    */
   async addConnectedProvider(provider: string): Promise<void> {
     try {
-      const profile = await this.getMasterProfile();
+      let profile = await this.getMasterProfile();
       
+      // Create default profile if it doesn't exist
       if (!profile) {
-        throw new Error('No master profile found');
+        console.log('[MasterProfile] No profile found, creating default profile');
+        profile = {
+          id: `user-${Date.now()}`,
+          email: '',
+          name: 'User',
+          connectedProviders: [],
+          createdAt: Date.now(),
+          lastLogin: Date.now(),
+        };
+        await this.saveMasterProfile(profile);
       }
 
       if (!profile.connectedProviders.includes(provider)) {
@@ -81,13 +92,24 @@ class MasterProfileManager {
 
   /**
    * Remove a connected provider from the profile
+   * Creates a default profile if one doesn't exist
    */
   async removeConnectedProvider(provider: string): Promise<void> {
     try {
-      const profile = await this.getMasterProfile();
+      let profile = await this.getMasterProfile();
       
+      // Create default profile if it doesn't exist
       if (!profile) {
-        throw new Error('No master profile found');
+        console.log('[MasterProfile] No profile found, creating default profile');
+        profile = {
+          id: `user-${Date.now()}`,
+          email: '',
+          name: 'User',
+          connectedProviders: [],
+          createdAt: Date.now(),
+          lastLogin: Date.now(),
+        };
+        await this.saveMasterProfile(profile);
       }
 
       profile.connectedProviders = profile.connectedProviders.filter(p => p !== provider);

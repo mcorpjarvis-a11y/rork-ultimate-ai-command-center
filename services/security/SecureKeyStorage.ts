@@ -13,7 +13,7 @@ export interface SecureKeyOptions {
  * Falls back to AsyncStorage for web platform
  */
 class SecureKeyStorage {
-  private readonly prefix: string = '@jarvis:secure:';
+  private readonly prefix: string = 'jarvis_secure_';
   private readonly isSecureStoreAvailable: boolean;
   private readonly MAX_RETRIES = 3;
   private readonly RETRY_BASE_DELAY_MS = 100;
@@ -147,8 +147,7 @@ class SecureKeyStorage {
    */
   async getAllKeys(userId?: string): Promise<Record<string, string>> {
     try {
-      const registryKey = this.buildKey('__key_registry__', userId);
-      const registryJson = await this.getKey('__key_registry__', { userId });
+      const registryJson = await this.getKey('key_registry', { userId });
       
       if (!registryJson) {
         return {};
@@ -176,12 +175,12 @@ class SecureKeyStorage {
    */
   private async registerKey(key: string, userId?: string): Promise<void> {
     try {
-      const registryJson = await this.getKey('__key_registry__', { userId });
+      const registryJson = await this.getKey('key_registry', { userId });
       let registry: string[] = registryJson ? JSON.parse(registryJson) : [];
       
       if (!registry.includes(key)) {
         registry.push(key);
-        await this.saveKey('__key_registry__', JSON.stringify(registry), { userId });
+        await this.saveKey('key_registry', JSON.stringify(registry), { userId });
       }
     } catch (error) {
       console.error('[SecureKeyStorage] Error registering key:', error);
@@ -193,13 +192,13 @@ class SecureKeyStorage {
    */
   private async unregisterKey(key: string, userId?: string): Promise<void> {
     try {
-      const registryJson = await this.getKey('__key_registry__', { userId });
+      const registryJson = await this.getKey('key_registry', { userId });
       if (!registryJson) return;
       
       let registry: string[] = JSON.parse(registryJson);
       registry = registry.filter(k => k !== key);
       
-      await this.saveKey('__key_registry__', JSON.stringify(registry), { userId });
+      await this.saveKey('key_registry', JSON.stringify(registry), { userId });
     } catch (error) {
       console.error('[SecureKeyStorage] Error unregistering key:', error);
     }
@@ -261,8 +260,8 @@ class SecureKeyStorage {
     
     for (const key of keys) {
       try {
-        // Try to get value from AsyncStorage
-        const asyncKey = `@jarvis:${key}`;
+        // Try to get value from AsyncStorage with old format
+        const asyncKey = `@jarvis_${key}`;
         const value = await AsyncStorage.getItem(asyncKey);
         
         if (value) {
@@ -294,7 +293,7 @@ class SecureKeyStorage {
       }
       
       // Clear the registry
-      await this.deleteKey('__key_registry__', { userId });
+      await this.deleteKey('key_registry', { userId });
       
       console.log('[SecureKeyStorage] Cleared all keys');
     } catch (error) {
@@ -303,13 +302,26 @@ class SecureKeyStorage {
   }
 
   /**
+   * Alias for clearAll() for test compatibility
+   */
+  async clear(userId?: string): Promise<void> {
+    return this.clearAll(userId);
+  }
+
+  /**
    * Build full key with optional user prefix
+   * Only uses alphanumeric characters, underscores, hyphens, and dots
+   * to comply with SecureStore key requirements
    */
   private buildKey(key: string, userId?: string): string {
+    // Sanitize the key to only allow valid characters for SecureStore
+    const sanitizedKey = key.replace(/[^a-zA-Z0-9\-_.]/g, '_');
+    
     if (userId) {
-      return `${this.prefix}${userId}:${key}`;
+      const sanitizedUserId = userId.replace(/[^a-zA-Z0-9\-_.]/g, '_');
+      return `${this.prefix}${sanitizedUserId}_${sanitizedKey}`;
     }
-    return `${this.prefix}${key}`;
+    return `${this.prefix}${sanitizedKey}`;
   }
 
   /**
@@ -325,7 +337,7 @@ class SecureKeyStorage {
    */
   async testSecureStorage(): Promise<boolean> {
     try {
-      const testKey = '__test_key__';
+      const testKey = 'test_key';
       const testValue = 'test';
       await this.saveKey(testKey, testValue);
       const retrieved = await this.getKey(testKey);

@@ -21,7 +21,7 @@ import {
   Settings as SettingsIcon,
   Wand2,
 } from 'lucide-react-native';
-import GoogleAuthService from '@/services/auth/GoogleAuthService';
+import GoogleAuthAdapter from '@/services/auth/GoogleAuthAdapter';
 import UserProfileService, { UserProfile } from '@/services/user/UserProfileService';
 import GoogleDriveSync from '@/services/sync/GoogleDriveSync';
 import SetupWizard from '@/components/SetupWizard';
@@ -110,7 +110,7 @@ export default function Settings() {
               setLoading(true);
               // Sync before logout
               await GoogleDriveSync.uploadProfile();
-              await GoogleAuthService.signOut();
+              await GoogleAuthAdapter.signOut();
               await UserProfileService.clearProfile();
               // Reload app (this will show the wizard again)
               Alert.alert('Logged Out', 'Please restart the app');
@@ -139,7 +139,7 @@ export default function Settings() {
             try {
               setLoading(true);
               await GoogleDriveSync.deleteProfile();
-              await GoogleAuthService.revokeAccess();
+              await GoogleAuthAdapter.revokeAccess();
               await UserProfileService.clearProfile();
               Alert.alert('Account Deleted', 'Please restart the app');
             } catch (error) {
