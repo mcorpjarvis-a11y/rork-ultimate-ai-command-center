@@ -5,13 +5,10 @@ export const API_CONFIG = {
   retryDelay: 1000,
 };
 
-// Import centralized API keys
-import { API_KEYS } from './apiKeys';
-
 export const FREE_AI_MODELS = {
   huggingface: {
     baseURL: 'https://api-inference.huggingface.co/models',
-    apiKey: process.env.EXPO_PUBLIC_HF_API_TOKEN || API_KEYS.HUGGING_FACE,
+    apiKey: process.env.EXPO_PUBLIC_HF_API_TOKEN || '',
     models: {
       text: {
         'mistral-7b': 'mistralai/Mistral-7B-Instruct-v0.2',
@@ -33,7 +30,7 @@ export const FREE_AI_MODELS = {
   },
   togetherai: {
     baseURL: 'https://api.together.xyz/v1',
-    apiKey: process.env.EXPO_PUBLIC_TOGETHER_API_KEY || API_KEYS.TOGETHER_AI,
+    apiKey: process.env.EXPO_PUBLIC_TOGETHER_API_KEY || '',
     models: {
       text: {
         'llama-3.1-70b': 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
@@ -55,7 +52,7 @@ export const FREE_AI_MODELS = {
   },
   deepseek: {
     baseURL: 'https://api.deepseek.com/v1',
-    apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY || API_KEYS.DEEPSEEK,
+    apiKey: process.env.EXPO_PUBLIC_DEEPSEEK_API_KEY || '',
     models: {
       code: {
         'deepseek-coder': 'deepseek-coder',
@@ -67,7 +64,7 @@ export const FREE_AI_MODELS = {
   },
   groq: {
     baseURL: 'https://api.groq.com/openai/v1',
-    apiKey: process.env.EXPO_PUBLIC_GROQ_API_KEY || API_KEYS.GROQ,
+    apiKey: process.env.EXPO_PUBLIC_GROQ_API_KEY || '',
     models: {
       text: {
         'llama-3.1-70b': 'llama-3.1-70b-versatile',
@@ -112,7 +109,7 @@ export const AI_CONFIG = {
   gemini: {
     baseURL: 'https://generativelanguage.googleapis.com/v1beta',
     model: 'gemini-pro',
-    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY || API_KEYS.GOOGLE_GEMINI,
+    apiKey: process.env.EXPO_PUBLIC_GEMINI_API_KEY || '',
     tier: 'free',
   },
   toolkit: {

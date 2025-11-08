@@ -17,6 +17,16 @@ backend/**/*.d.ts
 !backend/hono.ts
 !backend/server.ts
 
+# Build artifacts from TypeScript compilation
+config/**/*.js
+config/**/*.js.map
+config/**/*.d.ts
+config/**/*.d.ts.map
+services/**/*.js
+services/**/*.js.map
+services/**/*.d.ts
+services/**/*.d.ts.map
+
 # Native
 *.orig.*
 *.jks

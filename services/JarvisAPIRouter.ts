@@ -1,5 +1,4 @@
 import { apiConfig } from '../config/api.config';
-import { API_KEYS } from '../config/apiKeys';
 
 type Provider = 'google' | 'groq' | 'huggingface' | 'togetherai' | 'deepseek';
 
@@ -16,7 +15,8 @@ interface JarvisQueryResult {
  */
 async function useGemini(prompt: string, apiKey?: string): Promise<JarvisQueryResult> {
   const config = apiConfig.google;
-  const key = apiKey || API_KEYS.GOOGLE_GEMINI;
+  // TODO: replace process.env fallback with AuthManager.getAccessToken('google') when available
+  const key = apiKey || process.env.EXPO_PUBLIC_GEMINI_API_KEY || '';
   if (!key) return { success: false, error: 'Google Gemini API key not found', provider: 'google' };
 
   try {
@@ -46,7 +46,8 @@ async function useGemini(prompt: string, apiKey?: string): Promise<JarvisQueryRe
  */
 async function useGroq(prompt: string, apiKey?: string): Promise<JarvisQueryResult> {
   const config = apiConfig.groq;
-  const key = apiKey || API_KEYS.GROQ;
+  // TODO: replace process.env fallback with AuthManager.getAccessToken('groq') when available
+  const key = apiKey || process.env.EXPO_PUBLIC_GROQ_API_KEY || '';
   if (!key) return { success: false, error: 'Groq API key not found', provider: 'groq' };
 
   try {
