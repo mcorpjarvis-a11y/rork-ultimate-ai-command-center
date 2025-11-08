@@ -1,4 +1,4 @@
-import GoogleAuthService from '@/services/auth/GoogleAuthService';
+import GoogleAuthAdapter from '@/services/auth/GoogleAuthAdapter';
 import UserProfileService, { UserProfile } from '@/services/user/UserProfileService';
 
 const APPDATA_FOLDER = 'appDataFolder';
@@ -32,7 +32,7 @@ class GoogleDriveSync {
     try {
       this.syncStatus.syncInProgress = true;
 
-      const accessToken = await GoogleAuthService.getAccessToken();
+      const accessToken = await GoogleAuthAdapter.getAccessToken();
       if (!accessToken) {
         throw new Error('Not authenticated with Google');
       }
@@ -81,7 +81,7 @@ class GoogleDriveSync {
     try {
       this.syncStatus.syncInProgress = true;
 
-      const accessToken = await GoogleAuthService.getAccessToken();
+      const accessToken = await GoogleAuthAdapter.getAccessToken();
       if (!accessToken) {
         throw new Error('Not authenticated with Google');
       }
@@ -121,7 +121,7 @@ class GoogleDriveSync {
     try {
       console.log('[GoogleDriveSync] Starting bidirectional sync');
 
-      const accessToken = await GoogleAuthService.getAccessToken();
+      const accessToken = await GoogleAuthAdapter.getAccessToken();
       if (!accessToken) {
         throw new Error('Not authenticated with Google');
       }
@@ -297,7 +297,7 @@ class GoogleDriveSync {
    */
   async deleteProfile(): Promise<void> {
     try {
-      const accessToken = await GoogleAuthService.getAccessToken();
+      const accessToken = await GoogleAuthAdapter.getAccessToken();
       if (!accessToken) {
         throw new Error('Not authenticated with Google');
       }
