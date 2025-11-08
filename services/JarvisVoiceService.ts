@@ -1,5 +1,7 @@
 import * as Speech from 'expo-speech';
-import { AudioRecorder, AudioPlayer, AudioModule, RecordingPresets } from 'expo-audio';
+import AudioModule from 'expo-audio/build/AudioModule';
+import type { AudioRecorder, AudioPlayer } from 'expo-audio';
+import { RecordingPresets } from 'expo-audio';
 import { Platform } from 'react-native';
 import { AI_CONFIG } from '@/config/api.config';
 
@@ -134,8 +136,8 @@ class JarvisVoiceService {
       const audioData = await response.json();
       
       // Play the audio using expo-audio
-      const player = new AudioPlayer({ uri: audioData.audioContent });
-      await player.play();
+      const player = new AudioModule.AudioPlayer({ uri: audioData.audioContent }, 0, false);
+      player.play();
       
       console.log('[JARVIS] Spoke using Google Cloud Neural2 TTS (most natural voice)');
     } catch (error) {
@@ -202,7 +204,7 @@ class JarvisVoiceService {
         playsInSilentMode: true,
       });
 
-      this.recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
       await this.recording.prepareToRecordAsync();
       this.recording.record();
       console.log('[JARVIS] Recording started');

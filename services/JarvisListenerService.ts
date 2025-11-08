@@ -1,4 +1,6 @@
-import { AudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
+import AudioModule from 'expo-audio/build/AudioModule';
+import type { AudioRecorder } from 'expo-audio';
+import { RecordingPresets } from 'expo-audio';
 import { Platform } from 'react-native';
 import JarvisVoiceService from './JarvisVoiceService';
 import JarvisGuidanceService from './JarvisGuidanceService';
@@ -67,7 +69,6 @@ class JarvisListenerService {
         await AudioModule.setAudioModeAsync({
           allowsRecording: true,
           playsInSilentMode: true,
-          staysActiveInBackground: true,
         });
       }
 
@@ -310,7 +311,7 @@ class JarvisListenerService {
   private async listenForWakeWordNative(): Promise<void> {
     try {
       // Set up short recording for wake word detection (3 seconds)
-      this.recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
       await this.recording.prepareToRecordAsync();
       this.recording.record();
       
@@ -422,7 +423,7 @@ class JarvisListenerService {
 
   private async captureFullCommandNative(): Promise<void> {
     try {
-      this.recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
       await this.recording.prepareToRecordAsync();
       this.recording.record();
       
@@ -450,10 +451,9 @@ class JarvisListenerService {
       await AudioModule.setAudioModeAsync({
         allowsRecording: true,
         playsInSilentMode: true,
-        staysActiveInBackground: true,
       });
 
-      this.recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
       await this.recording.prepareToRecordAsync();
       this.recording.record();
       console.log('[JarvisListener] Native recording started');

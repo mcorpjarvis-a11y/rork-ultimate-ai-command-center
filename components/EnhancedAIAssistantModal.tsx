@@ -15,7 +15,9 @@ import JarvisPersonality from '@/services/personality/JarvisPersonality';
 import JarvisVoiceService from '@/services/JarvisVoiceService';
 import JarvisGuidanceService from '@/services/JarvisGuidanceService';
 import * as Speech from 'expo-speech';
-import { AudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
+import AudioModule from 'expo-audio/build/AudioModule';
+import type { AudioRecorder } from 'expo-audio';
+import { RecordingPresets } from 'expo-audio';
 import { IronManTheme } from '@/constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AI_CONFIG } from '@/config/api.config';
@@ -1199,7 +1201,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         playsInSilentMode: true,
       });
 
-      const recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      const recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
       await recording.prepareToRecordAsync();
       recording.record();
       recordingRef.current = recording;

@@ -1,5 +1,7 @@
 import * as Speech from 'expo-speech';
-import { AudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
+import AudioModule from 'expo-audio/build/AudioModule';
+import type { AudioRecorder } from 'expo-audio';
+import { RecordingPresets } from 'expo-audio';
 import { Platform } from 'react-native';
 import { AI_CONFIG } from '@/config/api.config';
 
@@ -113,7 +115,7 @@ class VoiceService {
         playsInSilentMode: true,
       });
 
-      this.recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
       await this.recording.prepareToRecordAsync();
       this.recording.record();
 

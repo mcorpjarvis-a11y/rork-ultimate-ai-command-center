@@ -6,7 +6,9 @@ import { useJarvisAgent, createJarvisTool } from '@jarvis/toolkit';
 import { useApp } from '@/contexts/AppContext';
 import { z } from 'zod';
 import * as Speech from 'expo-speech';
-import { AudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
+import AudioModule from 'expo-audio/build/AudioModule';
+import type { AudioRecorder } from 'expo-audio';
+import { RecordingPresets } from 'expo-audio';
 import { IronManTheme } from '@/constants/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AI_CONFIG } from '@/config/api.config';
@@ -315,7 +317,7 @@ export default function AIAssistantModal({ visible, onClose }: AIAssistantModalP
         playsInSilentMode: true,
       });
 
-      const recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      const recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
       await recording.prepareToRecordAsync();
       recording.record();
       recordingRef.current = recording;
