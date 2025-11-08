@@ -1,0 +1,19 @@
+{
+  "files": {
+    "CURSOR_PR_INSTRUCTIONS.txt": "PR directive and enforcement",
+    "AUTH_SYSTEM_STRUCTURE.md": "Structure overview",
+    "TEST_REQUIREMENTS.md": "Mandated tests",
+    "PROVIDER_HELPER_TEMPLATE.ts": "Template for helpers",
+    "OAUTH_DEVICE_FLOW_GUIDE.md": "Termux device flow",
+    "NO_IOS_SUPPORT_POLICY.txt": "No iOS policy",
+    "DEV_VALIDATION_CHECKLIST.txt": "Validation steps",
+    "PROVIDERS_MATRIX.csv": "Providers endpoints overview",
+    "CONNECTIONS_HUB_SPEC.md": "Connections Hub UI spec",
+    "TOKEN_SECURITY_POLICY.md": "Security guidance",
+    "README_FOR_CURSOR.txt": "How Cursor should use this ZIP"
+  },
+  "generated": "2025-11-08T00:29:16.541805Z",
+  "android_only": true,
+  "termux_supported": true,
+  "expo_only": true
+}

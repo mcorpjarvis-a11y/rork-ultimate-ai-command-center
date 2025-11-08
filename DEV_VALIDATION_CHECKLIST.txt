@@ -1,0 +1,9 @@
+
+# DEV VALIDATION CHECKLIST
+[ ] Add tests in /tests/auth/
+[ ] Run tests after each step
+[ ] Expo Go Google sign-in works
+[ ] APK build runs onboarding → connections
+[ ] Termux Device Flow succeeds for one provider
+[ ] No secrets in repo; TokenVault uses SecureKeyStorage
+[ ] All services call AuthManager.getAccessToken(provider)

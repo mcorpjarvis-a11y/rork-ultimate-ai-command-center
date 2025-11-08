@@ -1,0 +1,18 @@
+Provider,Auth URL,Token URL,Revoke URL,Device Flow,Notes
+Google,https://accounts.google.com/o/oauth2/v2/auth,https://oauth2.googleapis.com/token,https://oauth2.googleapis.com/revoke,Partial,PKCE; OIDC + API scopes
+HuggingFace,https://huggingface.co/oauth/authorize,https://huggingface.co/oauth/token,,No,Prefer OAuth; PAT for dev only
+Gemini (Google AI),https://accounts.google.com/o/oauth2/v2/auth,https://oauth2.googleapis.com/token,https://oauth2.googleapis.com/revoke,Partial,Use Google helper + Gemini scopes
+Instagram (FB Graph),https://www.facebook.com/v17.0/dialog/oauth,https://graph.facebook.com/v17.0/oauth/access_token,,No,App review needed
+Discord,https://discord.com/api/oauth2/authorize,https://discord.com/api/oauth2/token,https://discord.com/api/oauth2/token/revoke,No,PKCE; bot flow separate
+Reddit,https://www.reddit.com/api/v1/authorize,https://www.reddit.com/api/v1/access_token,,Yes (installed),Use installed app
+Spotify,https://accounts.spotify.com/authorize,https://accounts.spotify.com/api/token,,No,PKCE; no official device flow
+Twitter/X,https://twitter.com/i/oauth2/authorize,https://api.twitter.com/2/oauth2/token,,No,PKCE; app registration
+YouTube (Google),https://accounts.google.com/o/oauth2/v2/auth,https://oauth2.googleapis.com/token,https://oauth2.googleapis.com/revoke,Partial,Use Google helper
+GitHub,https://github.com/login/device,,,Yes,Device flow available
+Slack,https://slack.com/oauth/v2/authorize,https://slack.com/api/oauth.v2.access,,No,
+Notion,https://api.notion.com/v1/oauth/authorize,https://api.notion.com/v1/oauth/token,,No,
+Home Assistant,Local token,Local,Local,N/A,LLAT token or OAuth via addon
+Tuya,https://openapi.tuya{region}.com,https://openapi.tuya{region}.com/v1.0/token,,No,Cloud project
+Philips Hue,Bridge local,Bridge local,,N/A,Link button pairing
+Alexa Smart Home,Account linking,Account linking,,No,Complex
+Google Home,Account linking,Token,,No,Restricted
