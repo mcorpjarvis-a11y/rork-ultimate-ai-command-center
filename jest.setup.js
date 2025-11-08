@@ -6,6 +6,10 @@ jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'myapp://redirect'),
   AuthRequest: jest.fn(),
   useAuthRequest: jest.fn(),
+  ResponseType: {
+    Code: 'code',
+    Token: 'token',
+  },
 }));
 
 jest.mock('expo-web-browser', () => ({
@@ -38,9 +42,16 @@ jest.mock('react-native', () => ({
   },
 }));
 
-// Suppress console warnings in tests
+// Suppress console logs in tests (but keep errors)
+const originalConsoleError = console.error;
+
 global.console = {
   ...console,
+  log: jest.fn(),
   warn: jest.fn(),
-  error: jest.fn(),
+  error: jest.fn((...args) => {
+    // Keep errors visible
+    originalConsoleError(...args);
+  }),
 };
+

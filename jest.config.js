@@ -29,7 +29,8 @@ module.exports = {
     }
   },
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
+    '^@/(.*)$': '<rootDir>/$1',
+    '^@/services/security/SecureKeyStorage$': '<rootDir>/services/security/InMemorySecureStorage.ts'
   },
   testEnvironment: 'node',
   globals: {
