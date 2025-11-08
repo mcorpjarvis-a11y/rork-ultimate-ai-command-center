@@ -6,7 +6,6 @@ import {
   AnalyticsService,
   TrendService,
   WorkflowService,
-  UserService,
   MonitoringService,
   SchedulerService,
   WebSocketService,
@@ -34,10 +33,6 @@ export function useTrendService() {
 
 export function useWorkflowService() {
   return WorkflowService;
-}
-
-export function useUserService() {
-  return UserService;
 }
 
 export function useMonitoringService() {
