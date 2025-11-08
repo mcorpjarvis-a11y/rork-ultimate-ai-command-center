@@ -1,4 +1,0 @@
-
-# NO iOS SUPPORT POLICY
-- Do not modify or generate iOS.
-- Respect Apple-block script.
