@@ -66,9 +66,8 @@ const apiKeysPath = path.join(__dirname, '..', 'config', 'apiKeys.ts');
 const envContent = checkFile(envPath, '.env file');
 const envExampleContent = checkFile(envExamplePath, '.env.example file');
 const apiConfigContent = checkFile(apiConfigPath, 'config/api.config.ts');
-const apiKeysContent = checkFile(apiKeysPath, 'config/apiKeys.ts');
 
-if (!envContent || !apiConfigContent || !apiKeysContent) {
+if (!envContent || !apiConfigContent) {
   console.log('\n❌ Critical configuration files missing!');
   process.exit(1);
 }
@@ -84,19 +83,16 @@ const apiServices = [
   {
     name: 'Google Gemini',
     envKey: 'EXPO_PUBLIC_GEMINI_API_KEY',
-    hardcodedKey: 'AIzaSyD8XihT8YcI3ycp0rNkzYpFq61vPoLWJTA',
     tier: 'free'
   },
   {
     name: 'Groq',
     envKey: 'EXPO_PUBLIC_GROQ_API_KEY',
-    hardcodedKey: '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',
     tier: 'free'
   },
   {
     name: 'HuggingFace',
     envKey: 'EXPO_PUBLIC_HF_API_TOKEN',
-    hardcodedKey: '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',
     tier: 'free'
   },
   {
@@ -124,7 +120,6 @@ const apiServices = [
 apiServices.forEach(service => {
   const envValue = env[service.envKey];
   const hasEnvKey = envValue && envValue.length > 0;
-  const hasHardcodedKey = service.hardcodedKey && service.hardcodedKey.length > 0;
   
   let status = '❌';
   let message = 'NOT CONFIGURED';
@@ -132,10 +127,6 @@ apiServices.forEach(service => {
   if (hasEnvKey) {
     status = '✅';
     message = `CONFIGURED in .env (${service.tier})`;
-    results.configured.push(service.name);
-  } else if (hasHardcodedKey) {
-    status = '⚙️';
-    message = `HARDCODED fallback available (${service.tier})`;
     results.configured.push(service.name);
   } else {
     status = '⏭️';
@@ -162,10 +153,6 @@ console.log('\n📋 Configuration Structure Verification:\n');
 
 const checks = [
   {
-    name: 'api.config.ts imports apiKeys',
-    test: () => apiConfigContent.includes("import { API_KEYS } from './apiKeys'")
-  },
-  {
     name: 'FREE_AI_MODELS configured',
     test: () => apiConfigContent.includes('FREE_AI_MODELS')
   },
@@ -182,16 +169,8 @@ const checks = [
     test: () => apiConfigContent.includes('huggingface:') && apiConfigContent.includes('api-inference.huggingface.co')
   },
   {
-    name: 'apiKeys.ts has Groq key',
-    test: () => apiKeysContent.includes('GROQ:') && apiKeysContent.includes('gsk_')
-  },
-  {
-    name: 'apiKeys.ts has Gemini key',
-    test: () => apiKeysContent.includes('GOOGLE_GEMINI:') && apiKeysContent.includes('AIza')
-  },
-  {
-    name: 'apiKeys.ts has HuggingFace key',
-    test: () => apiKeysContent.includes('HUGGING_FACE:') && apiKeysContent.includes('hf_')
+    name: 'API config uses environment variables',
+    test: () => apiConfigContent.includes('process.env.EXPO_PUBLIC_')
   }
 ];
 
@@ -234,7 +213,6 @@ if (hasWorkingConfig && hasNoWarnings) {
   console.log('\n💡 Status:');
   console.log(`   - ${results.configured.length} AI services configured`);
   console.log('   - Configuration structure is valid');
-  console.log('   - Fallback keys available for development');
   console.log('\n🚀 To test API connectivity:');
   console.log('   - Start the app: npm start');
   console.log('   - Try asking JARVIS a question');
