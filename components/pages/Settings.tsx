@@ -24,7 +24,7 @@ import {
 import GoogleAuthService from '@/services/auth/GoogleAuthService';
 import UserProfileService, { UserProfile } from '@/services/user/UserProfileService';
 import GoogleDriveSync from '@/services/sync/GoogleDriveSync';
-import StartupWizard from '@/components/StartupWizard';
+import SetupWizard from '@/components/SetupWizard';
 
 export default function Settings() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -361,10 +361,9 @@ export default function Settings() {
       animationType="slide"
       presentationStyle="fullScreen"
     >
-      <StartupWizard 
+      <SetupWizard 
         visible={showWizard} 
-        onComplete={handleWizardComplete}
-        isRerun={true}
+        onClose={handleWizardComplete}
       />
     </Modal>
   </>
