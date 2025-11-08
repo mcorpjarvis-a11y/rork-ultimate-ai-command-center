@@ -8,8 +8,26 @@ import TokenVault from './TokenVault';
 import MasterProfile from './MasterProfile';
 import { TokenData, AuthEvent, AuthEventListener, ProviderStatus } from './types';
 
+// Static imports for Metro bundler compatibility
+import * as googleProvider from './providerHelpers/google';
+import * as githubProvider from './providerHelpers/github';
+import * as discordProvider from './providerHelpers/discord';
+import * as redditProvider from './providerHelpers/reddit';
+import * as spotifyProvider from './providerHelpers/spotify';
+import * as homeassistantProvider from './providerHelpers/homeassistant';
+
 class AuthManager {
   private eventListeners: Map<AuthEvent, Set<AuthEventListener>> = new Map();
+  
+  // Static provider registry for Metro bundler compatibility
+  private readonly PROVIDER_REGISTRY: Record<string, any> = {
+    google: googleProvider,
+    github: githubProvider,
+    discord: discordProvider,
+    reddit: redditProvider,
+    spotify: spotifyProvider,
+    homeassistant: homeassistantProvider,
+  };
 
   constructor() {
     // Initialize event listener maps
@@ -26,8 +44,8 @@ class AuthManager {
     try {
       console.log(`[AuthManager] Starting auth flow for ${provider}`);
 
-      // Dynamically import the provider helper
-      const providerHelper = await this.getProviderHelper(provider);
+      // Get the provider helper from static registry
+      const providerHelper = this.getProviderHelper(provider);
       
       if (!providerHelper || !providerHelper.startAuth) {
         throw new Error(`Provider helper not found or invalid for ${provider}`);
@@ -108,8 +126,8 @@ class AuthManager {
 
       console.log(`[AuthManager] Refreshing token for ${provider}`);
 
-      // Get provider helper
-      const providerHelper = await this.getProviderHelper(provider);
+      // Get provider helper from static registry
+      const providerHelper = this.getProviderHelper(provider);
       
       if (!providerHelper || !providerHelper.refreshToken) {
         throw new Error(`Provider helper does not support token refresh for ${provider}`);
@@ -159,7 +177,7 @@ class AuthManager {
       if (tokenData) {
         // Try to revoke with provider helper
         try {
-          const providerHelper = await this.getProviderHelper(provider);
+          const providerHelper = this.getProviderHelper(provider);
           
           if (providerHelper && providerHelper.revokeToken) {
             await providerHelper.revokeToken(tokenData.access_token);
@@ -297,20 +315,21 @@ class AuthManager {
   }
 
   /**
-   * Dynamically load provider helper
+   * Get provider helper from static registry
+   * Metro bundler compatible - uses static imports instead of dynamic imports
    */
-  private async getProviderHelper(provider: string): Promise<any> {
-    try {
-      // Normalize provider name to match file names
-      const normalizedProvider = provider.toLowerCase().replace(/\s+/g, '');
-      
-      // Try to import the provider helper
-      const helper = await import(`./providerHelpers/${normalizedProvider}`);
-      return helper;
-    } catch (error) {
-      console.error(`[AuthManager] Failed to load provider helper for ${provider}:`, error);
-      throw new Error(`Provider helper not found for ${provider}`);
+  private getProviderHelper(provider: string): any {
+    // Normalize provider name to match registry keys
+    const normalizedProvider = provider.toLowerCase().replace(/\s+/g, '');
+    
+    const helper = this.PROVIDER_REGISTRY[normalizedProvider];
+    
+    if (!helper) {
+      const availableProviders = Object.keys(this.PROVIDER_REGISTRY).join(', ');
+      throw new Error(`Provider helper not found for ${provider}. Available providers: ${availableProviders}`);
     }
+    
+    return helper;
   }
 }
 
