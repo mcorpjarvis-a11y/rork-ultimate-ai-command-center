@@ -6,11 +6,9 @@ import { AppProvider } from "@/contexts/AppContext";
 import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { trpc, trpcClient } from "@/lib/trpc";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import StartupWizard from "@/components/StartupWizard";
+import SignInScreen from "@/screens/Onboarding/SignInScreen";
 import JarvisInitializationService from "@/services/JarvisInitializationService";
-import GoogleAuthService from "@/services/auth/GoogleAuthService";
-import UserProfileService from "@/services/user/UserProfileService";
-import GoogleDriveSync from "@/services/sync/GoogleDriveSync";
+import MasterProfile from "@/services/auth/MasterProfile";
 import SecureKeyStorage from "@/services/security/SecureKeyStorage";
 import { 
   SchedulerService, 
@@ -37,7 +35,7 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [appReady, setAppReady] = useState(false);
-  const [showWizard, setShowWizard] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
 
   useEffect(() => {
@@ -53,26 +51,26 @@ export default function RootLayout() {
           console.log('[App] SecureStorage test passed');
         }
         
-        // Step 1: Check authentication and load user profile
+        // Step 1: Check if master profile exists
         const isAuthenticated = await checkAuthentication();
         
         if (!isAuthenticated) {
-          console.log('[App] No authentication found, showing wizard');
-          setShowWizard(true);
+          console.log('[App] No master profile found, showing sign-in');
+          setShowSignIn(true);
           setIsAuthenticating(false);
           SplashScreen.hideAsync();
           return;
         }
 
-        // Step 2: Initialize JARVIS with user's API keys
+        // Step 2: Initialize JARVIS
         await initializeJarvis();
         
         setAppReady(true);
         console.log('[App] App initialization complete');
       } catch (error) {
         console.error('[App] App initialization error:', error);
-        // Show wizard on error
-        setShowWizard(true);
+        // Show sign-in on error
+        setShowSignIn(true);
       } finally {
         setIsAuthenticating(false);
         SplashScreen.hideAsync();
@@ -91,45 +89,15 @@ export default function RootLayout() {
 
   async function checkAuthentication(): Promise<boolean> {
     try {
-      // Check if user is signed in with Google
-      const googleUser = await GoogleAuthService.getStoredTokens();
-      
-      if (!googleUser) {
-        console.log('[App] No Google user found');
-        return false;
-      }
-
-      console.log('[App] Google user found:', googleUser.email);
-
-      // Load or create user profile
-      let profile = await UserProfileService.loadProfile(googleUser.id);
+      // Check if master profile exists
+      const profile = await MasterProfile.getMasterProfile();
       
       if (!profile) {
-        // Try to restore from cloud
-        console.log('[App] No local profile, checking cloud...');
-        profile = await GoogleDriveSync.downloadProfile();
-        
-        if (!profile) {
-          // Create new profile
-          console.log('[App] No cloud profile, creating new...');
-          profile = await UserProfileService.createProfile(googleUser);
-        }
-      }
-
-      // Check if setup is complete
-      if (!profile.setupCompleted) {
-        console.log('[App] Setup not complete');
+        console.log('[App] No master profile found');
         return false;
       }
 
-      // Validate and refresh token if needed
-      const accessToken = await GoogleAuthService.getAccessToken();
-      if (!accessToken) {
-        console.log('[App] Failed to get valid access token');
-        return false;
-      }
-
-      console.log('[App] Authentication successful');
+      console.log('[App] Master profile found:', profile.email || profile.id);
       return true;
     } catch (error) {
       console.error('[App] Authentication check error:', error);
@@ -174,27 +142,27 @@ export default function RootLayout() {
     }
   }
 
-  async function handleWizardComplete() {
-    console.log('[App] Wizard completed, initializing app...');
-    setShowWizard(false);
+  async function handleSignInComplete() {
+    console.log('[App] Sign-in completed, initializing app...');
+    setShowSignIn(false);
     setIsAuthenticating(true);
     
     try {
-      // Initialize JARVIS after wizard completion
+      // Initialize JARVIS after sign-in
       await initializeJarvis();
       setAppReady(true);
     } catch (error) {
-      console.error('[App] Failed to initialize after wizard:', error);
+      console.error('[App] Failed to initialize after sign-in:', error);
       setAppReady(true); // Continue loading app even if Jarvis fails
     } finally {
       setIsAuthenticating(false);
     }
   }
 
-  if (showWizard) {
+  if (showSignIn) {
     return (
       <ErrorBoundary>
-        <StartupWizard visible={true} onComplete={handleWizardComplete} />
+        <SignInScreen />
       </ErrorBoundary>
     );
   }

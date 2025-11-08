@@ -14,7 +14,6 @@ import TrendAnalysis from '@/components/pages/TrendAnalysis';
 import PersonaBuilder from '@/components/pages/PersonaBuilder';
 import MediaGenerator from '@/components/pages/MediaGenerator';
 import MediaStudio from '@/components/pages/MediaStudio';
-import APIKeys from '@/components/pages/APIKeys';
 import SocialConnect from '@/components/pages/SocialConnect';
 import DataSources from '@/components/pages/DataSources';
 import Scheduler from '@/components/pages/Scheduler';
@@ -39,7 +38,7 @@ import SmartVideoEditor from '@/components/pages/SmartVideoEditor';
 import FloatingButtons from '@/components/FloatingButtons';
 import EnhancedAIAssistantModal from '@/components/EnhancedAIAssistantModal';
 import { JarvisOnboarding } from '@/components/JarvisOnboarding';
-import LoginScreen from '@/components/LoginScreen';
+import ConnectionsHub from '@/components/ConnectionsHub';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
@@ -49,7 +48,6 @@ export default function Index() {
   const [expandedSections, setExpandedSections] = useState<string[]>(['overview']);
   const [showAIModal, setShowAIModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [showLoginScreen, setShowLoginScreen] = useState(false);
 
   const checkOnboarding = useCallback(async () => {
     try {
@@ -62,28 +60,9 @@ export default function Index() {
     }
   }, []);
 
-  const checkAuth = useCallback(async () => {
-    try {
-      const authenticated = await AsyncStorage.getItem('authenticated');
-      if (!authenticated) {
-        setShowLoginScreen(true);
-      } else {
-        checkOnboarding();
-      }
-    } catch (error) {
-      console.error('Failed to check auth status:', error);
-      setShowLoginScreen(true);
-    }
-  }, [checkOnboarding]);
-
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  const handleLoginSuccess = async () => {
-    setShowLoginScreen(false);
     checkOnboarding();
-  };
+  }, [checkOnboarding]);
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) =>
@@ -105,7 +84,7 @@ export default function Index() {
       'ai-persona-builder': { title: 'AI Influencer', section: 'AI Modules / Persona Builder' },
       'ai-media-generator': { title: 'AI Influencer', section: 'AI Modules / Media Generator' },
       'ai-media-studio': { title: 'AI Influencer', section: 'AI Modules / Media Studio' },
-      'integrations-api-keys': { title: 'AI Influencer', section: 'Integrations / API Keys' },
+      'integrations-connections': { title: 'AI Influencer', section: 'Integrations / Connections' },
       'integrations-social-connect': { title: 'AI Influencer', section: 'Integrations / Social Connect' },
       'integrations-data-sources': { title: 'AI Influencer', section: 'Integrations / Data Sources' },
       'automation-scheduler': { title: 'AI Influencer', section: 'Automation / Scheduler' },
@@ -151,8 +130,8 @@ export default function Index() {
         return <MediaGenerator />;
       case 'ai-media-studio':
         return <MediaStudio />;
-      case 'integrations-api-keys':
-        return <APIKeys />;
+      case 'integrations-connections':
+        return <ConnectionsHub />;
       case 'integrations-social-connect':
         return <SocialConnect />;
       case 'integrations-data-sources':
@@ -199,10 +178,6 @@ export default function Index() {
         return <OverviewDashboard />;
     }
   };
-
-  if (showLoginScreen) {
-    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
-  }
 
   return (
     <View style={styles.container}>

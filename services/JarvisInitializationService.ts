@@ -4,7 +4,6 @@ import JarvisListenerService from './JarvisListenerService';
 import JarvisVoiceService from './JarvisVoiceService';
 import JarvisPersonality from './personality/JarvisPersonality';
 import FreeAIService from './ai/FreeAIService';
-import { autoInitializeAPIKeys } from './AutoInitAPIKeysService';
 
 const INITIALIZATION_KEY = '@jarvis_initialized';
 
@@ -84,9 +83,6 @@ class JarvisInitializationService {
     console.log('[JarvisInit] 🚀 Starting Jarvis initialization...');
 
     try {
-      // Step 0: Auto-initialize hardcoded testing API keys
-      await autoInitializeAPIKeys();
-
       // Step 1: Load and save API keys from config to AsyncStorage
       await this.loadAPIKeysFromConfig();
 
