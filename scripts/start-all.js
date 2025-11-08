@@ -5,7 +5,7 @@
  * Starts both frontend and backend in a single command
  */
 
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const os = require('os');
 
 const isWindows = os.platform() === 'win32';
@@ -14,6 +14,32 @@ console.log('\n🚀 ════════════════════
 console.log('🚀   JARVIS UNIFIED LAUNCHER');
 console.log('🚀   Starting Complete AI Command Center');
 console.log('🚀 ════════════════════════════════════════════════════════════\n');
+
+// Check if --skip-update flag is provided
+const skipUpdate = process.argv.includes('--skip-update');
+
+if (!skipUpdate) {
+  console.log('🔍 Checking dependencies...\n');
+
+  try {
+    // Check for outdated packages
+    try {
+      execSync('npm outdated || true', { stdio: 'inherit' });
+    } catch (e) {
+      // npm outdated exits with 1 if there are outdated packages, which is fine
+    }
+    
+    console.log('\n📦 Updating dependencies to match package.json...\n');
+    execSync('npm install', { stdio: 'inherit' });
+    
+    console.log('\n✅ Dependencies updated successfully!\n');
+  } catch (error) {
+    console.error('⚠️  Warning: Failed to update dependencies:', error.message);
+    console.log('Continuing with current dependencies...\n');
+  }
+} else {
+  console.log('⏭️  Skipping dependency update (--skip-update flag provided)\n');
+}
 
 let backendRunning = false;
 let frontendRunning = false;
