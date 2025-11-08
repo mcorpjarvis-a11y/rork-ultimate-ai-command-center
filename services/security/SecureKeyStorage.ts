@@ -261,7 +261,7 @@ class SecureKeyStorage {
     for (const key of keys) {
       try {
         // Try to get value from AsyncStorage with old format
-        const asyncKey = `@jarvis_${key}`;
+        const asyncKey = `@jarvis:secure_${key}`;
         const value = await AsyncStorage.getItem(asyncKey);
         
         if (value) {
