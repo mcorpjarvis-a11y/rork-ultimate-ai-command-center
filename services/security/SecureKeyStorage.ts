@@ -302,6 +302,13 @@ class SecureKeyStorage {
   }
 
   /**
+   * Alias for clearAll() for test compatibility
+   */
+  async clear(userId?: string): Promise<void> {
+    return this.clearAll(userId);
+  }
+
+  /**
    * Build full key with optional user prefix
    * Only uses alphanumeric characters, underscores, hyphens, and dots
    * to comply with SecureStore key requirements
