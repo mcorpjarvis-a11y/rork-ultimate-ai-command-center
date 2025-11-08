@@ -10,6 +10,7 @@ import SignInScreen from "@/screens/Onboarding/SignInScreen";
 import JarvisInitializationService from "@/services/JarvisInitializationService";
 import MasterProfile from "@/services/auth/MasterProfile";
 import SecureKeyStorage from "@/services/security/SecureKeyStorage";
+import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService";
 import { 
   SchedulerService, 
   WebSocketService, 
@@ -81,6 +82,7 @@ export default function RootLayout() {
     
     // Cleanup on unmount
     return () => {
+      JarvisAlwaysListeningService.stop();
       SchedulerService.stop();
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
@@ -121,6 +123,15 @@ export default function RootLayout() {
       // Access them to ensure they're loaded (they're singleton instances)
       const speechServices = [JarvisVoiceService, JarvisListenerService];
       console.log('[App] Speech services initialized:', speechServices.length);
+      
+      // Start always-listening service for wake word detection
+      console.log('[App] Starting always-listening service...');
+      const alwaysListeningStarted = await JarvisAlwaysListeningService.start();
+      if (alwaysListeningStarted) {
+        console.log('[App] ✅ Always-listening service started - JARVIS is now listening for wake word');
+      } else {
+        console.warn('[App] ⚠️ Always-listening service could not be started');
+      }
       
       // Start scheduler for automated tasks
       SchedulerService.start();

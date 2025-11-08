@@ -25,6 +25,7 @@ export { default as IoTDeviceService } from './IoTDeviceService';
 export { default as JarvisGuidanceService } from './JarvisGuidanceService';
 export { default as JarvisVoiceService } from './JarvisVoiceService';
 export { default as JarvisListenerService } from './JarvisListenerService';
+export { default as JarvisAlwaysListeningService } from './JarvisAlwaysListeningService';
 export { default as IntegrationManager } from './IntegrationManager';
 export { default as AutonomousEngine } from './AutonomousEngine';
 
