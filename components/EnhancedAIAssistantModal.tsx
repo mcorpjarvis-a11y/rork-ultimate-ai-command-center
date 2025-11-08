@@ -15,7 +15,9 @@ import JarvisPersonality from '@/services/personality/JarvisPersonality';
 import JarvisVoiceService from '@/services/JarvisVoiceService';
 import JarvisGuidanceService from '@/services/JarvisGuidanceService';
 import * as Speech from 'expo-speech';
-import { Audio } from 'expo-av';
+import AudioModule from 'expo-audio/build/AudioModule';
+import type { AudioRecorder } from 'expo-audio';
+import { RecordingPresets } from 'expo-audio';
 import { IronManTheme } from '@/constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AI_CONFIG } from '@/config/api.config';
@@ -47,7 +49,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
   const [selectedImages, setSelectedImages] = useState<{ uri: string; type: string }[]>([]);
   const greetingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
-  const recordingRef = useRef<Audio.Recording | null>(null);
+  const recordingRef = useRef<AudioRecorder | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const [settings, setSettings] = useState({
@@ -1188,45 +1190,20 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
 
   const startNativeRecording = async () => {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
+      const { granted } = await AudioModule.requestRecordingPermissionsAsync();
+      if (!granted) {
         Alert.alert('Permission Denied', 'Microphone access is required for voice input.');
         return;
       }
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await AudioModule.setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync({
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.wav',
-          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
-
-      await recording.startAsync();
+      const recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      await recording.prepareToRecordAsync();
+      recording.record();
       recordingRef.current = recording;
       setIsRecording(true);
     } catch (error) {
@@ -1245,10 +1222,10 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         }
       } else {
         if (recordingRef.current) {
-          await recordingRef.current.stopAndUnloadAsync();
-          await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+          await recordingRef.current.stop();
+          await AudioModule.setAudioModeAsync({ allowsRecording: false });
           
-          const uri = recordingRef.current.getURI();
+          const uri = recordingRef.current.uri;
           if (uri) {
             await processNativeAudio(uri);
           }

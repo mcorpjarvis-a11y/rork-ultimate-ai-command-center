@@ -206,7 +206,7 @@ async function testServices() {
     console.error('Troubleshooting:');
     console.error('  1. Ensure all services are properly exported in services/index.ts');
     console.error('  2. Check that all imports use .js extensions');
-    console.error('  3. Verify Expo dependencies are installed (expo-speech, expo-av)');
+    console.error('  3. Verify Expo dependencies are installed (expo-speech, expo-audio)');
     console.error('  4. Make sure AsyncStorage is available');
     console.error('');
     process.exit(1);

@@ -1,4 +1,6 @@
-import { Audio } from 'expo-av';
+import AudioModule from 'expo-audio/build/AudioModule';
+import type { AudioRecorder } from 'expo-audio';
+import { RecordingPresets } from 'expo-audio';
 import { Platform } from 'react-native';
 import JarvisVoiceService from './JarvisVoiceService';
 import JarvisGuidanceService from './JarvisGuidanceService';
@@ -26,7 +28,7 @@ export interface TranscriptionResult {
 
 class JarvisListenerService {
   private static instance: JarvisListenerService;
-  private recording: Audio.Recording | null = null;
+  private recording: AudioRecorder | null = null;
   private isListening: boolean = false;
   private isSpeaking: boolean = false;
   private continuousMode: boolean = false;
@@ -58,16 +60,15 @@ class JarvisListenerService {
       console.log('[JarvisListener] Initializing listener service...');
       
       if (Platform.OS !== 'web') {
-        const { status } = await Audio.requestPermissionsAsync();
-        if (status !== 'granted') {
+        const { granted } = await AudioModule.requestRecordingPermissionsAsync();
+        if (!granted) {
           console.warn('[JarvisListener] Microphone permission not granted');
           return;
         }
 
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
+        await AudioModule.setAudioModeAsync({
+          allowsRecording: true,
+          playsInSilentMode: true,
         });
       }
 
@@ -310,40 +311,16 @@ class JarvisListenerService {
   private async listenForWakeWordNative(): Promise<void> {
     try {
       // Set up short recording for wake word detection (3 seconds)
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync({
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.wav',
-          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
-          audioQuality: Audio.IOSAudioQuality.MEDIUM,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
-
-      await recording.startAsync();
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      await this.recording.prepareToRecordAsync();
+      this.recording.record();
       
       // Record for configured wake word duration
       await new Promise(resolve => setTimeout(resolve, this.config.wakeWordListenDuration));
       
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await this.recording.stop();
+      const uri = this.recording.uri;
+      this.recording = null;
 
       if (uri) {
         const transcription = await this.transcribeAudio(uri);
@@ -446,40 +423,16 @@ class JarvisListenerService {
 
   private async captureFullCommandNative(): Promise<void> {
     try {
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync({
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.wav',
-          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
-
-      await recording.startAsync();
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      await this.recording.prepareToRecordAsync();
+      this.recording.record();
       
       // Record for configured command duration
       await new Promise(resolve => setTimeout(resolve, this.config.commandListenDuration));
       
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await this.recording.stop();
+      const uri = this.recording.uri;
+      this.recording = null;
 
       if (uri) {
         const transcription = await this.transcribeAudio(uri);
@@ -495,40 +448,14 @@ class JarvisListenerService {
 
   private async startNativeListening(): Promise<void> {
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
+      await AudioModule.setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      this.recording = new Audio.Recording();
-      await this.recording.prepareToRecordAsync({
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.wav',
-          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
-
-      await this.recording.startAsync();
+      this.recording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      await this.recording.prepareToRecordAsync();
+      this.recording.record();
       console.log('[JarvisListener] Native recording started');
     } catch (error) {
       console.error('[JarvisListener] Failed to start native recording:', error);
@@ -555,14 +482,14 @@ class JarvisListenerService {
         return null;
       }
 
-      await this.recording.stopAndUnloadAsync();
-      const uri = this.recording.getURI();
+      await this.recording.stop();
+      const uri = this.recording.uri;
       this.recording = null;
       this.isListening = false;
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
+      await AudioModule.setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: true,
       });
 
       console.log('[JarvisListener] Recording stopped, URI:', uri);
