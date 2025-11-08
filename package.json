@@ -16,6 +16,8 @@
     "test:startup": "node scripts/test-startup.js",
     "test:expo-go": "node scripts/test-expo-go.js",
     "test:api-keys": "node scripts/test-api-keys.js",
+    "test:metro-config": "node scripts/test-metro-config.js",
+    "test:provider-registry": "node scripts/test-provider-registry.js",
     "verify:api-config": "node scripts/verify-api-config.js",
     "lint": "expo lint",
     "android": "expo run:android",
