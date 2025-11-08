@@ -93,7 +93,7 @@ class CodebaseAnalysisService {
         path: 'services/JarvisVoiceService.ts',
         type: 'service',
         description: 'Voice synthesis and recognition service for JARVIS',
-        dependencies: ['expo-speech', 'expo-av'],
+        dependencies: ['expo-speech', 'expo-audio'],
         exports: ['JarvisVoiceService'],
         linesOfCode: 260,
         complexity: 'medium',

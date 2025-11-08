@@ -1,5 +1,5 @@
 import * as Speech from 'expo-speech';
-import { Audio } from 'expo-av';
+import { AudioRecorder, AudioPlayer, AudioModule, RecordingPresets } from 'expo-audio';
 import { Platform } from 'react-native';
 import { AI_CONFIG } from '@/config/api.config';
 
@@ -16,7 +16,7 @@ export interface VoiceSettings {
 
 class JarvisVoiceService {
   private static instance: JarvisVoiceService;
-  private recording: Audio.Recording | null = null;
+  private recording: AudioRecorder | null = null;
   // JARVIS voice configuration - optimized for natural, human-like British male voice
   // These settings create a voice as close as possible to the Iron Man JARVIS
   private settings: VoiceSettings = {
@@ -44,10 +44,10 @@ class JarvisVoiceService {
   private async initializeAudio(): Promise<void> {
     try {
       if (Platform.OS !== 'web') {
-        await Audio.requestPermissionsAsync();
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          playsInSilentModeIOS: true,
+        await AudioModule.requestRecordingPermissionsAsync();
+        await AudioModule.setAudioModeAsync({
+          allowsRecording: false,
+          playsInSilentMode: true,
         });
       }
     } catch (error) {
@@ -133,20 +133,9 @@ class JarvisVoiceService {
 
       const audioData = await response.json();
       
-      // Play the audio using expo-av
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: audioData.audioContent },
-        { shouldPlay: true }
-      );
-      
-      await sound.playAsync();
-      
-      // Unload after playing
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
+      // Play the audio using expo-audio
+      const player = new AudioPlayer({ uri: audioData.audioContent });
+      await player.play();
       
       console.log('[JARVIS] Spoke using Google Cloud Neural2 TTS (most natural voice)');
     } catch (error) {
@@ -202,46 +191,20 @@ class JarvisVoiceService {
 
   private async startNativeListening(): Promise<void> {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
+      const { granted } = await AudioModule.requestRecordingPermissionsAsync();
+      if (!granted) {
         console.warn('Microphone permission not granted');
         return;
       }
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await AudioModule.setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync({
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.wav',
-          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 1,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
-
-      await recording.startAsync();
-      this.recording = recording;
+      this.recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      await this.recording.prepareToRecordAsync();
+      this.recording.record();
       console.log('[JARVIS] Recording started');
     } catch (error) {
       console.error('Failed to start native listening:', error);
@@ -258,12 +221,12 @@ class JarvisVoiceService {
         return null;
       }
 
-      await this.recording.stopAndUnloadAsync();
-      const uri = this.recording.getURI();
+      await this.recording.stop();
+      const uri = this.recording.uri;
       this.recording = null;
 
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
+      await AudioModule.setAudioModeAsync({
+        allowsRecording: false,
       });
 
       console.log('[JARVIS] Recording stopped:', uri);

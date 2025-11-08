@@ -1,5 +1,5 @@
 import * as Speech from 'expo-speech';
-import { Audio } from 'expo-av';
+import { AudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
 import { Platform } from 'react-native';
 import { AI_CONFIG } from '@/config/api.config';
 
@@ -19,7 +19,7 @@ export interface TranscriptionResult {
 }
 
 class VoiceService {
-  private recording: Audio.Recording | null = null;
+  private recording: AudioRecorder | null = null;
   private isRecording: boolean = false;
   // JARVIS voice configuration - optimized for natural, human-like British male voice
   // These settings create a voice as close as possible to the Iron Man JARVIS
@@ -34,13 +34,13 @@ class VoiceService {
 
   async initialize(): Promise<void> {
     if (Platform.OS !== 'web') {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
+      const { granted } = await AudioModule.requestRecordingPermissionsAsync();
+      if (!granted) {
         throw new Error('Audio permission not granted');
       }
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
+      await AudioModule.setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: true,
       });
     }
   }
@@ -108,38 +108,15 @@ class VoiceService {
     }
 
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await AudioModule.setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      const { recording } = await Audio.Recording.createAsync({
-        android: {
-          extension: '.m4a',
-          outputFormat: Audio.AndroidOutputFormat.MPEG_4,
-          audioEncoder: Audio.AndroidAudioEncoder.AAC,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: '.wav',
-          outputFormat: Audio.IOSOutputFormat.LINEARPCM,
-          audioQuality: Audio.IOSAudioQuality.HIGH,
-          sampleRate: 44100,
-          numberOfChannels: 2,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
-        web: {
-          mimeType: 'audio/webm',
-          bitsPerSecond: 128000,
-        },
-      });
+      this.recording = new AudioRecorder(RecordingPresets.HIGH_QUALITY);
+      await this.recording.prepareToRecordAsync();
+      this.recording.record();
 
-      this.recording = recording;
       this.isRecording = true;
       console.log('[VoiceService] Recording started');
     } catch (error) {
@@ -157,15 +134,15 @@ class VoiceService {
     console.log('[VoiceService] Stopping recording');
 
     try {
-      await this.recording.stopAndUnloadAsync();
-      const uri = this.recording.getURI();
+      await this.recording.stop();
+      const uri = this.recording.uri;
       this.recording = null;
       this.isRecording = false;
 
       if (Platform.OS !== 'web') {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          playsInSilentModeIOS: true,
+        await AudioModule.setAudioModeAsync({
+          allowsRecording: false,
+          playsInSilentMode: true,
         });
       }
 
