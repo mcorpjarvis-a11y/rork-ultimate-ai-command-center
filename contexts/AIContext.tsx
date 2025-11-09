@@ -1,48 +1,96 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { queryJarvis } from '../services/JarvisAPIRouter'; // <-- IMPORT THE NEW ROUTER
+import { queryJarvis } from '../services/JarvisAPIRouter';
+import { UploadedFile } from '../services/FileUploadService';
 
-type AIProvider = 'google' | 'groq'; // Expand as more providers are added
+type AIProvider = 'google' | 'groq' | 'huggingface' | 'togetherai' | 'deepseek';
+
+export interface AIMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  files?: UploadedFile[];
+  timestamp: number;
+}
 
 interface AIContextType {
-  response: string | null;
+  messages: AIMessage[];
   isLoading: boolean;
   error: string | null;
-  ask: (prompt: string, provider: AIProvider) => Promise<void>;
+  ask: (prompt: string, files?: UploadedFile[]) => Promise<void>;
   provider: AIProvider;
   setProvider: (provider: AIProvider) => void;
+  clearMessages: () => void;
 }
 
 const AIContext = createContext<AIContextType | undefined>(undefined);
 
 export const AIProvider = ({ children }: { children: ReactNode }) => {
-  const [response, setResponse] = useState<string | null>(null);
+  const [messages, setMessages] = useState<AIMessage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [provider, setProvider] = useState<AIProvider>('groq'); // Default to Groq
 
-  const ask = async (prompt: string, currentProvider: AIProvider) => {
+  const ask = async (prompt: string, files?: UploadedFile[]) => {
     setIsLoading(true);
     setError(null);
-    setResponse(null);
+
+    // Add user message
+    const userMessage: AIMessage = {
+      id: `user_${Date.now()}`,
+      role: 'user',
+      content: prompt,
+      files,
+      timestamp: Date.now(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+
+    // Build prompt with file context
+    let enhancedPrompt = prompt;
+    if (files && files.length > 0) {
+      const fileDescriptions = files
+        .map((f) => `[${f.type.toUpperCase()}: ${f.name}]`)
+        .join(', ');
+      enhancedPrompt = `${prompt}\n\nAttached files: ${fileDescriptions}`;
+    }
 
     // Use the unified query function
-    const result = await queryJarvis(prompt, currentProvider);
+    const result = await queryJarvis(enhancedPrompt, provider);
 
     if (result.success && result.content) {
-      setResponse(result.content);
+      const assistantMessage: AIMessage = {
+        id: `assistant_${Date.now()}`,
+        role: 'assistant',
+        content: result.content,
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
     } else {
       setError(result.error || 'An unknown error occurred.');
+      // Add error message
+      const errorMessage: AIMessage = {
+        id: `error_${Date.now()}`,
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${result.error || 'Unknown error'}`,
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     }
     setIsLoading(false);
   };
 
+  const clearMessages = () => {
+    setMessages([]);
+    setError(null);
+  };
+
   const contextValue = {
-    response,
+    messages,
     isLoading,
     error,
-    ask: (prompt: string) => ask(prompt, provider),
+    ask,
     provider,
     setProvider,
+    clearMessages,
   };
 
   return <AIContext.Provider value={contextValue}>{children}</AIContext.Provider>;

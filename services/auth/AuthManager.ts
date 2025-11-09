@@ -15,6 +15,9 @@ import * as discordProvider from './providerHelpers/discord';
 import * as redditProvider from './providerHelpers/reddit';
 import * as spotifyProvider from './providerHelpers/spotify';
 import * as homeassistantProvider from './providerHelpers/homeassistant';
+import * as youtubeProvider from './providerHelpers/youtube';
+import * as instagramProvider from './providerHelpers/instagram';
+import * as twitterProvider from './providerHelpers/twitter';
 
 class AuthManager {
   private eventListeners: Map<AuthEvent, Set<AuthEventListener>> = new Map();
@@ -27,6 +30,10 @@ class AuthManager {
     reddit: redditProvider,
     spotify: spotifyProvider,
     homeassistant: homeassistantProvider,
+    youtube: youtubeProvider,
+    instagram: instagramProvider,
+    twitter: twitterProvider,
+    x: twitterProvider, // Alias for twitter
   };
 
   constructor() {
