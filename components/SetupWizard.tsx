@@ -37,7 +37,7 @@ export default function SetupWizard({ visible, onClose, initialService }: SetupW
   ];
 
   const handleShowGuidance = async (serviceId: string) => {
-    const guidanceService = JarvisGuidanceService.getInstance();
+    const guidanceService = JarvisGuidanceService;
     const setupInfo = await guidanceService.generateAPIKeyGuidance(serviceId);
     setGuidance(setupInfo);
     setShowGuidance(true);

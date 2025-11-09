@@ -882,10 +882,10 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
       getCampaigns: createJarvisTool({
         description: 'Get all active marketing campaigns with ROI data',
         zodSchema: z.object({}),
-        execute() {
+        async execute() {
           const engine = AutonomousEngine.getInstance();
           const campaigns = engine.getCampaigns();
-          const performance = engine.getPerformanceMetrics();
+          const performance = await engine.getPerformanceMetrics();
           addSystemLog('info', `Retrieved ${campaigns.length} active campaigns`, 'Autonomous');
           addInsight(`AI analyzed ${campaigns.length} marketing campaigns with current revenue: $${performance.revenue.today}`);
           return `Found ${campaigns.length} campaigns, sir. Today's revenue: $${performance.revenue.today}. I can provide detailed analytics on any specific campaign.`;
@@ -914,12 +914,12 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         zodSchema: z.object({
           campaignId: z.string().describe('Campaign ID to optimize'),
         }),
-        execute(input: any) {
+        async execute(input: any) {
           const engine = AutonomousEngine.getInstance();
-          const result = engine.optimizeCampaign(input.campaignId);
-          addSystemLog('success', `Optimized campaign: ${input.campaignId}`, 'Autonomous');
-          addInsight(`AI optimized campaign ${input.campaignId} automatically`);
-          return `Campaign optimized, sir. ${result.message}`;
+          const result = await engine.optimizeCampaigns();
+          addSystemLog('success', `Optimized campaigns including: ${input.campaignId}`, 'Autonomous');
+          addInsight(`AI optimized ${result.optimized} campaigns automatically`);
+          return `Campaigns optimized, sir. Optimized: ${result.optimized}, Scaled: ${result.scaled}, Killed: ${result.killed}`;
         },
       }),
 
@@ -929,7 +929,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         description: 'Scan system for issues and problems',
         zodSchema: z.object({}),
         execute() {
-          const debugService = JarvisSelfDebugService.getInstance();
+          const debugService = JarvisSelfDebugService;
           const issues = debugService.getIssues();
           const critical = issues.filter((i: any) => i.severity === 'critical');
           addSystemLog('info', `System scan found ${issues.length} issues`, 'Debug');
@@ -944,7 +944,7 @@ export default function EnhancedAIAssistantModal({ visible, onClose }: AIAssista
         description: 'Run complete system health check',
         zodSchema: z.object({}),
         async execute() {
-          const debugService = JarvisSelfDebugService.getInstance();
+          const debugService = JarvisSelfDebugService;
           const health = await debugService.runDiagnostics();
           addSystemLog('info', `System diagnostics: ${health.systemHealth}`, 'Debug');
           addInsight(`JARVIS completed full system health check: ${health.systemHealth}`);
