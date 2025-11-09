@@ -5,5 +5,37 @@ module.exports = defineConfig([
   expoConfig,
   {
     ignores: ["dist/*"],
+  },
+  {
+    files: ["backend/**/*.ts", "backend/**/*.js"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["react-native", "react-native/*"],
+              message: "React Native imports are not allowed in backend code. Backend must run in pure Node.js environment."
+            },
+            {
+              group: ["react-native-web", "react-native-web/*"],
+              message: "React Native Web imports are not allowed in backend code."
+            },
+            {
+              group: ["expo", "expo-*"],
+              message: "Expo imports are not allowed in backend code. Backend must run in pure Node.js environment."
+            },
+            {
+              group: ["react", "react-dom"],
+              message: "React and React DOM imports are not allowed in backend code."
+            },
+            {
+              group: ["@react-native*"],
+              message: "React Native packages are not allowed in backend code."
+            }
+          ]
+        }
+      ]
+    }
   }
 ]);

@@ -48,8 +48,27 @@ npm run dev:backend      # Backend with hot reload
 
 # Build
 npm run build:backend    # Build backend TypeScript
+npm run verify:backend   # Build & verify backend isolation
 npm run build:apk        # Build Android APK
 ```
+
+## Backend Development
+
+The backend has been isolated from React Native dependencies to run in pure Node.js.
+
+**Quick start**:
+```bash
+npm run build:backend    # Compile backend
+npm run start:backend    # Build and start server
+npm run dev:backend      # Development mode with hot reload
+```
+
+**📖 See [BACKEND_DEV.md](./BACKEND_DEV.md) for complete backend documentation**, including:
+- Architecture and isolation strategy
+- Build process and troubleshooting
+- Development vs production modes
+- ESLint safeguards against React Native imports
+- Testing and verification
 
 ## Important Notes
 
