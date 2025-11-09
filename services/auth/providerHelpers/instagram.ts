@@ -10,13 +10,8 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const FACEBOOK_APP_ID = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || '';
-const FACEBOOK_APP_SECRET = process.env.EXPO_PUBLIC_FACEBOOK_APP_SECRET || '';
-
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
+// Use Expo proxy for OAuth
+const USE_PROXY = true;
 
 const INSTAGRAM_SCOPES = [
   'instagram_basic',
@@ -34,16 +29,26 @@ export async function startAuth(): Promise<AuthResponse> {
   try {
     console.log('[InstagramProvider] Starting authentication flow');
 
+    // Create redirect URI using proxy
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
+    });
+
+    // Use client ID or proxy
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || '');
+
     const request = new AuthSession.AuthRequest({
-      clientId: FACEBOOK_APP_ID,
+      clientId,
       scopes: INSTAGRAM_SCOPES,
       responseType: AuthSession.ResponseType.Code,
-      redirectUri: REDIRECT_URI,
+      redirectUri,
       usePKCE: false, // Facebook doesn't support PKCE
     });
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://www.facebook.com/v18.0/dialog/oauth',
+      useProxy: USE_PROXY,
     });
 
     if (result.type === 'success') {
@@ -53,7 +58,7 @@ export async function startAuth(): Promise<AuthResponse> {
         throw new Error('No authorization code received');
       }
 
-      const tokens = await exchangeCodeForTokens(code);
+      const tokens = await exchangeCodeForTokens(code, redirectUri);
       const profile = await fetchUserProfile(tokens.access_token);
       
       return {
@@ -74,15 +79,11 @@ export async function startAuth(): Promise<AuthResponse> {
   }
 }
 
-async function exchangeCodeForTokens(code: string): Promise<any> {
-  const response = await fetch('https://graph.facebook.com/v18.0/oauth/access_token', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  const url = `https://graph.facebook.com/v18.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&code=${code}`;
+async function exchangeCodeForTokens(code: string, redirectUri: string): Promise<any> {
+  const appId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || 'EXPO_PROXY';
+  const appSecret = process.env.EXPO_PUBLIC_FACEBOOK_APP_SECRET || '';
+  
+  const url = `https://graph.facebook.com/v18.0/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&redirect_uri=${encodeURIComponent(redirectUri)}&code=${code}`;
   
   const tokenResponse = await fetch(url);
 
@@ -94,7 +95,7 @@ async function exchangeCodeForTokens(code: string): Promise<any> {
   const data = await tokenResponse.json();
   
   // Exchange short-lived token for long-lived token
-  const longLivedUrl = `https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&fb_exchange_token=${data.access_token}`;
+  const longLivedUrl = `https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${data.access_token}`;
   
   const longLivedResponse = await fetch(longLivedUrl);
   if (!longLivedResponse.ok) {

@@ -11,13 +11,8 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const TWITTER_CLIENT_ID = process.env.EXPO_PUBLIC_TWITTER_CLIENT_ID || '';
-const TWITTER_CLIENT_SECRET = process.env.EXPO_PUBLIC_TWITTER_CLIENT_SECRET || '';
-
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
+// Use Expo proxy for OAuth
+const USE_PROXY = true;
 
 const TWITTER_SCOPES = [
   'tweet.read',
@@ -48,11 +43,20 @@ export async function startAuth(): Promise<AuthResponse> {
     const codeVerifier = await generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
 
+    // Create redirect URI using proxy
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
+    });
+
+    // Use client ID or proxy
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_TWITTER_CLIENT_ID || '');
+
     const request = new AuthSession.AuthRequest({
-      clientId: TWITTER_CLIENT_ID,
+      clientId,
       scopes: TWITTER_SCOPES,
       responseType: AuthSession.ResponseType.Code,
-      redirectUri: REDIRECT_URI,
+      redirectUri,
       usePKCE: false, // We're handling PKCE manually
       extraParams: {
         code_challenge: codeChallenge,
@@ -62,6 +66,7 @@ export async function startAuth(): Promise<AuthResponse> {
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://twitter.com/i/oauth2/authorize',
+      useProxy: USE_PROXY,
     });
 
     if (result.type === 'success') {
@@ -71,7 +76,7 @@ export async function startAuth(): Promise<AuthResponse> {
         throw new Error('No authorization code received');
       }
 
-      const tokens = await exchangeCodeForTokens(code, codeVerifier);
+      const tokens = await exchangeCodeForTokens(code, codeVerifier, redirectUri);
       const profile = await fetchUserProfile(tokens.access_token);
       
       return {
@@ -123,17 +128,20 @@ function base64URLEncode(str: string | Uint8Array): string {
     .replace(/=/g, '');
 }
 
-async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+async function exchangeCodeForTokens(code: string, codeVerifier: string, redirectUri: string): Promise<any> {
+  const clientId = process.env.EXPO_PUBLIC_TWITTER_CLIENT_ID || 'EXPO_PROXY';
+  const clientSecret = process.env.EXPO_PUBLIC_TWITTER_CLIENT_SECRET || '';
+  
   const response = await fetch('https://api.twitter.com/2/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${Buffer.from(`${TWITTER_CLIENT_ID}:${TWITTER_CLIENT_SECRET}`).toString('base64')}`,
+      'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
     },
     body: new URLSearchParams({
       code,
       grant_type: 'authorization_code',
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: redirectUri,
       code_verifier: codeVerifier,
     }).toString(),
   });
@@ -180,11 +188,14 @@ async function fetchUserProfile(accessToken: string): Promise<any> {
  * Refresh access token
  */
 export async function refreshToken(refreshToken: string): Promise<AuthResponse> {
+  const clientId = process.env.EXPO_PUBLIC_TWITTER_CLIENT_ID || 'EXPO_PROXY';
+  const clientSecret = process.env.EXPO_PUBLIC_TWITTER_CLIENT_SECRET || '';
+  
   const response = await fetch('https://api.twitter.com/2/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${Buffer.from(`${TWITTER_CLIENT_ID}:${TWITTER_CLIENT_SECRET}`).toString('base64')}`,
+      'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
     },
     body: new URLSearchParams({
       refresh_token: refreshToken,
@@ -212,11 +223,14 @@ export async function refreshToken(refreshToken: string): Promise<AuthResponse> 
  * Revoke access token
  */
 export async function revokeToken(token: string): Promise<void> {
+  const clientId = process.env.EXPO_PUBLIC_TWITTER_CLIENT_ID || 'EXPO_PROXY';
+  const clientSecret = process.env.EXPO_PUBLIC_TWITTER_CLIENT_SECRET || '';
+  
   await fetch('https://api.twitter.com/2/oauth2/revoke', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${Buffer.from(`${TWITTER_CLIENT_ID}:${TWITTER_CLIENT_SECRET}`).toString('base64')}`,
+      'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
     },
     body: new URLSearchParams({
       token,

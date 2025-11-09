@@ -10,13 +10,8 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const DISCORD_CLIENT_ID = process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || '';
-const DISCORD_CLIENT_SECRET = process.env.EXPO_PUBLIC_DISCORD_CLIENT_SECRET || '';
-
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
+// Use Expo proxy for OAuth
+const USE_PROXY = true;
 
 const DEFAULT_SCOPES = ['identify', 'email'];
 
@@ -29,16 +24,26 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
+    // Create redirect URI using proxy
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
+    });
+
+    // Use client ID or proxy
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || '');
+
     const request = new AuthSession.AuthRequest({
-      clientId: DISCORD_CLIENT_ID,
+      clientId,
       scopes,
       responseType: AuthSession.ResponseType.Code,
-      redirectUri: REDIRECT_URI,
+      redirectUri,
       usePKCE: true,
     });
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://discord.com/api/oauth2/authorize',
+      useProxy: USE_PROXY,
     });
 
     console.log('[DiscordProvider] Auth result:', result.type);
@@ -51,7 +56,7 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
       }
 
       // Exchange code for tokens
-      const tokens = await exchangeCodeForTokens(code, request.codeVerifier!);
+      const tokens = await exchangeCodeForTokens(code, request.codeVerifier!, redirectUri);
       
       // Fetch user profile
       const profile = await fetchUserProfile(tokens.access_token);
@@ -81,19 +86,22 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 /**
  * Exchange authorization code for tokens
  */
-async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+async function exchangeCodeForTokens(code: string, codeVerifier: string, redirectUri: string): Promise<any> {
   try {
+    const clientId = process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || 'EXPO_PROXY';
+    const clientSecret = process.env.EXPO_PUBLIC_DISCORD_CLIENT_SECRET || '';
+    
     const params = new URLSearchParams({
-      client_id: DISCORD_CLIENT_ID,
+      client_id: clientId,
       code,
       grant_type: 'authorization_code',
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: redirectUri,
       code_verifier: codeVerifier,
     });
 
     // Add client secret if available (not required for PKCE)
-    if (DISCORD_CLIENT_SECRET) {
-      params.append('client_secret', DISCORD_CLIENT_SECRET);
+    if (clientSecret) {
+      params.append('client_secret', clientSecret);
     }
 
     const response = await fetch('https://discord.com/api/oauth2/token', {
@@ -126,14 +134,17 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
   try {
     console.log('[DiscordProvider] Refreshing access token');
 
+    const clientId = process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || 'EXPO_PROXY';
+    const clientSecret = process.env.EXPO_PUBLIC_DISCORD_CLIENT_SECRET || '';
+
     const params = new URLSearchParams({
-      client_id: DISCORD_CLIENT_ID,
+      client_id: clientId,
       refresh_token,
       grant_type: 'refresh_token',
     });
 
-    if (DISCORD_CLIENT_SECRET) {
-      params.append('client_secret', DISCORD_CLIENT_SECRET);
+    if (clientSecret) {
+      params.append('client_secret', clientSecret);
     }
 
     const response = await fetch('https://discord.com/api/oauth2/token', {
@@ -173,13 +184,16 @@ export async function revokeToken(token: string): Promise<void> {
   try {
     console.log('[DiscordProvider] Revoking token');
 
+    const clientId = process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || 'EXPO_PROXY';
+    const clientSecret = process.env.EXPO_PUBLIC_DISCORD_CLIENT_SECRET || '';
+
     const params = new URLSearchParams({
-      client_id: DISCORD_CLIENT_ID,
+      client_id: clientId,
       token,
     });
 
-    if (DISCORD_CLIENT_SECRET) {
-      params.append('client_secret', DISCORD_CLIENT_SECRET);
+    if (clientSecret) {
+      params.append('client_secret', clientSecret);
     }
 
     const response = await fetch('https://discord.com/api/oauth2/token/revoke', {
