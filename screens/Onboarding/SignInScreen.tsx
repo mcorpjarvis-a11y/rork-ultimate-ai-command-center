@@ -42,8 +42,8 @@ export default function SignInScreen() {
       const profile = await MasterProfile.getMasterProfile();
       
       if (profile) {
-        // Profile already exists, navigate to dashboard
-        console.log('[SignInScreen] Existing profile found, navigating to dashboard');
+        // Profile exists - let _layout.tsx handle routing based on onboarding status
+        console.log('[SignInScreen] Existing profile found, redirecting to app');
         router.replace('/');
       }
     } catch (error) {
@@ -119,12 +119,13 @@ export default function SignInScreen() {
           await MasterProfile.saveMasterProfile(masterProfile);
         }
 
-        console.log('[SignInScreen] Sign-in successful');
-        router.replace('/onboarding/permissions');
+        console.log('[SignInScreen] Sign-in successful, redirecting to app');
+        // Let _layout.tsx handle routing based on onboarding status
+        router.replace('/');
         
         Alert.alert(
           'Welcome Back!',
-          `Signed in as ${email}. Let's review your permissions.`,
+          `Signed in as ${email}.`,
           [{ text: 'OK' }]
         );
       }

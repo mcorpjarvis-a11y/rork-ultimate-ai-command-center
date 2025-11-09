@@ -354,14 +354,25 @@ class JarvisAlwaysListeningService {
     const wakeWord = this.config.wakeWord.toLowerCase();
 
     // Check for exact match or variations
+    // Support multiple wake word patterns:
+    // - "jarvis" (base)
+    // - "hey jarvis"
+    // - "ok jarvis"
+    // - "yo jarvis"
+    // - "jarvis," / "jarvis."
+    // - At start of sentence
     const variations = [
       wakeWord,
       `hey ${wakeWord}`,
       `ok ${wakeWord}`,
+      `yo ${wakeWord}`,
       `${wakeWord},`,
       `${wakeWord}.`,
+      `${wakeWord}!`,
+      `${wakeWord}?`,
     ];
 
+    // Check if any variation is present or if it starts with wake word
     return variations.some(v => normalized.includes(v)) || normalized.startsWith(wakeWord);
   }
 
