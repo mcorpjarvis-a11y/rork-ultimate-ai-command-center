@@ -23,6 +23,7 @@
     "test:api-keys": "node scripts/test-api-keys.js",
     "test:metro-config": "node scripts/test-metro-config.js",
     "test:provider-registry": "node scripts/test-provider-registry.js",
+    "verify": "node scripts/verify-metro.js",
     "verify:api-config": "node scripts/verify-api-config.js",
     "verify:metro": "node scripts/verify-metro.js",
     "lint": "expo lint",

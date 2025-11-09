@@ -15,6 +15,18 @@ console.log('🚀   JARVIS UNIFIED LAUNCHER');
 console.log('🚀   Starting Complete AI Command Center');
 console.log('🚀 ════════════════════════════════════════════════════════════\n');
 
+// Check Node version
+const nodeVersion = process.version;
+const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
+console.log(`📌 Node version: ${nodeVersion}`);
+
+if (majorVersion > 20) {
+  console.log('⚠️  WARNING: Node.js > 20 detected. Node 20.x LTS is recommended for Metro bundler.');
+  console.log('   You may experience TransformError issues. Consider downgrading to Node 20.\n');
+} else if (majorVersion === 20) {
+  console.log('✅ Node 20.x LTS detected (optimal for Metro bundler)\n');
+}
+
 // Check if --skip-update flag is provided
 const skipUpdate = process.argv.includes('--skip-update');
 
@@ -59,11 +71,22 @@ function log(prefix, color, message) {
 }
 
 console.log('📡 Starting Backend Server...\n');
-const backend = spawn(
-  isWindows ? 'npx.cmd' : 'npx',
-  ['tsx', 'backend/server.express.ts'],
-  { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
-);
+
+let backend;
+try {
+  backend = spawn(
+    isWindows ? 'npx.cmd' : 'npx',
+    ['tsx', 'backend/server.express.ts'],
+    { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
+  );
+} catch (error) {
+  console.error('❌ Failed to start backend server:', error.message);
+  console.error('\nTroubleshooting:');
+  console.error('  1. Check that tsx is installed: npm install');
+  console.error('  2. Verify backend/server.express.ts exists');
+  console.error('  3. Check Node version is compatible (Node 20.x recommended)');
+  process.exit(1);
+}
 
 backendRunning = true;
 
@@ -94,11 +117,22 @@ backend.on('exit', (code) => {
 setTimeout(() => {
   console.log('\n📱 Starting Frontend (Expo)...\n');
   
-  const frontend = spawn(
-    isWindows ? 'npx.cmd' : 'npx',
-    ['expo', 'start'],
-    { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
-  );
+  let frontend;
+  try {
+    frontend = spawn(
+      isWindows ? 'npx.cmd' : 'npx',
+      ['expo', 'start'],
+      { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
+    );
+  } catch (error) {
+    console.error('❌ Failed to start frontend (Metro bundler):', error.message);
+    console.error('\nTroubleshooting:');
+    console.error('  1. Run: npm run verify:metro');
+    console.error('  2. Clear Metro cache: npm start -- --clear');
+    console.error('  3. Check MASTER_CHECKLIST.md Metro Troubleshooting section');
+    if (backend && backend.pid) backend.kill('SIGTERM');
+    process.exit(1);
+  }
 
   frontendRunning = true;
 
