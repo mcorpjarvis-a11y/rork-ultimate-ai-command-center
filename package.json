@@ -24,6 +24,7 @@
     "test:metro-config": "node scripts/test-metro-config.js",
     "test:provider-registry": "node scripts/test-provider-registry.js",
     "verify:api-config": "node scripts/verify-api-config.js",
+    "verify:metro": "node scripts/verify-metro.js",
     "lint": "expo lint",
     "android": "expo run:android",
     "build:apk": "expo run:android --variant release"
@@ -37,6 +38,7 @@
     "@jarvis/toolkit": "file:jarvis-toolkit",
     "@nkzw/create-context-hook": "^1.1.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native/virtualized-lists": "^0.81.5",
     "@react-navigation/native": "^7.1.6",
     "@stardazed/streams-text-encoding": "^1.0.2",
     "@tanstack/eslint-plugin-query": "^5.91.2",
@@ -49,6 +51,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "expo": "^54.0.23",
+    "expo-asset": "~12.0.9",
     "expo-audio": "~1.0.14",
     "expo-auth-session": "~7.0.8",
     "expo-blur": "~15.0.7",

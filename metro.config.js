@@ -16,8 +16,15 @@ config.resolver = {
   extraNodeModules: {
     '@': path.resolve(__dirname, './'),
   },
-  // Ensure TypeScript files are resolved
-  sourceExts: [...(config.resolver?.sourceExts || []), 'ts', 'tsx'],
+  // Ensure TypeScript files and other extensions are resolved
+  sourceExts: [...(config.resolver?.sourceExts || []), 'ts', 'tsx', 'mjs', 'cjs'],
+  assetExts: [...(config.resolver?.assetExts || []), 'db', 'mp3', 'ttf', 'obj', 'png', 'jpg'],
+  // Block only build artifacts and cache directories from being watched
+  // Don't block nested node_modules as some packages need them
+  blockList: [
+    /backend\/dist\/.*/,
+    /\.git\/.*/,
+  ].map((re) => new RegExp(re)),
 };
 
 module.exports = config;

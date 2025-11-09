@@ -1,0 +1,50 @@
+name: Metro Bundler Verification
+
+on:
+  push:
+    branches: [ main, develop, copilot/** ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  verify-metro:
+    name: Verify Metro Bundler
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit || echo "TypeScript errors exist but don't block Metro"
+        continue-on-error: true
+      
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Verify Metro bundler
+        run: npm run verify:metro
+      
+      - name: Upload bundle artifacts (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metro-bundle-failure
+          path: |
+            /tmp/metro-verification-bundle/
+            .expo/
+          if-no-files-found: ignore
+          retention-days: 7

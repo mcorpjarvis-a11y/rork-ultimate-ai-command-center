@@ -4,7 +4,9 @@
     "slug": "ultimate-ai-command-center",
     "version": "1.0.0",
     "sdkVersion": "54.0.0",
-    "platforms": ["android"],
+    "platforms": [
+      "android"
+    ],
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -61,7 +63,7 @@
         }
       ],
       [
-        "expo-av",
+        "expo-audio",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
         }
@@ -80,7 +82,8 @@
           "isAccessMediaLocationEnabled": true
         }
       ],
-      "expo-document-picker"
+      "expo-document-picker",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true

@@ -49,14 +49,32 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm install
 
-# Step 4: Start the instant web preview of your app in your browser, with auto-reloading of your changes
+# Step 4: Verify Metro bundler is working (recommended)
+npm run verify:metro
+
+# Step 5: Run tests to ensure everything is set up correctly
+npm test
+
+# Step 6: Start the instant web preview of your app in your browser, with auto-reloading of your changes
 npm run start-web
 
-# Step 5: Start Android preview
+# Step 7: Start Android preview
 # Option A (recommended):
 npm run start  # then press "a" for Android
 # Option B (if supported by your environment):
 npm run android
+```
+
+### Troubleshooting
+
+If you encounter Metro bundler issues:
+
+```bash
+# Clear Metro cache and verify bundler
+npm run verify:metro
+
+# For detailed troubleshooting, see:
+# METRO_TROUBLESHOOTING.md
 ```
 
 ### **Edit a file directly in GitHub**
@@ -92,6 +110,29 @@ The backend is fully TypeScript-enabled with:
 - ✅ Full type safety across all routes
 
 For backend details, see [backend/README.md](backend/README.md)
+
+## Available Scripts
+
+### Development
+- `npm start` - Start Expo dev server (Metro bundler)
+- `npm run start:all` - Start both frontend and backend
+- `npm run start:backend` - Start backend API server
+- `npm run dev:backend` - Start backend with hot reload
+- `npm run start-web` - Start web version
+
+### Testing & Verification
+- `npm test` - Run all tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Generate test coverage report
+- `npm run verify:metro` - Verify Metro bundler is working correctly
+- `npm run lint` - Run ESLint
+
+### Build
+- `npm run build:backend` - Build backend TypeScript
+- `npm run build:apk` - Build Android APK
+- `npm run android` - Run on Android device/emulator
+
+For Metro bundler troubleshooting, see [METRO_TROUBLESHOOTING.md](METRO_TROUBLESHOOTING.md)
 
 ## Backend Development
 
