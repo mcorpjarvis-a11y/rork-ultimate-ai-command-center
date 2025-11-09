@@ -23,6 +23,7 @@ import systemRoutes from './routes/system';
 import analyticsRoutes from './routes/analytics';
 import trendsRoutes from './routes/trends';
 import contentRoutes from './routes/content';
+import monetizationRoutes from './routes/monetization';
 
 const app: Express = express();
 const PORT = envConfig.PORT;
@@ -87,6 +88,7 @@ app.use('/api/system', systemRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/trends', trendsRoutes);
 app.use('/api/content', contentRoutes);
+app.use('/api/monetization', monetizationRoutes);
 
 // tRPC support (backwards compatibility)
 app.use('/trpc', (req: Request, res: Response) => {
