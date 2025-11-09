@@ -687,10 +687,10 @@ This section lists remaining tasks. Most major features (A-O) are complete. Focu
 #### U. Backend Enhancements
 - [x] U1: Rate limiting implemented (100 req/15min) ✅
 - [x] U2: Request/response logging ✅
-- [ ] U3: WebSocket for real-time updates
-- [ ] U4: API versioning (/api/v1/, /api/v2/)
-- [ ] U5: Health check dashboard UI
-- [ ] U6: API metrics and monitoring
+- [x] U3: WebSocket for real-time updates ✅ (Completed: 2025-11-09)
+- [x] U4: API versioning (/api/v1/, /api/v2/) ✅ (Completed: 2025-11-09)
+- [x] U5: Health check dashboard UI ✅ (Completed: 2025-11-09)
+- [x] U6: API metrics and monitoring ✅ (Completed: 2025-11-09)
 - [ ] U7: GraphQL endpoint (optional alternative to REST)
 
 #### V. Feature Enhancements
@@ -1388,6 +1388,32 @@ GET /api/system/status              - System status
 GET /api/system/health              - Health check
 GET /api/system/info                - API information
 ```
+
+##### Health & Monitoring (U3-U6 Implementation)
+```
+GET    /api/health                   - Basic health check (fast)
+GET    /api/health/detailed          - Comprehensive health with metrics
+GET    /api/health/ready             - Readiness probe (k8s)
+GET    /api/health/live              - Liveness probe (k8s)
+GET    /api/metrics                  - Prometheus-style metrics
+WS     /ws                          - WebSocket real-time updates
+```
+
+**WebSocket Events:**
+- `system_health` - System status changes
+- `iot_update` - IoT device state changes
+- `social_post` - Social media post updates
+- `analytics` - Analytics refresh notifications
+- `job_complete` - Background job completion
+- `notification` - General notifications
+
+**API Versioning (U4):**
+All endpoints support versioning through:
+1. URL path: `/api/v1/resource` or `/api/v2/resource`
+2. Header: `Accept: application/vnd.jarvis.v1+json`
+3. Query param: `/api/resource?version=1`
+
+Default version: v1
 
 ##### Logs
 ```
