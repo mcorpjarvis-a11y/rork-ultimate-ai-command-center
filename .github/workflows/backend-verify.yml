@@ -19,6 +19,8 @@ jobs:
   verify-backend-isolation:
     name: Verify Backend Isolation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
