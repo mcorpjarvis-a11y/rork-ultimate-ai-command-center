@@ -175,23 +175,6 @@ export default function RootLayout() {
     }
   }
 
-  async function handleSignInComplete() {
-    console.log('[App] Sign-in completed, initializing app...');
-    setShowSignIn(false);
-    setIsAuthenticating(true);
-    
-    try {
-      // Initialize JARVIS after sign-in
-      await initializeJarvis();
-      setAppReady(true);
-    } catch (error) {
-      console.error('[App] Failed to initialize after sign-in:', error);
-      setAppReady(true); // Continue loading app even if Jarvis fails
-    } finally {
-      setIsAuthenticating(false);
-    }
-  }
-
   if (showSignIn) {
     return (
       <ErrorBoundary>
