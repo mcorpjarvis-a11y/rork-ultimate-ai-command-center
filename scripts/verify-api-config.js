@@ -231,7 +231,7 @@ if (hasWorkingConfig && hasNoWarnings) {
 }
 
 console.log('\n📚 Documentation:');
-console.log('   - API setup: README.md');
+console.log('   - API setup: MASTER_CHECKLIST.md (API Keys Setup section)');
 console.log('   - Key management: .env.example');
 console.log('   - Getting free keys: See URLs in .env.example\n');
 
