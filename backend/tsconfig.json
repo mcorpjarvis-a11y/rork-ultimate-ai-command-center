@@ -3,7 +3,7 @@
     // Target modern Node.js
     "target": "ES2020",
     "module": "CommonJS",
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2020"],
     
     // Output configuration
     "outDir": "./dist",
@@ -19,6 +19,7 @@
     "noImplicitAny": false,
     "strictNullChecks": false,
     "noImplicitThis": false,
+    "noEmitOnError": false,
     
     // Additional checks
     "noUnusedLocals": false,
@@ -28,8 +29,8 @@
     "noUncheckedIndexedAccess": false,
     
     // Emit configuration
-    "declaration": true,
-    "declarationMap": true,
+    "declaration": false,
+    "declarationMap": false,
     "sourceMap": true,
     "removeComments": false,
     
@@ -39,16 +40,30 @@
     "forceConsistentCasingInFileNames": true,
     
     // Types
-    "types": ["node"]
+    "types": ["node"],
+    "typeRoots": ["../node_modules/@types"]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "./**/*.ts",
+    "./**/*.tsx",
+    "../services/**/*.ts",
+    "../config/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "../services/**/__tests__/**",
+    "../services/**/**.test.ts",
+    "../services/**/**.spec.ts",
+    "../app",
+    "../components",
+    "../screens",
+    "../contexts",
+    "../hooks",
+    "../lib",
+    "../types",
+    "../constants"
   ]
 }

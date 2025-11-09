@@ -18,6 +18,7 @@
 - [Quick Navigation](#quick-navigation)
 - [README - Project Overview](#readme---project-overview)
 - [Quick Start Guide](#quick-start-guide)
+- [Development & Build Flow](#development--build-flow)
 - [TESTING - Testing Strategy](#testing---testing-strategy)
 - [DONE - Completed Tasks](#done---completed-tasks)
 - [TODO - Remaining Tasks](#todo---remaining-tasks)
@@ -56,20 +57,22 @@
 npm test                 # Run all tests (should show 142/142)
 npm run verify:metro     # Verify Metro bundler works
 npm run verify           # Quick pre-start verification
+npm run verify:backend   # Verify backend isolation and build
 npm run lint             # Check code quality
 
 # Development
 npm start                # Start Metro bundler
 npm run start:all        # Start backend + frontend
-npm run dev:backend      # Start backend with hot reload
+npm run dev:backend      # Start backend with hot reload (recommended for dev)
 
 # Build
-npm run build:backend    # Build backend TypeScript
+npm run build:backend    # Build backend with esbuild (isolated from RN)
 npm run build:apk        # Build Android APK
 ```
 
 ### Quick Links to Sections
 - [How to Get Started](#quick-start-guide)
+- [Development & Build Flow](#development--build-flow)
 - [Environment Setup](#environment-setup)
 - [Running Tests](#running-tests)
 - [Common Issues](#metro-troubleshooting)
@@ -265,6 +268,215 @@ TWITTER_API_KEY=your_twitter_key
 ### Testing in Browser
 
 Run `npm run start-web` to test in a web browser. Note: The browser preview is great for quick testing, but some native features may not be available.
+
+---
+
+## Development & Build Flow
+
+> **⚠️ IMPORTANT: ACTIVE DEVELOPMENT WORKFLOW**
+>
+> This section documents the **current development workflow** for testing on the Samsung Galaxy S25 Ultra.
+> **Production builds are NOT configured** until building and testing are complete.
+
+### Workflow Overview
+
+This is the standard development cycle for working on JARVIS:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Development Cycle                          │
+│                                                              │
+│  1. BUILD HERE     →  2. PUSH TO TERMUX                     │
+│     (Development        (S25 Ultra Device)                   │
+│      Machine)                ↓                               │
+│                                                              │
+│  4. ITERATE        ←  3. TEST IN EXPO GO 54                 │
+│     (Fix Issues)       (On S25 Ultra)                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step 1: Build & Verify Locally
+
+**On your development machine:**
+
+```bash
+# Make your code changes
+# Then verify everything works locally
+
+# Run tests
+npm test
+
+# Verify Metro bundler
+npm run verify:metro
+
+# Build backend (if backend changes made)
+npm run build:backend
+
+# Lint your code
+npm run lint
+
+# Commit your changes
+git add .
+git commit -m "Your commit message"
+git push origin your-branch
+```
+
+### Step 2: Deploy to Termux (S25 Ultra)
+
+**On your Samsung Galaxy S25 Ultra in Termux:**
+
+```bash
+# Navigate to project directory
+cd ~/rork-ultimate-ai-command-center
+
+# Pull latest changes
+git pull origin your-branch
+
+# Install any new dependencies (if package.json changed)
+npm install
+
+# You're now ready to test!
+```
+
+### Step 3: Test in Expo Go 54
+
+**Still on S25 Ultra:**
+
+```bash
+# Start BOTH backend and frontend together
+npm run start:all
+
+# This command does:
+# 1. Starts the backend server (Express API)
+# 2. Starts Metro bundler (React Native)
+# 3. Displays QR code for Expo Go
+
+# Alternative: Start individually
+npm run dev:backend     # Backend only (with hot reload)
+npm start               # Frontend only (Metro bundler)
+```
+
+**In Expo Go app on S25 Ultra:**
+
+1. Open **Expo Go 54** app
+2. Scan the QR code displayed in Termux
+3. App will load and connect to your local backend
+4. Test all features thoroughly
+
+### Step 4: Iterate
+
+**If you find issues:**
+
+1. **Note the issue** on your development machine
+2. **Make fixes** to the code
+3. **Commit and push** changes
+4. **Repeat Step 2** (pull in Termux)
+5. **Expo Go will auto-reload** with your changes
+
+> **💡 Hot Reload**: For backend changes, use `npm run dev:backend` which automatically reloads when you save files.
+
+### Key Points
+
+✅ **DO:**
+- Always use `npm run start:all` for full-stack testing
+- Test on physical S25 Ultra device with Expo Go 54
+- Use `npm run dev:backend` for backend development (hot reload)
+- Run tests before pushing (`npm test`)
+- Commit and push frequently
+
+❌ **DON'T:**
+- Don't build production APK yet (not configured)
+- Don't use `npm run build:apk` during development
+- Don't test on iOS (not supported)
+- Don't skip tests before committing
+
+### Device & Environment Specifics
+
+**Hardware:**
+- Device: Samsung Galaxy S25 Ultra
+- OS: Android with Termux
+- Testing App: Expo Go 54
+
+**Software Stack:**
+- Node.js: 20.x LTS (in Termux)
+- npm: Latest version
+- Metro Bundler: Expo 54
+- Backend: Express.js (Node.js)
+
+### Troubleshooting Development Flow
+
+#### Issue: Can't connect to backend from Expo Go
+
+**Solution:**
+```bash
+# Check backend is running
+# You should see "Server is ONLINE" message
+
+# Verify PORT (default: 3000)
+# Make sure firewall allows connections
+
+# Try restarting both services
+npm run start:all
+```
+
+#### Issue: Metro bundler won't start
+
+**Solution:**
+```bash
+# Clear Metro cache
+npm run verify:metro
+
+# Or manually
+rm -rf .expo
+rm -rf node_modules/.cache
+npm start -- --clear
+```
+
+#### Issue: Changes not reflecting in Expo Go
+
+**Solution:**
+```bash
+# Force reload in Expo Go (shake device)
+# Or restart Metro bundler
+npm start -- --clear
+```
+
+#### Issue: Backend changes not loading
+
+**Solution:**
+```bash
+# Make sure using dev mode (hot reload)
+npm run dev:backend
+
+# Or restart backend
+# Ctrl+C to stop, then:
+npm run start:backend
+```
+
+### Backend-Specific Development
+
+For backend-only development (no frontend testing needed):
+
+```bash
+# Development mode (recommended)
+npm run dev:backend
+
+# This uses tsx with hot reload
+# Best for active development
+# Changes auto-reload on save
+```
+
+For more backend details, see [Backend Documentation](#backend-documentation) section.
+
+### When to Build Production
+
+**Production builds will be configured when:**
+- All features are implemented
+- All tests pass consistently
+- Performance is optimized
+- Ready for deployment
+
+**Until then**: Use the development flow above for all testing.
 
 ---
 
@@ -692,6 +904,22 @@ This section lists remaining tasks. Most major features (A-O) are complete. Focu
 - [x] U5: Health check dashboard UI ✅ (Completed: 2025-11-09)
 - [x] U6: API metrics and monitoring ✅ (Completed: 2025-11-09)
 - [ ] U7: GraphQL endpoint (optional alternative to REST)
+
+#### U-Backend. Backend Isolation & Hardening (Completed: 2025-11-09)
+- [x] UB1: Remove DOM lib from backend/tsconfig.json ✅
+- [x] UB2: Add typeRoots restriction (only @types) ✅
+- [x] UB3: Exclude frontend directories from backend compilation ✅
+- [x] UB4: Switch from tsc to esbuild for backend builds ✅
+- [x] UB5: Mark React Native/Expo packages as external ✅
+- [x] UB6: Add ESLint no-restricted-imports for RN/Expo ✅
+- [x] UB7: Create verify-backend-isolated.js script ✅
+- [x] UB8: Add backend-verify.yml CI workflow ✅
+- [x] UB9: Add esbuild to devDependencies ✅
+- [x] UB10: Create BACKEND_DEV.md documentation ✅
+- [x] UB11: Fix esbuild TransformError on react-native ✅
+- [x] UB12: Update MASTER_CHECKLIST.md with backend hardening info ✅
+
+**Summary**: Backend now builds successfully with esbuild, isolated from React Native dependencies. No more TransformError when transforming react-native/index.js. Build system marks RN packages as external, lint catches forbidden imports, and CI verifies isolation. See BACKEND_DEV.md for complete details.
 
 #### V. Feature Enhancements
 - [ ] V1: Additional voice options (ElevenLabs, Azure TTS)
@@ -1208,9 +1436,42 @@ The JARVIS backend is a fully TypeScript-enabled Express.js server that provides
 - **Runtime**: Node.js 20+
 - **Language**: TypeScript 5.9.x
 - **Framework**: Express.js with full TypeScript types
-- **Build Tool**: TypeScript Compiler (tsc)
+- **Build Tool**: esbuild (with React Native packages as external)
 - **Dev Runtime**: tsx (for hot reloading)
 - **Module System**: CommonJS
+- **Isolation**: Backend isolated from React Native/Expo dependencies
+
+### Backend Isolation & Hardening
+
+**Status**: ✅ Complete (as of 2025-11-09)
+
+The backend has been hardened to prevent React Native/Expo coupling and DOM type leakage:
+
+#### Key Improvements
+
+1. **No DOM Types**: Removed `"DOM"` from `backend/tsconfig.json` lib array
+   - Only `["ES2020"]` lib is used
+   - No browser globals (window, document, etc.) available
+   - Prevents accidental browser API usage
+
+2. **esbuild Build System**: Switched from tsc to esbuild
+   - Marks React Native/Expo packages as external (not bundled)
+   - Prevents esbuild TransformError on `react-native/index.js`
+   - Faster builds with proper module handling
+
+3. **ESLint Safeguards**: Added `no-restricted-imports` rules
+   - Blocks: `react-native`, `expo`, `react`, `react-dom`
+   - Automatic detection of forbidden imports during linting
+   - Prevents accidental React Native coupling
+
+4. **CI Verification**: Added `backend-verify.yml` workflow
+   - Automatically builds backend on changes
+   - Runs verification checks
+   - Ensures continued isolation
+
+**Documentation**: See [BACKEND_DEV.md](../BACKEND_DEV.md) for complete details
+
+**Known Limitation**: Services folder imports React Native modules (AsyncStorage, Platform, etc.), causing runtime issues. Use `npm run dev:backend` for development. Future work: refactor services layer.
 
 ### Directory Structure
 
@@ -1280,23 +1541,37 @@ GOOGLE_CLIENT_ID=your_google_client_id
 
 ### Development Workflow
 
-#### Development Mode (Hot Reload)
+#### Development Mode (Hot Reload - Recommended)
 ```bash
 # Run with tsx watch (auto-reloads on file changes)
 npm run dev:backend
 
-# Or run without watch
-npm run start:backend
+# This uses tsx directly on TypeScript sources
+# Best for active development with hot reload
 ```
 
-#### Production Build
+#### Production Build & Run
 ```bash
-# Compile TypeScript to JavaScript
+# Build backend (compiles with esbuild)
 npm run build:backend
 
 # Run compiled production build
 npm run start:backend:prod
+
+# Or do both in one command
+npm run start:backend
 ```
+
+#### Backend Verification
+```bash
+# Build and verify backend isolation
+npm run verify:backend
+
+# This builds the backend and spawns a test server
+# to verify it starts without errors
+```
+
+**Note**: The `start:backend` script now builds first, then runs the compiled output. For development with hot reload, use `dev:backend` instead.
 
 #### Run All Services
 ```bash

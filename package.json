@@ -6,10 +6,10 @@
     "prestart": "node scripts/prevent-ios.js",
     "start": "expo start",
     "start:all": "node scripts/start-all.js",
-    "start:backend": "tsx backend/server.express.ts",
+    "start:backend": "npm run build:backend && npm run start:backend:prod",
     "start:backend:prod": "node backend/dist/server.express.js",
     "dev:backend": "tsx watch backend/server.express.ts",
-    "build:backend": "tsc -p backend/tsconfig.json",
+    "build:backend": "node scripts/build-backend.js",
     "start:frontend": "expo start",
     "start-web": "expo start --web",
     "start-web-dev": "DEBUG=expo* expo start --web",
@@ -24,6 +24,7 @@
     "test:metro-config": "node scripts/test-metro-config.js",
     "test:provider-registry": "node scripts/test-provider-registry.js",
     "verify": "npm run verify:metro && npm test && npm run lint",
+    "verify:backend": "npm run build:backend && node scripts/verify-backend-isolated.js",
     "verify:api-config": "node scripts/verify-api-config.js",
     "verify:metro": "node scripts/verify-metro.js",
     "lint": "expo lint",
@@ -93,9 +94,9 @@
     "react-native-web": "~0.21.0",
     "superjson": "^2.2.3",
     "tsx": "^4.19.1",
+    "ws": "^8.18.0",
     "zod": "^4.1.12",
-    "zustand": "^5.0.2",
-    "ws": "^8.18.0"
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -107,7 +108,9 @@
     "@types/jest": "29.5.14",
     "@types/node": "^24.10.0",
     "@types/react": "~19.1.10",
+    "@types/ws": "^8.5.13",
     "babel-plugin-module-resolver": "^5.0.2",
+    "esbuild": "^0.24.0",
     "eslint": "9.31.0",
     "eslint-config-expo": "~10.0.0",
     "jest": "^29.7.0",
@@ -115,8 +118,7 @@
     "react-test-renderer": "19.1.0",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.2",
-    "@types/ws": "^8.5.13"
+    "typescript": "~5.9.2"
   },
   "private": true
 }
