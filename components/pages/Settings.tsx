@@ -61,7 +61,15 @@ export default function Settings() {
       const success = await AuthManager.startAuthFlow('google');
 
       if (!success) {
-        Alert.alert('Connection Failed', 'Could not connect to Google. Please try again.');
+        Alert.alert(
+          'Connection Failed', 
+          'Could not connect to Google. This may happen if:\n\n' +
+          '• You cancelled the connection\n' +
+          '• There was a network issue\n' +
+          '• You denied permissions\n\n' +
+          'Please try again.',
+          [{ text: 'OK' }]
+        );
         return;
       }
 
@@ -99,14 +107,16 @@ export default function Settings() {
       
       Alert.alert(
         'Connected!',
-        'Your Google account has been connected successfully.',
+        'Your Google account has been connected successfully. You can now use Google Drive sync.',
         [{ text: 'OK' }]
       );
     } catch (error) {
       console.error('[Settings] Google connection error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
       Alert.alert(
-        'Error',
-        'An error occurred while connecting to Google. Please try again.',
+        'Connection Error',
+        `Failed to connect Google account: ${errorMessage}\n\nPlease try again.`,
         [{ text: 'OK' }]
       );
     } finally {

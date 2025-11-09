@@ -149,7 +149,15 @@ export default function SignInScreen() {
       const success = await AuthManager.startAuthFlow('google');
 
       if (!success) {
-        Alert.alert('Sign In Failed', 'Could not sign in with Google. Please try again.');
+        Alert.alert(
+          'Sign In Failed', 
+          'Could not sign in with Google. This may happen if:\n\n' +
+          '• You cancelled the sign-in\n' +
+          '• There was a network issue\n' +
+          '• You denied permissions\n\n' +
+          'Please try again or use email sign-in instead.',
+          [{ text: 'OK' }]
+        );
         return;
       }
 
@@ -157,7 +165,11 @@ export default function SignInScreen() {
       const googleToken = await AuthManager.getAccessToken('google');
       
       if (!googleToken) {
-        Alert.alert('Error', 'Could not retrieve authentication token.');
+        Alert.alert(
+          'Error', 
+          'Could not retrieve authentication token. Please try again or use email sign-in instead.',
+          [{ text: 'OK' }]
+        );
         return;
       }
 
@@ -169,7 +181,9 @@ export default function SignInScreen() {
       });
 
       if (!profileResponse.ok) {
-        throw new Error('Failed to fetch user profile');
+        const errorText = await profileResponse.text();
+        console.error('[SignInScreen] Profile fetch error:', errorText);
+        throw new Error('Failed to fetch user profile from Google');
       }
 
       const googleProfile = await profileResponse.json();
@@ -198,9 +212,11 @@ export default function SignInScreen() {
       );
     } catch (error) {
       console.error('[SignInScreen] Sign-in error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
       Alert.alert(
-        'Error',
-        'An error occurred during sign-in. Please try again.',
+        'Google Sign-In Error',
+        `${errorMessage}\n\nYou can use email sign-in instead if Google sign-in continues to have issues.`,
         [{ text: 'OK' }]
       );
     } finally {
