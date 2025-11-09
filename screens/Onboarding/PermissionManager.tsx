@@ -194,14 +194,16 @@ export default function PermissionManager() {
   ]);
 
   useEffect(() => {
-    checkExistingPermissions();
+    checkAndRequestPermissions();
   }, []);
 
-  const checkExistingPermissions = async () => {
+  const checkAndRequestPermissions = async () => {
     if (Platform.OS !== 'android') {
+      console.log('[PermissionManager] Not Android platform, skipping');
       return;
     }
 
+    // First check existing permissions
     const updatedPermissions = await Promise.all(
       permissions.map(async (perm) => {
         try {
@@ -218,6 +220,15 @@ export default function PermissionManager() {
     );
 
     setPermissions(updatedPermissions);
+
+    // Then automatically request all pending permissions
+    const hasPending = updatedPermissions.some(p => p.status === 'pending');
+    if (hasPending) {
+      console.log('[PermissionManager] Auto-requesting permissions...');
+      setTimeout(() => {
+        requestAllPermissions();
+      }, 800); // Small delay for UI to render
+    }
   };
 
   const requestPermission = async (permission: Permission) => {
