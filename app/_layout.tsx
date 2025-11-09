@@ -115,7 +115,7 @@ export default function RootLayout() {
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
     };
-  }, []);
+  }, [router]);
 
   async function checkAuthentication(): Promise<boolean> {
     try {

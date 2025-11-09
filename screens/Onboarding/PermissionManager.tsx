@@ -106,7 +106,7 @@ export default function PermissionManager() {
       name: 'Wi-Fi State',
       description: 'Monitor Wi-Fi connections for network-based automation',
       icon: Wifi,
-      androidPermission: PermissionsAndroid.PERMISSIONS.ACCESS_WIFI_STATE,
+      androidPermission: 'android.permission.ACCESS_WIFI_STATE' as any,
       isCritical: false,
       status: 'pending',
     },
@@ -207,7 +207,7 @@ export default function PermissionManager() {
     const updatedPermissions = await Promise.all(
       permissions.map(async (perm) => {
         try {
-          const granted = await PermissionsAndroid.check(perm.androidPermission);
+          const granted = await PermissionsAndroid.check(perm.androidPermission as any);
           return {
             ...perm,
             status: granted ? 'granted' : 'pending',
@@ -238,7 +238,7 @@ export default function PermissionManager() {
     }
 
     try {
-      const result = await PermissionsAndroid.request(permission.androidPermission, {
+      const result = await PermissionsAndroid.request(permission.androidPermission as any, {
         title: `${permission.name} Permission`,
         message: permission.description,
         buttonPositive: 'Allow',
@@ -277,13 +277,13 @@ export default function PermissionManager() {
       // Request all permissions in batch
       const permissionsToRequest = permissions
         .filter((p) => p.status === 'pending')
-        .map((p) => p.androidPermission);
+        .map((p) => p.androidPermission as any);
 
       const results = await PermissionsAndroid.requestMultiple(permissionsToRequest);
 
       setPermissions((prev) =>
         prev.map((p) => {
-          const result = results[p.androidPermission];
+          const result = (results as any)[p.androidPermission];
           if (result) {
             return {
               ...p,
