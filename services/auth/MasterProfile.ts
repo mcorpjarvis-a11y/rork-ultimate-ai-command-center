@@ -73,7 +73,7 @@ class MasterProfileManager {
           email: '',
           name: 'User',
           connectedProviders: [],
-          createdAt: Date.now(),
+          createdAt: new Date().toISOString(),
           lastLogin: Date.now(),
         };
         await this.saveMasterProfile(profile);
@@ -106,7 +106,7 @@ class MasterProfileManager {
           email: '',
           name: 'User',
           connectedProviders: [],
-          createdAt: Date.now(),
+          createdAt: new Date().toISOString(),
           lastLogin: Date.now(),
         };
         await this.saveMasterProfile(profile);

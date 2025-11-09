@@ -521,8 +521,7 @@ class JarvisListenerService {
         console.info('[JarvisListener] For now, using Web Speech API fallback when available.');
         
         // Provide helpful user guidance
-        const guidanceService = JarvisGuidanceService.getInstance();
-        const sttGuidance = await guidanceService.getSTTSetupGuidance();
+        const sttGuidance = await JarvisGuidanceService.getSTTSetupGuidance();
         if (sttGuidance) {
           console.info('[JarvisListener] Setup guidance:', sttGuidance);
         }

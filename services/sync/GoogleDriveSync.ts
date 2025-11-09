@@ -149,7 +149,7 @@ class GoogleDriveSync {
         return;
       }
 
-      const localModifiedTime = localProfile.lastLogin;
+      const localModifiedTime = localProfile.lastModified;
 
       // Compare timestamps and use last-write-wins
       if (remoteModifiedTime > localModifiedTime) {

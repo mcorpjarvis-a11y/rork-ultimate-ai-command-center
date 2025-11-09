@@ -12,6 +12,7 @@ export interface TokenData {
   token_type?: string;
   scopes?: string[];
   scope?: string; // Raw scope string from provider
+  metadata?: Record<string, any>; // Additional metadata from provider
 }
 
 export interface MasterProfile {
@@ -20,6 +21,7 @@ export interface MasterProfile {
   email?: string;
   avatar?: string;
   createdAt: string; // ISO 8601 timestamp
+  lastLogin?: number; // Unix timestamp in milliseconds
   connectedProviders: string[];
 }
 
@@ -31,8 +33,10 @@ export interface AuthResponse {
   access_token: string;
   refresh_token?: string;
   expires_in?: number;
+  expires_at?: number; // Unix timestamp in milliseconds
   token_type?: string;
   scope?: string;
+  scopes?: string[]; // Array of scope strings (alternative to scope)
   profile?: any;
 }
 

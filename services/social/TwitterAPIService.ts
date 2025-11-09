@@ -129,7 +129,18 @@ class TwitterAPIService {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
-        body: new FormData().append('command', 'APPEND').append('media_id', mediaId).append('media', mediaData).append('segment_index', '0'),
+        body: (() => {
+          const formData = new FormData();
+          formData.append('command', 'APPEND');
+          formData.append('media_id', mediaId);
+          // Convert Buffer to Blob if needed
+          const mediaBlob = typeof mediaData === 'string' 
+            ? mediaData 
+            : new Blob([new Uint8Array(mediaData)], { type: mediaType });
+          formData.append('media', mediaBlob);
+          formData.append('segment_index', '0');
+          return formData;
+        })(),
       });
 
       if (!uploadResponse.ok) {

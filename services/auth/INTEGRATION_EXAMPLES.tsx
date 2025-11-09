@@ -70,7 +70,7 @@ class ContentService {
         const result = await this.postToAPI(platform, content, token);
         results[platform] = result;
       } catch (error) {
-        results[platform] = { error: error.message };
+        results[platform] = { error: (error as Error).message };
       }
     }
     
@@ -79,7 +79,7 @@ class ContentService {
   
   private async postToAPI(platform: string, content: string, token: string) {
     // Platform-specific posting logic
-    const apiEndpoints = {
+    const apiEndpoints: Record<string, string> = {
       twitter: 'https://api.twitter.com/2/tweets',
       reddit: 'https://oauth.reddit.com/api/submit',
       discord: 'https://discord.com/api/channels/{channel}/messages',
