@@ -1,16 +1,18 @@
 # JARVIS Documentation
 
-This directory contains all project documentation organized by category.
+**Note:** All documentation has been consolidated into `MASTER_CHECKLIST.md` in the project root.
 
-## Quick Start
-- [README](../README.md) - Main project README
-- [Quick Start Guide](./guides/QUICK_START.md) - Get started quickly
-- [Setup Guide](./setup/SETUP_GUIDE.md) - Complete setup instructions
+This is the single source of truth for the JARVIS Command Center project.
 
-## Guides
-- **Setup Guides**: Initial setup and configuration
-- **User Guides**: How to use JARVIS features
-- **Development Guides**: Developer documentation
+## Quick Links
 
-## Archive
-Historical documentation and completed checklists are stored in the `archive/` directory for reference.
+- [MASTER_CHECKLIST.md](../MASTER_CHECKLIST.md) - Complete project documentation
+- [README.md](../README.md) - Project overview
+
+## Archived Documentation
+
+Historical documentation has been archived for reference. See `docs-archive-consolidated/` in the project root.
+
+---
+
+**Last Updated:** 2025-11-09
