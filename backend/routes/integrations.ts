@@ -2,12 +2,14 @@ import express, { Request, Response, Router } from 'express';
 import AuthManager from '../../services/auth/AuthManager';
 import TokenVault from '../../services/auth/TokenVault';
 import YouTubeAPIService from '../../services/social/YouTubeAPIService';
+import InstagramAPIService from '../../services/social/InstagramAPIService';
+import TwitterAPIService from '../../services/social/TwitterAPIService';
 
 const router: Router = express.Router();
 
 /**
  * Real Integrations Routes
- * Uses AuthManager for OAuth and real API calls
+ * Uses AuthManager for OAuth and real API calls for YouTube, Instagram, Twitter
  */
 
 interface PostRequestBody {
@@ -109,6 +111,48 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
           message: 'Video uploaded successfully to YouTube',
         });
 
+      case 'instagram':
+        const profile = await AuthManager.getProviderStatus('instagram');
+        const igUserId = profile.profile?.id;
+        
+        if (!igUserId) {
+          return res.status(400).json({
+            success: false,
+            error: 'Instagram user ID not found',
+          });
+        }
+
+        result = await InstagramAPIService.post({
+          imageUrl: mediaUrls && mediaUrls[0],
+          videoUrl: videoFile ? videoFile.toString() : undefined,
+          caption: content,
+          accessToken: profile.profile?.pageAccessToken || accessToken,
+          igUserId,
+        });
+        
+        return res.json({
+          success: true,
+          platform: 'instagram',
+          data: result,
+          message: 'Posted successfully to Instagram',
+        });
+
+      case 'twitter':
+      case 'x':
+        const twitterProfile = await AuthManager.getProviderStatus('twitter');
+        
+        result = await TwitterAPIService.postTweet(accessToken, {
+          text: content,
+          media_ids: mediaUrls,
+        });
+        
+        return res.json({
+          success: true,
+          platform: 'twitter',
+          data: result,
+          message: 'Tweet posted successfully',
+        });
+
       default:
         return res.status(400).json({ 
           success: false, 
@@ -163,6 +207,32 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
           platform: 'youtube',
           data: analytics,
           period: { startDate: start, endDate: end },
+        });
+
+      case 'instagram':
+        const igProfile = await AuthManager.getProviderStatus('instagram');
+        const igUserId = igProfile.profile?.id;
+        const pageAccessToken = igProfile.profile?.pageAccessToken || accessToken;
+        
+        analytics = await InstagramAPIService.getInsights(igUserId, pageAccessToken, 'day');
+        
+        return res.json({
+          success: true,
+          platform: 'instagram',
+          data: analytics,
+        });
+
+      case 'twitter':
+      case 'x':
+        const twitterProfile = await AuthManager.getProviderStatus('twitter');
+        const twitterUserId = twitterProfile.profile?.id;
+        
+        analytics = await TwitterAPIService.getUserAnalytics(accessToken, twitterUserId);
+        
+        return res.json({
+          success: true,
+          platform: 'twitter',
+          data: analytics,
         });
 
       default:
