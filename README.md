@@ -42,9 +42,10 @@ npm run verify           # Verify Metro bundler
 npm run lint             # Check code quality
 
 # Development
-npm start                # Start Metro bundler
-npm run start:all        # Start frontend + backend
-npm run dev:backend      # Backend with hot reload
+npm start                    # Start Metro bundler
+npm run start:all            # Start frontend + backend
+npm run start:backend:prod   # Backend (compiled, stable)
+npm run dev:backend          # Backend with hot reload (has tsx limitation)
 
 # Build
 npm run build:backend    # Build backend TypeScript

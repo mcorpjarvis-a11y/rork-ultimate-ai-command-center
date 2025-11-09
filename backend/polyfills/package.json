@@ -1,0 +1,6 @@
+{
+  "name": "@backend-polyfills/react-native",
+  "version": "1.0.0",
+  "main": "react-native.js",
+  "types": "react-native.d.ts"
+}

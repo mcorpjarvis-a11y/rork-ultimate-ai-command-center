@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "jsx": "react"
+  },
+  "esbuild": {
+    "external": [
+      "react-native",
+      "react-native-*",
+      "expo",
+      "expo-*",
+      "@expo/*"
+    ]
+  }
+}

@@ -1303,25 +1303,33 @@ GOOGLE_CLIENT_ID=your_google_client_id
 
 ### Development Workflow
 
-#### Development Mode (Hot Reload)
+#### Development Mode (Quick Start - Has Known Limitation)
+```bash
+# Fast start with tsx (for active development)
+npm run start:backend
+```
+
+**Note**: Currently encounters TransformError with react-native module due to tsx runtime transformation. This is a known limitation. For stable development, use the production build method below.
+
+#### Development Mode (Hot Reload with tsx)
 ```bash
 # Run with tsx watch (auto-reloads on file changes)
 npm run dev:backend
 ```
 
-**Note**: Development mode uses `tsx` for hot-reloading convenience. This is safe for development only.
+**Note**: Same TransformError limitation as start:backend. Use for quick iterations if you can work around the error, or use build mode.
 
-#### Production Build & Start
+#### Production Build & Start (Recommended for Testing)
 ```bash
-# Build and start in one command (recommended for production)
-npm run start:backend
+# Build and start (recommended for stable testing)
+npm run start:backend:prod
 
 # Or run steps separately:
 npm run build:backend           # Compile TypeScript to JavaScript
-npm run start:backend:prod      # Run compiled production build
+node backend/bootstrap.js       # Run compiled production build
 ```
 
-**Important**: Production mode always runs precompiled JavaScript from `backend/dist/` to avoid runtime transformation errors.
+**Important**: Production mode runs precompiled JavaScript from `backend/dist/` which avoids tsx transformation issues. Use this for testing on your S25 Ultra with Termux.
 
 #### Backend Isolation & Verification
 ```bash
