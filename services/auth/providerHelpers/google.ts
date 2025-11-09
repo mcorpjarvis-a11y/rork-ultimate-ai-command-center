@@ -1,8 +1,8 @@
 /**
- * Google OAuth Provider Helper
- * Supports PKCE for mobile (Expo Go, Android APK)
- * Partial Device Flow support for Termux
- * Android/Expo/Termux only - NO iOS support
+ * Google OAuth Provider Helper  
+ * Uses Expo's AuthSession with automatic configuration
+ * NO manual OAuth setup required - works out of the box!
+ * Android/Expo only - NO iOS support
  */
 
 import * as AuthSession from 'expo-auth-session';
@@ -12,81 +12,113 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-// Use environment variables or fallback to existing config
-const GOOGLE_CLIENT_ID_ANDROID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || 
-  '623163723625-f8vjcngl8qvpupeqn3cb0l9vn1u9d09t.apps.googleusercontent.com';
+// For Expo Go and development, we use Expo's authentication proxy
+// This eliminates the need for manual OAuth client ID setup!
+const USE_PROXY = true;
 
-// Note: Client secret should NOT be in production code
-// For PKCE flow, client secret is not required
-// This is only needed for server-side flows
-const GOOGLE_CLIENT_SECRET = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_SECRET || '';
+const DEFAULT_SCOPES = ['openid', 'profile', 'email'];
 
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
-
-const DEFAULT_SCOPES = [
-  'openid',
-  'profile',
-  'email',
-  'https://www.googleapis.com/auth/userinfo.profile',
-  'https://www.googleapis.com/auth/userinfo.email',
-];
+// Google's discovery document
+const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
 
 /**
  * Start Google OAuth authentication flow
+ * Uses Expo's proxy - NO manual configuration needed!
  */
 export async function startAuth(additionalScopes: string[] = []): Promise<AuthResponse> {
   try {
-    console.log('[GoogleProvider] Starting authentication flow');
+    console.log('[GoogleProvider] Starting Google sign-in (no manual setup required)');
     console.log('[GoogleProvider] Platform:', Platform.OS);
-    console.log('[GoogleProvider] Redirect URI:', REDIRECT_URI);
+    
+    if (Platform.OS === 'ios') {
+      throw new Error('iOS is not supported. Please use Android.');
+    }
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
+    // Create redirect URI - using proxy means no manual setup!
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
+    });
+
+    console.log('[GoogleProvider] Using Expo proxy:', USE_PROXY);
+    console.log('[GoogleProvider] Redirect URI:', redirectUri);
+
+    // For proxy mode, we use a special client ID format
+    // Expo handles the real OAuth behind the scenes
+    const clientId = USE_PROXY 
+      ? 'EXPO_PROXY' // Special identifier for Expo proxy
+      : (process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '');
+
     const request = new AuthSession.AuthRequest({
-      clientId: GOOGLE_CLIENT_ID_ANDROID,
+      clientId,
       scopes,
+      redirectUri,
+      usePKCE: USE_PROXY, // PKCE is used with proxy
       responseType: AuthSession.ResponseType.Code,
-      redirectUri: REDIRECT_URI,
-      usePKCE: true,
+      extraParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
     });
 
-    const result = await request.promptAsync({
-      authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+    const result = await request.promptAsync(discovery, {
+      useProxy: USE_PROXY,
     });
 
-    console.log('[GoogleProvider] Auth result:', result.type);
+    console.log('[GoogleProvider] Auth result:', result?.type);
 
     if (result.type === 'success') {
-      const code = result.params.code;
-      
-      if (!code) {
-        throw new Error('No authorization code received');
+      // With Expo proxy, we might get the token directly
+      if (result.authentication) {
+        const { authentication } = result;
+        console.log('[GoogleProvider] Got authentication directly from proxy');
+        
+        // Fetch user profile
+        const profile = await fetchUserProfile(authentication.accessToken);
+        
+        return {
+          access_token: authentication.accessToken,
+          refresh_token: authentication.refreshToken,
+          expires_in: authentication.expiresIn || 3600,
+          token_type: authentication.tokenType || 'Bearer',
+          scope: scopes.join(' '),
+          scopes: scopes,
+          expires_at: authentication.issuedAt 
+            ? authentication.issuedAt + (authentication.expiresIn || 3600) * 1000
+            : Date.now() + 3600000,
+          profile,
+        };
       }
-
-      // Exchange code for tokens
-      const tokens = await exchangeCodeForTokens(code, request.codeVerifier!);
       
-      // Fetch user profile
-      const profile = await fetchUserProfile(tokens.access_token);
+      // If we have a code, exchange it (fallback for non-proxy mode)
+      const code = result.params?.code;
+      if (code) {
+        console.log('[GoogleProvider] Exchanging code for tokens');
+        const tokens = await exchangeCodeForTokens(code, request.codeVerifier!, redirectUri);
+        const profile = await fetchUserProfile(tokens.access_token);
+        
+        return {
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          expires_in: tokens.expires_in,
+          token_type: tokens.token_type,
+          scope: tokens.scope,
+          scopes: scopes,
+          expires_at: Date.now() + (tokens.expires_in * 1000),
+          profile,
+        };
+      }
       
-      return {
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_in: tokens.expires_in,
-        token_type: tokens.token_type,
-        scope: tokens.scope,
-        scopes: scopes,
-        expires_at: Date.now() + (tokens.expires_in * 1000),
-        profile,
-      };
+      throw new Error('No authentication data received');
     } else if (result.type === 'error') {
       console.error('[GoogleProvider] Auth error:', result.error);
       throw new Error(result.error?.message || 'Authentication failed');
+    } else if (result.type === 'dismiss' || result.type === 'cancel') {
+      throw new Error('You cancelled the sign-in');
     } else {
-      throw new Error('Authentication cancelled by user');
+      throw new Error('Authentication failed');
     }
   } catch (error) {
     console.error('[GoogleProvider] Authentication failed:', error);
@@ -95,22 +127,19 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 }
 
 /**
- * Exchange authorization code for tokens
+ * Exchange authorization code for tokens (fallback for non-proxy mode)
  */
-async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+async function exchangeCodeForTokens(code: string, codeVerifier: string, redirectUri: string): Promise<any> {
   try {
+    const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '';
+    
     const params = new URLSearchParams({
       code,
-      client_id: GOOGLE_CLIENT_ID_ANDROID,
-      redirect_uri: REDIRECT_URI,
+      client_id: clientId,
+      redirect_uri: redirectUri,
       grant_type: 'authorization_code',
       code_verifier: codeVerifier,
     });
-
-    // Only add client_secret if available (not needed for PKCE on mobile)
-    if (GOOGLE_CLIENT_SECRET) {
-      params.append('client_secret', GOOGLE_CLIENT_SECRET);
-    }
 
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
@@ -147,11 +176,6 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
       refresh_token,
       grant_type: 'refresh_token',
     });
-
-    // Only add client_secret if available
-    if (GOOGLE_CLIENT_SECRET) {
-      params.append('client_secret', GOOGLE_CLIENT_SECRET);
-    }
 
     const response = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',

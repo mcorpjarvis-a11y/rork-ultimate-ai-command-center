@@ -10,6 +10,7 @@ import SignInScreen from "@/screens/Onboarding/SignInScreen";
 import JarvisInitializationService from "@/services/JarvisInitializationService";
 import MasterProfile from "@/services/auth/MasterProfile";
 import SecureKeyStorage from "@/services/security/SecureKeyStorage";
+import ConfigValidator from "@/services/config/ConfigValidator";
 import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService";
 import { 
   SchedulerService, 
@@ -44,7 +45,19 @@ export default function RootLayout() {
       try {
         console.log('[App] Starting app initialization...');
         
-        // Step 0: Test SecureStorage on app startup
+        // Step 0: Validate configuration
+        const configValidation = ConfigValidator.validateConfig();
+        
+        if (!ConfigValidator.canRunApp(configValidation)) {
+          console.error('[App] Critical configuration errors:', configValidation.errors);
+          // Show error but continue - app can still work with local features
+        }
+        
+        if (configValidation.warnings.length > 0) {
+          console.warn('[App] Configuration warnings:', configValidation.warnings);
+        }
+        
+        // Step 1: Test SecureStorage on app startup
         const storageWorks = await SecureKeyStorage.testSecureStorage();
         if (!storageWorks) {
           console.warn('[App] SecureStorage not fully functional, some features may be limited');
@@ -52,7 +65,7 @@ export default function RootLayout() {
           console.log('[App] SecureStorage test passed');
         }
         
-        // Step 1: Check if master profile exists
+        // Step 2: Check if master profile exists
         const isAuthenticated = await checkAuthentication();
         
         if (!isAuthenticated) {
@@ -63,7 +76,7 @@ export default function RootLayout() {
           return;
         }
 
-        // Step 2: Initialize JARVIS
+        // Step 3: Initialize JARVIS
         await initializeJarvis();
         
         setAppReady(true);
@@ -112,8 +125,13 @@ export default function RootLayout() {
       console.log('[App] Initializing Jarvis...');
       await JarvisInitializationService.initialize();
       
-      // Initialize backend connectivity
-      await PlugAndPlayService.initialize();
+      // Initialize backend connectivity with error handling
+      try {
+        await PlugAndPlayService.initialize();
+      } catch (error) {
+        console.warn('[App] Backend connectivity initialization failed (will retry later):', error);
+        // Continue - app can work without backend
+      }
       
       // Initialize speech services
       await VoiceService.initialize();
@@ -137,10 +155,13 @@ export default function RootLayout() {
       SchedulerService.start();
       console.log('[App] Scheduler service started');
       
-      // Connect WebSocket for real-time updates
-      WebSocketService.connect().catch((error) => {
-        console.warn('[App] WebSocket connection failed (will retry):', error);
-      });
+      // Connect WebSocket for real-time updates with error handling
+      try {
+        await WebSocketService.connect();
+      } catch (error) {
+        console.warn('[App] WebSocket connection failed (will retry automatically):', error);
+        // Continue - app can work without WebSocket
+      }
       
       // Start system monitoring
       MonitoringService.startMonitoring();
@@ -149,24 +170,8 @@ export default function RootLayout() {
       console.log('[App] Jarvis initialization complete');
     } catch (error) {
       console.error('[App] Jarvis initialization error:', error);
-      throw error;
-    }
-  }
-
-  async function handleSignInComplete() {
-    console.log('[App] Sign-in completed, initializing app...');
-    setShowSignIn(false);
-    setIsAuthenticating(true);
-    
-    try {
-      // Initialize JARVIS after sign-in
-      await initializeJarvis();
-      setAppReady(true);
-    } catch (error) {
-      console.error('[App] Failed to initialize after sign-in:', error);
-      setAppReady(true); // Continue loading app even if Jarvis fails
-    } finally {
-      setIsAuthenticating(false);
+      // Don't throw - allow app to continue with reduced functionality
+      console.warn('[App] Continuing with reduced functionality');
     }
   }
 
