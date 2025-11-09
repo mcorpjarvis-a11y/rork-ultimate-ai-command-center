@@ -32,20 +32,37 @@ jest.mock('expo-secure-store', () => ({
   }),
 }));
 
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  default: {
-    getItem: jest.fn(async (key) => mockAsyncStore.get(key) || null),
+jest.mock('@react-native-async-storage/async-storage', () => {
+  const store = new Map();
+  const mockImpl = {
+    getItem: jest.fn(async (key) => store.get(key) || null),
     setItem: jest.fn(async (key, value) => {
-      mockAsyncStore.set(key, value);
+      store.set(key, value);
     }),
     removeItem: jest.fn(async (key) => {
-      mockAsyncStore.delete(key);
+      store.delete(key);
     }),
     clear: jest.fn(async () => {
-      mockAsyncStore.clear();
+      store.clear();
     }),
-  },
-}));
+    getAllKeys: jest.fn(async () => Array.from(store.keys())),
+    multiRemove: jest.fn(async (keys) => {
+      keys.forEach(key => store.delete(key));
+    }),
+    multiGet: jest.fn(async (keys) => {
+      return keys.map(key => [key, store.get(key) || null]);
+    }),
+    multiSet: jest.fn(async (keyValuePairs) => {
+      keyValuePairs.forEach(([key, value]) => store.set(key, value));
+    }),
+  };
+  
+  return {
+    __esModule: true,
+    default: mockImpl,
+    ...mockImpl, // Also export as named exports
+  };
+});
 
 jest.mock('react-native', () => ({
   Platform: {
