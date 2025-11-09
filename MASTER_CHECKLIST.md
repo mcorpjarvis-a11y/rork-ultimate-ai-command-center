@@ -13,8 +13,323 @@
 
 ---
 
+## 🎯 Development Best Practices & Implementation Guidelines
+
+> **READ THIS BEFORE IMPLEMENTING ANY SECTION**
+>
+> These guidelines ensure all features are built with **real logic, proper testing, and zero placeholders**.
+
+### ✅ Mandatory Implementation Standards
+
+#### 1. **NO MOCKS, NO PLACEHOLDERS, NO TEMPORARY CODE**
+
+**❌ NEVER:**
+```typescript
+// BAD: Placeholder/mock code
+const fetchData = async () => {
+  return { data: "TODO: implement real API call" };
+};
+
+// BAD: Hardcoded mock data
+const users = [
+  { id: 1, name: "Test User" },
+  { id: 2, name: "Mock User" }
+];
+```
+
+**✅ ALWAYS:**
+```typescript
+// GOOD: Real implementation with error handling
+const fetchData = async () => {
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    logger.error('fetchData failed', error);
+    throw error;
+  }
+};
+
+// GOOD: Real database/storage queries
+const users = await database.query('SELECT * FROM users WHERE active = 1');
+```
+
+#### 2. **Test-Driven Development (TDD) Process**
+
+**For EVERY new feature, follow this exact order:**
+
+1. **Write the test FIRST** (before any implementation)
+   ```typescript
+   describe('AuthManager.signIn', () => {
+     it('should authenticate with valid credentials', async () => {
+       const result = await AuthManager.signIn('user@test.com', 'password123');
+       expect(result.success).toBe(true);
+       expect(result.token).toBeDefined();
+     });
+   });
+   ```
+
+2. **Run the test** - it should FAIL (red)
+3. **Implement minimal code** to make test pass
+4. **Run test again** - it should PASS (green)
+5. **Refactor** if needed while keeping test green
+6. **Add edge case tests** (error handling, validation, etc.)
+
+**Required Test Coverage:**
+- ✅ Happy path (successful execution)
+- ✅ Error cases (network failures, invalid input)
+- ✅ Edge cases (empty data, null values, race conditions)
+- ✅ Integration tests (with fixtures for external APIs)
+- ✅ Minimum 50% code coverage (enforced by Jest)
+
+#### 3. **Iterative Build, Lint, Test Cycle**
+
+**After EVERY code change, run these commands in order:**
+
+```bash
+# 1. Lint check (fix issues immediately)
+npm run lint
+
+# 2. Type check (fix TypeScript errors)
+npx tsc --noEmit
+
+# 3. Run tests (all must pass)
+npm test
+
+# 4. Test specific module you changed
+npm test -- path/to/your/test.test.ts
+
+# 5. Verify Metro bundler (if frontend changes)
+npm run verify:metro
+
+# 6. Verify backend build (if backend changes)
+npm run verify:backend
+```
+
+**DO NOT proceed to next step until all checks pass.**
+
+#### 4. **Real API Integration Checklist**
+
+When integrating with external services:
+
+- [ ] **Read official API documentation** (not tutorials)
+- [ ] **Test API in Postman/curl** before coding
+- [ ] **Verify API key/credentials work** manually first
+- [ ] **Check rate limits** and implement throttling
+- [ ] **Handle all error codes** (401, 403, 429, 500, etc.)
+- [ ] **Implement retry logic** with exponential backoff
+- [ ] **Add request/response logging** (without exposing secrets)
+- [ ] **Create fixtures for tests** to avoid hitting real API
+- [ ] **Document API quirks** in code comments
+
+**Example: Proper API Integration**
+```typescript
+// services/ai/OpenAIService.ts
+import { withRetry, rateLimit } from '@/lib/api-utils';
+
+export class OpenAIService {
+  private static readonly RATE_LIMIT = rateLimit(60, 60000); // 60 req/min
+  
+  static async generateCompletion(prompt: string): Promise<string> {
+    // Validate inputs
+    if (!prompt?.trim()) {
+      throw new Error('Prompt cannot be empty');
+    }
+    
+    // Check API key exists
+    const apiKey = await this.getApiKey();
+    if (!apiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+    
+    // Apply rate limiting
+    await this.RATE_LIMIT();
+    
+    // Make request with retry logic
+    return withRetry(async () => {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`OpenAI API error: ${error.error?.message || response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data.choices[0].message.content;
+    }, {
+      maxRetries: 3,
+      backoff: 'exponential',
+      onRetry: (error, attempt) => {
+        logger.warn(`OpenAI request retry ${attempt}`, { error });
+      }
+    });
+  }
+}
+```
+
+#### 5. **Data Flow Verification**
+
+For each feature, trace the complete data flow:
+
+1. **User Input** → Validate & sanitize
+2. **Business Logic** → Process with error handling
+3. **External API/DB** → Call with retry logic
+4. **Response Processing** → Transform & validate
+5. **State Update** → Update React state/storage
+6. **UI Update** → Render new state
+7. **Logging** → Record success/failure
+
+**Create a diagram for complex flows:**
+```
+User clicks "Sign In"
+  → SignInScreen validates input
+  → AuthManager.signIn(email, password)
+  → GoogleAuthAdapter.authenticate()
+  → Expo AuthSession (PKCE flow)
+  → TokenVault.saveToken()
+  → MasterProfile.update()
+  → Navigate to Dashboard
+  → Analytics.trackEvent('user_signed_in')
+```
+
+#### 6. **Error Handling Requirements**
+
+**Every function must handle errors properly:**
+
+```typescript
+// ✅ CORRECT: Comprehensive error handling
+async function fetchUserProfile(userId: string): Promise<UserProfile> {
+  try {
+    // Validate input
+    if (!userId) {
+      throw new ValidationError('User ID is required');
+    }
+    
+    // Make request
+    const response = await api.get(`/users/${userId}`);
+    
+    // Validate response
+    if (!response.data) {
+      throw new DataError('Invalid response from server');
+    }
+    
+    return response.data;
+    
+  } catch (error) {
+    // Log with context
+    logger.error('Failed to fetch user profile', {
+      userId,
+      error: error.message,
+      stack: error.stack
+    });
+    
+    // Throw typed error
+    if (error instanceof NetworkError) {
+      throw new ServiceError('Network error. Check connection.', { cause: error });
+    }
+    
+    throw error; // Re-throw if unknown
+  }
+}
+```
+
+#### 7. **Documentation Standards**
+
+**For every new file/function:**
+
+```typescript
+/**
+ * Authenticates user with Google OAuth using PKCE flow.
+ * 
+ * @param scopes - Array of Google API scopes (e.g., ['drive.readonly'])
+ * @returns Promise resolving to authentication result with tokens
+ * @throws {AuthError} If authentication fails or user cancels
+ * 
+ * @example
+ * ```typescript
+ * const result = await GoogleAuthAdapter.authenticate(['drive.file']);
+ * console.log(result.accessToken);
+ * ```
+ * 
+ * @see https://developers.google.com/identity/protocols/oauth2/native-app
+ */
+export async function authenticate(scopes: string[]): Promise<AuthResult> {
+  // Implementation
+}
+```
+
+#### 8. **Pre-Implementation Checklist**
+
+**Before writing ANY code for a section, complete this checklist:**
+
+- [ ] **Read entire section specification** in this document
+- [ ] **Understand dependencies** (what must be built first)
+- [ ] **Review related sections** (A-O) for integration points
+- [ ] **Check existing tests** in `__tests__/` for patterns
+- [ ] **Verify required packages** are installed
+- [ ] **Test external APIs** manually (if applicable)
+- [ ] **Create test files** with empty test cases
+- [ ] **Write data models/types** first
+- [ ] **Plan error scenarios** (network, validation, edge cases)
+- [ ] **Design component structure** (sketch on paper)
+
+#### 9. **Common Pitfalls to Avoid**
+
+❌ **Don't:**
+- Copy-paste code without understanding it
+- Skip error handling ("I'll add it later")
+- Use `any` type in TypeScript
+- Commit without running tests
+- Leave `console.log` in production code
+- Hardcode API keys or secrets
+- Ignore ESLint warnings
+- Write 500+ line files (refactor into modules)
+- Use `// @ts-ignore` to bypass TypeScript errors
+
+✅ **Do:**
+- Write modular, single-responsibility functions
+- Use TypeScript strict mode features
+- Add JSDoc comments for public APIs
+- Create reusable utility functions
+- Follow existing project patterns
+- Ask for clarification before implementing
+- Test on actual device (Galaxy S25 Ultra)
+- Use proper async/await patterns
+
+#### 10. **Definition of Done**
+
+**A section is NOT complete until ALL of these are true:**
+
+- [ ] All tasks marked with `[x]` in checklist
+- [ ] All tests passing (155+)
+- [ ] No ESLint errors or warnings
+- [ ] No TypeScript errors in affected files
+- [ ] Code coverage ≥50% for new code
+- [ ] Manual testing completed on device
+- [ ] No hardcoded values or mock data
+- [ ] Error handling for all edge cases
+- [ ] Documentation updated in this file
+- [ ] Git commit with descriptive message
+- [ ] PR created with thorough description
+
+---
+
 ## 📑 Table of Contents
 
+- [Development Best Practices](#-development-best-practices--implementation-guidelines)
 - [Quick Navigation](#quick-navigation)
 - [Progress Dashboard](#-progress-dashboard)
 - [README - Project Overview](#readme---project-overview)
