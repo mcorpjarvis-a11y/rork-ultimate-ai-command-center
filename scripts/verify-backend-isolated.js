@@ -128,10 +128,10 @@ async function scanBackendForForbiddenImports() {
 async function testBackendStartup() {
   log('\n🚀 Testing backend startup...', colors.cyan);
   
-  const distPath = path.join(__dirname, '..', 'backend', 'dist', 'server.express.js');
+  const distPath = path.join(__dirname, '..', 'backend', 'bootstrap.js');
   
   if (!fs.existsSync(distPath)) {
-    log('❌ Backend dist file not found. Build must have failed.', colors.red);
+    log('❌ Backend bootstrap file not found. Build must have failed.', colors.red);
     return false;
   }
   

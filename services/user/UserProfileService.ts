@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import SecureKeyStorage from '@/services/security/SecureKeyStorage';
+import SecureKeyStorage from '../security/SecureKeyStorage';
 
 export interface UserProfile {
   name: string;
