@@ -415,8 +415,7 @@ export async function authenticate(scopes: string[]): Promise<AuthResult> {
 | **🧠 Systems Intelligence** | 0% | 🔴 Not Started | Meta-coordination layer |
 
 ### Testing Status
-- ✅ **155 unit tests** passing (100%)
-- ✅ **142 integration tests** included in total
+- ✅ **155 tests** passing (100%)
 - ✅ **Coverage:** 50%+ across all modules
 - ✅ **CI/CD:** Ready for GitHub Actions integration
 
@@ -1048,211 +1047,28 @@ Exit codes:
 
 > **Summary: All major features (Sections A-O) are complete and production-ready.**
 
-This section tracks all completed features organized by category. All items marked [x] have been implemented, tested, and verified.
+### Section A: Project Setup & Configuration — 100% ✅
+### Section B: Metro Bundler & Build System — 100% ✅
+### Section C: Testing Infrastructure — 100% ✅
+### Section D: Verification Scripts — 100% ✅
+### Section E: OAuth & Token Management — 100% ✅
+### Section F: OAuth Provider Helpers — 100% ✅
+### Section G: Authentication UI — 100% ✅
+### Section H: AI Provider Integration — 100% ✅
+### Section I: Voice Services — 100% ✅
+### Section J: Social Media Integrations — 100% ✅
+### Section K: Monetization Tracking — 100% ✅
+### Section L: IoT Device Control — 100% ✅
+### Section M: Analytics & Dashboard — 100% ✅
+### Section N: Media & Storage — 100% ✅
+### Section O: Settings & Integrations UI — 100% ✅
 
-### 🏗️ Core Infrastructure (100% Complete)
-
-<details>
-<summary><b>A-D: Project Setup, Metro, Testing, Verification</b> - Click to expand</summary>
-
-#### A. Project Setup & Configuration ✅
-- [x] A1: React Native + Expo 54 setup with TypeScript
-- [x] A2: File-based routing with Expo Router
-- [x] A3: Android-only configuration (iOS removed)
-- [x] A4: Environment variable management (.env setup)
-- [x] A5: Git repository initialized with proper .gitignore
-- [x] A6: Package.json with all dependencies configured
-- [x] A7: TypeScript strict mode configuration
-
-#### B. Metro Bundler & Build System ✅
-- [x] B1: Metro bundler configuration optimized
-- [x] B2: Babel module resolver for @/ path alias
-- [x] B3: Metro cache clearing strategy
-- [x] B4: expo-av → expo-audio migration completed
-- [x] B5: @react-native/virtualized-lists added as direct dependency
-- [x] B6: blockList simplified (only build artifacts excluded)
-- [x] B7: TypeScript path alias support
-- [x] B8: Asset handling extended (db, mp3, ttf, obj, png, jpg)
-
-**Key Deliverables:** 3,239 modules bundled successfully, 8.38MB bundle size
-
-#### C. Testing Infrastructure ✅
-- [x] C1: Jest configuration with jest-expo preset
-- [x] C2: React Native Testing Library setup
-- [x] C3: Jest setup with native module mocks
-- [x] C4: 155/155 tests passing (100% pass rate)
-- [x] C5: Coverage thresholds configured (50% minimum)
-- [x] C6: Test pipeline script (test:all)
-- [x] C7: Auth tests (AuthManager, Provider Registry, Integration)
-- [x] C8: Metro config validation script
-- [x] C9: Provider registry validation script
-
-**Key Deliverables:** 155 tests passing, 50%+ coverage, Jest + RTL configured
-
-#### D. Verification Scripts ✅
-- [x] D1: verify-metro.js script created
-- [x] D2: Automated cache clearing
-- [x] D3: Bundle generation testing
-- [x] D4: Bundle artifact verification
-- [x] D5: CI/CD integration support
-- [x] D6: verify:metro npm script added
-- [x] D7: Exit code handling for CI
-
-**Key Deliverables:** Automated verification, CI-ready exit codes
-
-</details>
-
-### 🔐 Authentication System (100% Complete)
-
-<details>
-<summary><b>E-G: OAuth, Providers, UI</b> - Click to expand</summary>
-
-#### E. OAuth & Token Management ✅
-- [x] E1: AuthManager service (central orchestrator)
-- [x] E2: TokenVault (secure token storage with SecureStore)
-- [x] E3: MasterProfile (single-user profile management)
-- [x] E4: PKCE OAuth 2.0 flows for mobile
-- [x] E5: Device Flow support for headless environments
-- [x] E6: Automatic token refresh
-- [x] E7: Event-driven architecture (connected, disconnected, token_refreshed)
-
-**Key Deliverables:** Secure token management, PKCE flows, auto-refresh
-
-#### F. OAuth Provider Helpers ✅
-- [x] F1: Google OAuth (Drive, YouTube, Gmail)
-- [x] F2: GitHub OAuth with Device Flow
-- [x] F3: Discord OAuth
-- [x] F4: Spotify OAuth
-- [x] F5: Reddit OAuth (installed app)
-- [x] F6: Home Assistant local tokens
-- [x] F7: Provider configuration registry
-- [x] F8: Static imports (Metro compatibility)
-
-**Key Deliverables:** 10 OAuth providers integrated, static registry
-
-#### G. Authentication UI ✅
-- [x] G1: SignInScreen (first-launch onboarding)
-- [x] G2: ConnectionsHub (provider management interface)
-- [x] G3: Guest mode / skip sign-in option
-- [x] G4: Status indicators (Connected, Not Connected, Needs Re-Auth)
-- [x] G5: Local token wizard for smart home devices
-- [x] G6: Real-time updates via event subscriptions
-
-**Key Deliverables:** Complete OAuth UI, real-time status updates
-
-</details>
-
-### 🤖 AI & Voice Services (100% Complete)
-
-<details>
-<summary><b>H-I: AI Providers, Voice/Speech</b> - Click to expand</summary>
-
-#### H. AI Provider Integration ✅
-- [x] H1: AIService (multi-provider support)
-- [x] H2: FreeAIService (free-tier-first implementation)
-- [x] H3: OpenAI integration (GPT-4, GPT-3.5)
-- [x] H4: Anthropic integration (Claude)
-- [x] H5: Google Gemini integration
-- [x] H6: Groq integration (fastest free AI)
-- [x] H7: HuggingFace integration
-- [x] H8: Auto-fallback when keys unavailable
-- [x] H9: Streaming responses
-- [x] H10: Token usage tracking
-- [x] H11: Cost optimization
-
-**Key Deliverables:** 8 AI providers (5 free + 3 paid), auto-fallback, streaming
-
-#### I. Voice Services ✅
-- [x] I1: VoiceService (TTS with expo-speech)
-- [x] I2: JARVIS British voice (Daniel)
-- [x] I3: Audio recording with expo-audio
-- [x] I4: JarvisVoiceService (audio playback)
-- [x] I5: JarvisAlwaysListeningService (continuous listening)
-- [x] I6: Wake word detection
-- [x] I7: Speech recognition with expo-speech-recognition
-- [x] I8: WhisperService (OpenAI Whisper API integration)
-- [x] I9: Voice preference configuration
-- [x] I10: Auto-start functionality
-
-**Key Deliverables:** TTS, STT, wake word, continuous listening, British voice
-
-</details>
-
-### 📱 Social, Monetization, IoT (100% Complete)
-
-<details>
-<summary><b>D, E, F: Social Media, Revenue, Smart Home</b> - Click to expand</summary>
-
-#### D. Social Media Integrations ✅
-**Platforms:** YouTube, Twitter/X, Instagram, Facebook, LinkedIn, TikTok  
-**Features:** OAuth auth, scheduling, analytics, cross-platform posting  
-**Key Deliverables:** 6 platforms integrated, content calendar
-
-#### E. Monetization Tracking ✅
-**Features:** Revenue streams (YouTube, affiliate, sponsorship), CSV import, dashboard  
-**Key Deliverables:** Multi-source revenue tracking, YouTube Analytics API
-
-#### F. IoT Device Control ✅
-**Platforms:** Philips Hue, Google Nest, Ring, TP-Link Kasa, MQTT, Home Assistant  
-**Features:** Device discovery, real-time control, scenes, voice control  
-**Key Deliverables:** 6 IoT platforms, voice integration, automation
-
-</details>
-
-### 📊 Data, UI, Backend (100% Complete)
-
-<details>
-<summary><b>G-M: Analytics, Media, Settings, Security, Testing, Data, Frontend</b> - Click to expand</summary>
-
-#### G. Analytics & Dashboard ✅
-**Features:** Real-time aggregation, multi-platform metrics, caching (5-min TTL), cost tracking  
-**Key Deliverables:** Live dashboard, AI cost tracking, system health monitoring
-
-#### H. Media & Storage ✅
-**Features:** Multipart upload, validation, thumbnails, cloud storage (S3, GCS)  
-**Key Deliverables:** Secure upload, thumbnail gen, multiple storage backends
-
-#### I. Settings & Integrations UI ✅
-**Features:** 5 settings tabs (Accounts, AI, Voice, Monetization, IoT), key testing  
-**Key Deliverables:** Unified settings, real-time validation
-
-#### J. Security & Error Handling ✅
-**Features:** Helmet, CORS, rate limiting (100 req/15min), zod validation, structured logging  
-**Key Deliverables:** Enterprise-grade security, standardized errors
-
-#### K. Test Plan Implementation ✅
-**Features:** 155 unit/integration tests, fixtures for social APIs, CI-ready  
-**Key Deliverables:** 100% test pass rate, 50%+ coverage
-
-#### L. Backend Server ✅
-**Features:** Express.js TypeScript, 10 REST endpoints, hot reload (tsx), esbuild  
-**Key Deliverables:** 2,484 lines backend code, isolated from React Native
-
-#### M. Frontend Wiring ✅
-**Features:** React Query, live hooks, mutations, skeleton loaders, inline errors  
-**Key Deliverables:** No mocks in production, optimistic updates
-
-</details>
-
-### 📚 Documentation & Quality (100% Complete)
-
-<details>
-<summary><b>N-O: Acceptance, Delivery, Docs</b> - Click to expand</summary>
-
-#### N. Documentation ✅
-**Files:** MASTER_CHECKLIST.md, METRO_TROUBLESHOOTING.md, BACKEND_DEV.md, README.md, etc.  
-**Key Deliverables:** Single source of truth, comprehensive troubleshooting
-
-#### O. Security & Code Quality ✅
-**Features:** CodeQL scanning, API key encryption, OAuth token management, ESLint  
-**Key Deliverables:** Zero critical vulnerabilities, strict TypeScript
-
-</details>
+**Complete Details:** All implementation details, task IDs, and completion dates are documented in the [Implementation Status - Sections A-O](#implementation-status---sections-a-o) section below.
 
 ### ✅ Completed Major Milestones
 
 - ✅ **All Sections A-O implemented** (Authentication, AI, Voice, Social, Monetization, IoT, Analytics, Media, Settings, Security, Testing, Data, Frontend, Acceptance, Delivery)
-- ✅ **155/155 tests passing** (Updated 2025-11-09)
+- ✅ **155 tests passing** (Updated 2025-11-09)
 - ✅ **Metro bundler working on Node 20.x**
 - ✅ **Documentation consolidated into MASTER_CHECKLIST.md**
 - ✅ **OAuth providers implemented (10 providers)**
@@ -1332,7 +1148,7 @@ This section lists remaining tasks organized by priority. Most major features (A
 - [ ] T6: Device farm integration (BrowserStack/Sauce Labs)
 - [ ] T7: Load testing for backend APIs
 
-**Current Coverage:** 155 tests passing, 50%+ coverage; E2E pending.
+**Current Coverage:** 155 tests passing, 50%+ coverage; E2E tests pending.
 
 ---
 
