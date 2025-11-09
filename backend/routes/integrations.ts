@@ -43,9 +43,9 @@ router.get('/accounts', async (req: Request, res: Response) => {
         accounts.push({
           id: provider,
           platform: provider,
-          username: 'User', // Profile information not available from current API
+          username: null, // Profile information not available from current API
           connected: true,
-          connectedAt: tokenData?.expires_at ? Date.now() : undefined,
+          connectedAt: undefined, // Connection timestamp not tracked in current implementation
           expiresAt: tokenData?.expires_at,
         });
       }
@@ -115,30 +115,19 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
         });
 
       case 'instagram':
-        // For Instagram, we need the user ID which should be configured separately
-        // or obtained during the OAuth flow and stored
-        const igUserId = 'default'; // This would need to be retrieved from profile storage
-        
-        if (!igUserId) {
-          return res.status(400).json({
-            success: false,
-            error: 'Instagram user ID not found. Please configure your Instagram profile.',
-          });
-        }
-
-        result = await InstagramAPIService.post({
-          imageUrl: mediaUrls && mediaUrls[0],
-          videoUrl: videoFile ? videoFile.toString() : undefined,
-          caption: content,
-          accessToken,
-          igUserId,
-        });
-        
-        return res.json({
-          success: true,
-          platform: 'instagram',
-          data: result,
-          message: 'Posted successfully to Instagram',
+        // Instagram Business Account ID must be provided or configured
+        // The Business Account ID cannot be retrieved from access token alone
+        return res.status(400).json({
+          success: false,
+          error: 'Instagram Business Account ID is required for posting.',
+          message: 'Please provide your Instagram Business Account ID. This can be obtained from your Instagram Business account settings.',
+          guidance: {
+            steps: [
+              'Go to Instagram Business account settings',
+              'Find your Instagram Business Account ID',
+              'Configure it in the application or provide it with the request'
+            ]
+          }
         });
 
       case 'twitter':
@@ -212,8 +201,23 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
         });
 
       case 'instagram':
-        // Instagram user ID would need to be configured separately
-        const igUserId = 'default'; // Should be retrieved from profile storage
+        // Instagram Business Account ID should be provided in query or configured
+        const igUserId = req.query.igUserId as string;
+        
+        if (!igUserId) {
+          return res.status(400).json({
+            success: false,
+            error: 'Instagram Business Account ID is required for analytics.',
+            message: 'Please provide igUserId as a query parameter or configure it in your profile.',
+            guidance: {
+              example: '/api/integrations/analytics?platform=instagram&igUserId=YOUR_BUSINESS_ACCOUNT_ID',
+              steps: [
+                'Obtain your Instagram Business Account ID from Instagram Business settings',
+                'Pass it as igUserId query parameter'
+              ]
+            }
+          });
+        }
         
         analytics = await InstagramAPIService.getInsights(igUserId, accessToken, 'day');
         
@@ -225,8 +229,23 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
 
       case 'twitter':
       case 'x':
-        // Twitter user ID would need to be configured separately
-        const twitterUserId = 'default'; // Should be retrieved from profile storage
+        // Twitter user ID should be provided in query parameter
+        const twitterUserId = req.query.twitterUserId as string;
+        
+        if (!twitterUserId) {
+          return res.status(400).json({
+            success: false,
+            error: 'Twitter user ID is required to fetch analytics.',
+            message: 'Please provide twitterUserId as a query parameter.',
+            guidance: {
+              example: '/api/integrations/analytics?platform=twitter&twitterUserId=YOUR_USER_ID',
+              steps: [
+                'Obtain your Twitter user ID',
+                'Pass it as twitterUserId query parameter'
+              ]
+            }
+          });
+        }
         
         analytics = await TwitterAPIService.getUserAnalytics(accessToken, twitterUserId);
         
