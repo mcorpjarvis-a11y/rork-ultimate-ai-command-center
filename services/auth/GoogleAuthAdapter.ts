@@ -6,7 +6,21 @@
 
 import AuthManager from './AuthManager';
 import TokenVault from './TokenVault';
-import { GoogleUser } from './GoogleAuthService';
+
+/**
+ * GoogleUser type for backward compatibility
+ */
+export interface GoogleUser {
+  id: string;
+  email: string;
+  name: string;
+  picture?: string;
+  givenName?: string;
+  familyName?: string;
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt?: number;
+}
 
 /**
  * Adapter that makes the new AuthManager API compatible with the old GoogleAuthService API

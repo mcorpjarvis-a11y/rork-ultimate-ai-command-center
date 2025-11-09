@@ -3,6 +3,10 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
+    "lib": ["ES2020", "DOM"],
+    "target": "ES2020",
+    "skipLibCheck": true,
+    "types": ["jest", "node"],
     "paths": {
       "@/*": [
         "./*"

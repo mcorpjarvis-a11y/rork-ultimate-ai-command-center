@@ -76,7 +76,7 @@ class FileUploadService {
         size: asset.fileSize || 0,
         uri: asset.uri,
         mimeType: asset.mimeType || 'image/jpeg',
-        base64: asset.base64,
+        base64: asset.base64 || undefined,
         timestamp: Date.now(),
       };
 
@@ -120,7 +120,7 @@ class FileUploadService {
       if (asset.size && asset.size < 5 * 1024 * 1024) {
         try {
           base64 = await FileSystem.readAsStringAsync(asset.uri, {
-            encoding: FileSystem.EncodingType.Base64,
+            encoding: 'base64',
           });
         } catch (e) {
           console.warn('[FileUploadService] Could not read file as base64:', e);
