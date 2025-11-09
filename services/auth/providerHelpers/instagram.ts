@@ -169,7 +169,10 @@ async function fetchUserProfile(accessToken: string): Promise<any> {
  * Facebook tokens don't have traditional refresh - need to exchange for long-lived
  */
 export async function refreshToken(accessToken: string): Promise<AuthResponse> {
-  const url = `https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${FACEBOOK_APP_ID}&client_secret=${FACEBOOK_APP_SECRET}&fb_exchange_token=${accessToken}`;
+  const appId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID || 'EXPO_PROXY';
+  const appSecret = process.env.EXPO_PUBLIC_FACEBOOK_APP_SECRET || '';
+  
+  const url = `https://graph.facebook.com/v18.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${accessToken}`;
   
   const response = await fetch(url);
 
