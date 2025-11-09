@@ -23,10 +23,18 @@
 - [TESTING - Testing Strategy](#testing---testing-strategy)
 - [DONE - Completed Tasks](#done---completed-tasks)
 - [TODO - Remaining Tasks](#todo---remaining-tasks)
+  - [Phase 2: Advanced Features](#-phase-2-advanced-features-future-roadmap)
+    - [Autonomous Agent Mode](#-autonomous-agent-mode---0-)
+    - [Multimodal Vision & Perception](#️-multimodal-vision--perception---0-)
+    - [Emotional & Adaptive Personality](#-emotional--adaptive-personality---0-)
+    - [Long-Term Semantic Memory Graph](#-long-term-semantic-memory-graph---0-)
+    - [Self-Coding & Auto-Deployment Pipeline](#️-self-coding--auto-deployment-pipeline---0-)
+    - [Full-Duplex Conversational Flow](#️-full-duplex-conversational-flow---0-)
+    - [Systems Intelligence Framework](#-systems-intelligence-framework---0-)
 - [Implementation Status - Sections A-O](#implementation-status---sections-a-o)
-  - [Section A: Authentication & Profile](#section-a-authentication--profile-system)
-  - [Section B: AI Providers](#section-b-ai-providers-integration)
-  - [Section C: Voice & Speech](#section-c-voice--speech-services)
+  - [Section A: Authentication & Profile](#section-a-authentication--profile-system---100-)
+  - [Section B: AI Providers](#section-b-ai-providers-integration---100-)
+  - [Section C: Voice & Speech](#section-c-voice--speech-services---100-)
   - [Section D: Social Media](#section-d-social-media-integrations)
   - [Section E: Monetization](#section-e-monetization-tracking)
   - [Section F: IoT Device Control](#section-f-iot-device-control)
@@ -54,9 +62,9 @@
 
 ## 📊 Progress Dashboard
 
-> **Overall Project Status: 92% Complete** 🎯
+> **Overall Project Status: 92% Complete (Phase 1) | Phase 2: 0% (Planning)** 🎯
 
-### Major Components Completion Status
+### Phase 1: MVP - Major Components Completion Status
 
 | Component | Progress | Status | Details |
 |-----------|----------|--------|---------|
@@ -78,6 +86,18 @@
 | **Documentation** | 95% | 🟢 Near Complete | Consolidated, needs CI/CD workflow file |
 | **Production Readiness** | 60% | 🟠 In Progress | Testing complete, APK build pending |
 | **Universal API Key Entry** | 0% | 🔴 Not Started | **NEW: Planned in this update** |
+
+### Phase 2: Advanced Features - Future Roadmap
+
+| Component | Progress | Status | Details |
+|-----------|----------|--------|---------|
+| **🤖 Autonomous Agent Mode** | 0% | 🔴 Not Started | Multi-step task planning & execution |
+| **👁️ Multimodal Vision** | 0% | 🔴 Not Started | Camera input, OCR, object detection |
+| **💠 Emotional Personality** | 0% | 🔴 Not Started | Adaptive tone, empathy, persona switching |
+| **🧩 Semantic Memory Graph** | 0% | 🔴 Not Started | Long-term knowledge persistence |
+| **⚙️ Self-Coding Pipeline** | 0% | 🔴 Not Started | Autonomous code generation & deployment |
+| **🗣️ Full-Duplex Conversation** | 0% | 🔴 Not Started | Interruption-aware voice flow |
+| **🧠 Systems Intelligence** | 0% | 🔴 Not Started | Meta-coordination layer |
 
 ### Testing Status
 - ✅ **155 unit tests** passing (100%)
@@ -1138,9 +1158,285 @@ See [Section Y: Universal API Key Entry System](#section-y-universal-api-key-ent
 
 ---
 
+## 🚀 Phase 2: Advanced Features (Future Roadmap)
+
+> **These features represent the next evolution of JARVIS beyond the current MVP.**
+
+### 🤖 Autonomous Agent Mode - 0% 🔴
+
+**Purpose:** Enable JARVIS to independently plan, execute, and verify multi-step tasks with minimal user intervention.
+
+#### Remaining Tasks:
+
+- [ ] AG-1: Core autonomy engine
+  - Let Jarvis plan, execute, and self-verify multi-step tasks
+  - Implement goal decomposition and task planning algorithms
+  - Create execution engine with state management
+
+- [ ] AG-2: Temporal planner
+  - Schedule and reprioritize background operations dynamically
+  - Implement priority queue with deadline awareness
+  - Add conflict resolution for competing tasks
+
+- [ ] AG-3: Goal memory
+  - Persistent ledger of objectives, states, and dependencies
+  - Create goal tracking database schema
+  - Implement dependency graph visualization
+
+- [ ] AG-4: Safety sentinel
+  - Confirmation layer and rollback for high-impact actions
+  - Define risk levels and approval thresholds
+  - Implement automated rollback mechanisms
+
+- [ ] AG-5: Contextual chain-of-thought logger
+  - Trace every autonomous decision for audit
+  - Create decision tree logging system
+  - Build audit trail UI for transparency
+
+**Dependencies:** Sections A-O must be complete  
+**Estimated Timeline:** 6-8 weeks  
+**Risk Level:** High (requires extensive testing)
+
+---
+
+### 👁️ Multimodal Vision & Perception - 0% 🔴
+
+**Purpose:** Give JARVIS the ability to see, interpret, and act on visual information from the device camera.
+
+#### Remaining Tasks:
+
+- [ ] MV-1: Camera input and stream capture
+  - Implement via Expo Camera API
+  - Add permission management
+  - Support photo and video capture modes
+
+- [ ] MV-2: Real-time object and face detection
+  - Integrate on-device ML Kit
+  - Implement bounding box overlay UI
+  - Add confidence scoring
+
+- [ ] MV-3: OCR + visual text parser
+  - Enable reading screens or documents
+  - Integrate Tesseract or Google Vision OCR
+  - Add text extraction and formatting
+
+- [ ] MV-4: Scene graph builder
+  - Map relationships between visible entities
+  - Create spatial relationship engine
+  - Implement object tracking across frames
+
+- [ ] MV-5: Vision-to-Command translator
+  - Convert "what I see" into actionable intents
+  - Build natural language vision query system
+  - Create command mapping from visual context
+
+**Dependencies:** AG (Autonomous Agent) for decision-making  
+**Estimated Timeline:** 8-10 weeks  
+**Hardware Requirements:** Device camera, ML Kit support
+
+---
+
+### 💠 Emotional & Adaptive Personality - 0% 🔴
+
+**Purpose:** Make JARVIS emotionally intelligent and adaptable to user mood and context.
+
+#### Remaining Tasks:
+
+- [ ] EP-1: Emotion state engine
+  - Derive affect from sentiment, tone, and conversation flow
+  - Implement emotion classification model
+  - Track emotional trajectory over conversations
+
+- [ ] EP-2: Response modulation
+  - Tone, cadence, and phrasing shift with emotional context
+  - Adjust voice parameters based on detected emotion
+  - Create response templates for different emotional states
+
+- [ ] EP-3: Personality memory
+  - Learn user preferences, humor, and mood trends
+  - Build user personality profile database
+  - Implement preference learning algorithms
+
+- [ ] EP-4: Contextual empathy
+  - Mirror user stress or enthusiasm appropriately
+  - Detect emotional cues from text and voice
+  - Adjust response empathy levels dynamically
+
+- [ ] EP-5: Dynamic persona templates
+  - Switchable personas: "Professional," "Witty," "Calm"
+  - Create persona configuration system
+  - Implement live persona switching
+
+**Dependencies:** Voice Services (Section C), SM (Semantic Memory)  
+**Estimated Timeline:** 5-7 weeks  
+**ML Requirements:** Sentiment analysis models
+
+---
+
+### 🧩 Long-Term Semantic Memory Graph - 0% 🔴
+
+**Purpose:** Enable JARVIS to remember and recall information across sessions with semantic understanding.
+
+#### Remaining Tasks:
+
+- [ ] SM-1: Knowledge-graph persistence
+  - Store entities, relations, and recurring topics
+  - Implement graph database (Neo4j or similar)
+  - Create entity extraction pipeline
+
+- [ ] SM-2: Temporal context recall
+  - Retrieve conversations across days or projects
+  - Implement time-based indexing
+  - Add conversation threading
+
+- [ ] SM-3: Memory pruning
+  - Summarize and compress redundant data automatically
+  - Create importance scoring algorithm
+  - Implement periodic cleanup jobs
+
+- [ ] SM-4: Vector search gateway
+  - Embed and query long-term context efficiently
+  - Integrate vector database (Pinecone, Weaviate, or local)
+  - Implement semantic similarity search
+
+- [ ] SM-5: Insight synthesis
+  - Generate "Jarvis remembers that…" summaries
+  - Create automated insight extraction
+  - Build proactive reminder system
+
+**Dependencies:** Data Persistence (Section L)  
+**Estimated Timeline:** 6-8 weeks  
+**Storage Requirements:** Graph database, vector store
+
+---
+
+### ⚙️ Self-Coding & Auto-Deployment Pipeline - 0% 🔴
+
+**Purpose:** Allow JARVIS to modify and improve his own codebase safely.
+
+#### Remaining Tasks:
+
+- [ ] SD-1: Autonomous code-generation agent
+  - Safe PR creation and patching
+  - Implement code generation with AI assistance
+  - Add automated code review checks
+
+- [ ] SD-2: Sandbox testing layer
+  - Validate builds and run smoke tests automatically
+  - Create isolated test environments
+  - Implement automated rollback on failure
+
+- [ ] SD-3: Auto-commit + rollback system
+  - Version tagging and change tracking
+  - Implement git automation safely
+  - Add rollback triggers and mechanisms
+
+- [ ] SD-4: Deployment orchestrator
+  - Expo ↔ Termux continuous delivery bridge
+  - Create deployment pipeline automation
+  - Add environment-specific configurations
+
+- [ ] SD-5: Adaptive optimization
+  - Jarvis refactors his own inefficient routines
+  - Implement performance monitoring
+  - Create self-improvement suggestions
+
+**Dependencies:** Backend hardening (Section U-Backend), Testing (Section K)  
+**Estimated Timeline:** 10-12 weeks  
+**Risk Level:** Critical (requires extensive safeguards)
+
+---
+
+### 🗣️ Full-Duplex Conversational Flow - 0% 🔴
+
+**Purpose:** Enable natural, interruption-aware, two-way conversations with JARVIS.
+
+#### Remaining Tasks:
+
+- [ ] VF-1: Streaming speech-to-intent engine
+  - Real-time recognition with live processing
+  - Implement low-latency STT pipeline
+  - Add incremental intent detection
+
+- [ ] VF-2: Mid-response interruption
+  - Handle "Jarvis, pause / stop / adjust…" commands
+  - Implement interrupt detection
+  - Add graceful response cancellation
+
+- [ ] VF-3: Overlap handler
+  - Natural conversational turn-taking
+  - Detect speech overlaps
+  - Implement priority-based speaker selection
+
+- [ ] VF-4: Voice-context correction
+  - Support "Actually, I meant…" clarifications
+  - Implement context revision system
+  - Add conversation state rollback
+
+- [ ] VF-5: Adaptive latency control
+  - Jarvis anticipates when to speak vs listen
+  - Create response timing optimizer
+  - Implement silence detection thresholds
+
+**Dependencies:** Voice Services (Section C), EP (Emotional Personality)  
+**Estimated Timeline:** 7-9 weeks  
+**Hardware Requirements:** Low-latency audio processing
+
+---
+
+### 🧠 Systems Intelligence Framework - 0% 🔴
+
+**Purpose:** Create a meta-intelligence layer that coordinates all JARVIS subsystems.
+
+#### Remaining Tasks:
+
+- [ ] SI-1: Cross-service reasoning bus
+  - Link AI, Vision, Memory, and Personality modules
+  - Implement service mesh architecture
+  - Create inter-module communication protocol
+
+- [ ] SI-2: Internal diagnostics
+  - Self-monitor resource use, latency, and model drift
+  - Implement health check system
+  - Add performance anomaly detection
+
+- [ ] SI-3: Goal arbitration
+  - Balance competing priorities between modules
+  - Create priority resolution algorithms
+  - Implement resource allocation system
+
+- [ ] SI-4: Global telemetry dashboard
+  - Voice + backend metrics in unified view
+  - Create real-time monitoring UI
+  - Add historical trend analysis
+
+- [ ] SI-5: Adaptive upgrade API
+  - Jarvis evolves capabilities without rebuilds
+  - Implement hot-reload for ML models
+  - Add capability versioning system
+
+**Dependencies:** All Phase 2 modules  
+**Estimated Timeline:** 8-10 weeks  
+**Integration Scope:** Cross-cutting across all features
+
+---
+
+### ✅ Phase 2 Checklist Maintenance
+
+**Important:** After completing any Phase 2 milestone:
+
+- [ ] Update progress percentage in Progress Dashboard
+- [ ] Document new capabilities in MASTER_CHECKLIST.md
+- [ ] Add Phase 2 section to "DONE - Completed Tasks"
+- [ ] Update tests to cover new Phase 2 functionality
+- [ ] Create migration guide for breaking changes
+- [ ] Update API documentation with new endpoints
+
+---
+
 ### 📊 Summary Statistics
 
-**Completed:**
+**Phase 1 - Completed:**
 - ✅ 15 major sections (A-O) - 100% complete
 - ✅ 155 tests passing
 - ✅ 10 OAuth providers
@@ -1150,7 +1446,7 @@ See [Section Y: Universal API Key Entry System](#section-y-universal-api-key-ent
 - ✅ Node 20.x verified
 - ✅ Metro bundler optimized
 
-**Remaining:**
+**Phase 1 - Remaining:**
 - 🟡 Migration system (L4) - High priority
 - 🟡 CI/CD workflow file (Q9) - High priority
 - 🟢 Production APK build (X1) - After testing
@@ -1158,7 +1454,20 @@ See [Section Y: Universal API Key Entry System](#section-y-universal-api-key-ent
 - 🔵 E2E tests (T3) - Enhancement
 - 🔵 Performance optimization (S) - Enhancement
 
-**Current Status:** MVP feature-complete at 92%. Focus: Production readiness + Universal API Key Entry.
+**Phase 2 - Advanced Features (0% complete):**
+- 🔴 Autonomous Agent Mode (AG) - 5 tasks
+- 🔴 Multimodal Vision (MV) - 5 tasks
+- 🔴 Emotional Personality (EP) - 5 tasks
+- 🔴 Semantic Memory Graph (SM) - 5 tasks
+- 🔴 Self-Coding Pipeline (SD) - 5 tasks
+- 🔴 Full-Duplex Conversation (VF) - 5 tasks
+- 🔴 Systems Intelligence (SI) - 5 tasks
+- **Total:** 35 Phase 2 tasks planned
+
+**Current Status:** 
+- **Phase 1:** MVP feature-complete at 92%
+- **Phase 2:** Planning stage (0%)
+- **Focus:** Production readiness + Universal API Key Entry
 
 **Next Session Goals:**
 1. Complete Q9: Create CI/CD workflow
