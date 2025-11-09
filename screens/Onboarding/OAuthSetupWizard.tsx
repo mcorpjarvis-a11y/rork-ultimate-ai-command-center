@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import AuthManager from '@/services/auth/AuthManager';
+import OnboardingStatus from '@/services/onboarding/OnboardingStatus';
 
 interface OAuthProvider {
   id: string;
@@ -250,7 +251,7 @@ export default function OAuthSetupWizard() {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const connectedCount = providers.filter((p) => p.status === 'connected').length;
 
     if (connectedCount === 0) {
@@ -259,12 +260,22 @@ export default function OAuthSetupWizard() {
         'You haven\'t connected any services. Connect at least one to get started.',
         [
           { text: 'OK', style: 'cancel' },
-          { text: 'Skip', onPress: () => router.replace('/'), style: 'default' },
+          { text: 'Skip', onPress: handleSkip, style: 'default' },
         ]
       );
       return;
     }
 
+    // Mark onboarding as complete before navigating to dashboard
+    await OnboardingStatus.markOnboardingComplete();
+    console.log('[OAuthWizard] Onboarding marked as complete, navigating to dashboard');
+    router.replace('/');
+  };
+
+  const handleSkip = async () => {
+    // Mark onboarding as complete even if user skips
+    await OnboardingStatus.markOnboardingComplete();
+    console.log('[OAuthWizard] Onboarding skipped and marked as complete');
     router.replace('/');
   };
 
@@ -411,7 +422,7 @@ export default function OAuthSetupWizard() {
 
           <TouchableOpacity
             style={[styles.button, styles.skipButton]}
-            onPress={() => router.replace('/')}
+            onPress={handleSkip}
           >
             <Text style={styles.skipButtonText}>Skip for Now</Text>
           </TouchableOpacity>

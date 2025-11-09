@@ -1,5 +1,5 @@
 import { View, StyleSheet } from 'react-native';
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 
 import { StatusBar } from 'expo-status-bar';
 import Header from '@/components/Header';
@@ -37,9 +37,7 @@ import BrandMarketplace from '@/components/pages/BrandMarketplace';
 import SmartVideoEditor from '@/components/pages/SmartVideoEditor';
 import FloatingButtons from '@/components/FloatingButtons';
 import EnhancedAIAssistantModal from '@/components/EnhancedAIAssistantModal';
-import { JarvisOnboarding } from '@/components/JarvisOnboarding';
 import ConnectionsHub from '@/components/ConnectionsHub';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
 
@@ -47,22 +45,6 @@ export default function Index() {
   const [currentPage, setCurrentPage] = useState('overview-dashboard');
   const [expandedSections, setExpandedSections] = useState<string[]>(['overview']);
   const [showAIModal, setShowAIModal] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  const checkOnboarding = useCallback(async () => {
-    try {
-      const completed = await AsyncStorage.getItem('jarvis-onboarding-completed');
-      if (!completed) {
-        setTimeout(() => setShowOnboarding(true), 1000);
-      }
-    } catch (error) {
-      console.error('Failed to check onboarding status:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkOnboarding();
-  }, [checkOnboarding]);
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) =>
@@ -206,10 +188,6 @@ export default function Index() {
         <EnhancedAIAssistantModal
           visible={showAIModal}
           onClose={() => setShowAIModal(false)}
-        />
-        <JarvisOnboarding
-          visible={showOnboarding}
-          onComplete={() => setShowOnboarding(false)}
         />
       </View>
     </View>

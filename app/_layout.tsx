@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
 import { AppProvider } from "@/contexts/AppContext";
@@ -11,6 +11,7 @@ import JarvisInitializationService from "@/services/JarvisInitializationService"
 import MasterProfile from "@/services/auth/MasterProfile";
 import SecureKeyStorage from "@/services/security/SecureKeyStorage";
 import ConfigValidator from "@/services/config/ConfigValidator";
+import OnboardingStatus from "@/services/onboarding/OnboardingStatus";
 import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService";
 import { 
   SchedulerService, 
@@ -36,6 +37,7 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const router = useRouter();
   const [appReady, setAppReady] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -76,7 +78,20 @@ export default function RootLayout() {
           return;
         }
 
-        // Step 3: Initialize JARVIS
+        // Step 3: Check onboarding status
+        const onboardingComplete = await OnboardingStatus.isOnboardingComplete();
+        
+        if (!onboardingComplete) {
+          console.log('[App] Profile exists but onboarding not complete, redirecting to wizard');
+          setIsAuthenticating(false);
+          SplashScreen.hideAsync();
+          // Let the router navigate to permissions screen
+          router.replace('/onboarding/permissions');
+          return;
+        }
+
+        // Step 4: Onboarding complete, initialize JARVIS
+        console.log('[App] Profile and onboarding complete, initializing JARVIS');
         await initializeJarvis();
         
         setAppReady(true);
