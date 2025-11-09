@@ -17,6 +17,9 @@ backend/**/*.d.ts
 !backend/hono.ts
 !backend/server.ts
 
+# Backend runtime data
+backend/.data/
+
 # Build artifacts from TypeScript compilation
 config/**/*.js
 config/**/*.js.map

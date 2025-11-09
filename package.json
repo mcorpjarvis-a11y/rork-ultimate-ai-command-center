@@ -25,7 +25,7 @@
     "test:metro-config": "node scripts/test-metro-config.js",
     "test:provider-registry": "node scripts/test-provider-registry.js",
     "verify": "npm run verify:metro && npm test && npm run lint",
-    "verify:backend": "npm run build:backend && node scripts/verify-backend-isolated.js",
+    "verify:backend": "npm run build:backend && node scripts/scan-backend-imports.js && node scripts/verify-backend-isolated.js",
     "verify:startup": "node scripts/test-startup.js",
     "verify:api-config": "node scripts/verify-api-config.js",
     "verify:metro": "node scripts/verify-metro.js",

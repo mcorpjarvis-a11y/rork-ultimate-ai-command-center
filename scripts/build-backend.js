@@ -62,6 +62,15 @@ async function build() {
       // ✅ Target Node 22 for Termux compatibility
       target: 'node22',
       outfile: 'backend/dist/server.express.js',
+      // ✅ Alias expo-secure-store to backend shim BEFORE external check
+      alias: {
+        'expo-secure-store': path.resolve(__dirname, '../backend/shims/expo-secure-store.ts'),
+        'react-native': path.resolve(__dirname, '../backend/shims/react-native.ts'),
+        '@react-native-async-storage/async-storage': path.resolve(__dirname, '../backend/shims/async-storage.ts'),
+        'expo-auth-session': path.resolve(__dirname, '../backend/shims/expo-auth-session.ts'),
+        'expo-web-browser': path.resolve(__dirname, '../backend/shims/expo-web-browser.ts'),
+        'expo-crypto': path.resolve(__dirname, '../backend/shims/expo-crypto.ts'),
+      },
       external: reactNativePackages,
       packages: 'external', // Don't bundle node_modules
       sourcemap: true,

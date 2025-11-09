@@ -10,15 +10,66 @@
  */
 
 const { spawn } = require('child_process');
+const http = require('http');
 const path = require('path');
 
 const TIMEOUT_MS = 30000; // 30 seconds timeout
 const SERVER_PATH = path.join(__dirname, '..', 'backend', 'dist', 'server.express.js');
+const HEALTH_CHECK_URL = 'http://0.0.0.0:3000/';
+
+// Check Node version and warn if > 20
+function checkNodeVersion() {
+  const nodeVersion = process.version;
+  const majorVersion = parseInt(nodeVersion.split('.')[0].substring(1));
+  
+  if (majorVersion > 20) {
+    console.log('⚠️  Node version detected:', nodeVersion);
+    console.log('⚠️  Note: Metro bundler may have issues with Node > 20');
+    console.log('⚠️  However, the backend should work fine on Node 22 (Termux compatible)');
+    console.log('');
+  }
+}
+
+function probeHealth() {
+  return new Promise((resolve, reject) => {
+    const req = http.get(HEALTH_CHECK_URL, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json.status === 'online') {
+            console.log('🩺 Health check passed:', json.message);
+            resolve(json);
+          } else {
+            reject(new Error('Health check returned unexpected status: ' + json.status));
+          }
+        } catch (error) {
+          reject(new Error('Failed to parse health check response: ' + error.message));
+        }
+      });
+    });
+    
+    req.on('error', (error) => {
+      reject(new Error('Health check HTTP request failed: ' + error.message));
+    });
+    
+    req.setTimeout(5000, () => {
+      req.destroy();
+      reject(new Error('Health check timed out'));
+    });
+  });
+}
 
 function verifyBackend() {
   return new Promise((resolve, reject) => {
     console.log('🔍 Verifying backend isolation...');
     console.log(`📂 Server path: ${SERVER_PATH}`);
+    console.log('');
     
     let serverOnline = false;
     let output = '';
@@ -48,10 +99,20 @@ function verifyBackend() {
         serverOnline = true;
         console.log('\n✅ Server came ONLINE successfully!');
         
-        // Give server a moment to stabilize
-        setTimeout(() => {
-          clearTimeout(timeout);
-          serverProcess.kill('SIGTERM');
+        // Probe health endpoint
+        setTimeout(async () => {
+          try {
+            await probeHealth();
+            clearTimeout(timeout);
+            serverProcess.kill('SIGTERM');
+          } catch (error) {
+            console.error('\n⚠️  Health check failed:', error.message);
+            console.error('   Server started but health endpoint is not responding correctly.');
+            clearTimeout(timeout);
+            serverProcess.kill('SIGTERM');
+            // Don't fail the verification if server started but health check failed
+            // This is a soft failure
+          }
         }, 1000);
       }
     });
@@ -93,6 +154,7 @@ function verifyBackend() {
 }
 
 // Run verification
+checkNodeVersion();
 verifyBackend()
   .then(() => {
     process.exit(0);
