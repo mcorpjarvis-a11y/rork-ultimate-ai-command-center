@@ -18,6 +18,7 @@
 - [Quick Navigation](#quick-navigation)
 - [README - Project Overview](#readme---project-overview)
 - [Quick Start Guide](#quick-start-guide)
+- [Development & Build Flow](#development--build-flow)
 - [TESTING - Testing Strategy](#testing---testing-strategy)
 - [DONE - Completed Tasks](#done---completed-tasks)
 - [TODO - Remaining Tasks](#todo---remaining-tasks)
@@ -71,6 +72,7 @@ npm run build:apk        # Build Android APK
 
 ### Quick Links to Sections
 - [How to Get Started](#quick-start-guide)
+- [Development & Build Flow](#development--build-flow)
 - [Environment Setup](#environment-setup)
 - [Running Tests](#running-tests)
 - [Common Issues](#metro-troubleshooting)
@@ -266,6 +268,178 @@ TWITTER_API_KEY=your_twitter_key
 ### Testing in Browser
 
 Run `npm run start-web` to test in a web browser. Note: The browser preview is great for quick testing, but some native features may not be available.
+
+---
+
+## Development & Build Flow
+
+### Overview
+
+This project follows a **development → push → test** workflow optimized for the Samsung Galaxy S25 Ultra running Expo Go 54.
+
+### The Workflow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. BUILD HERE (Development Machine)                        │
+│     - Make code changes                                     │
+│     - Run tests: npm test                                   │
+│     - Verify build: npm run verify:metro                    │
+│     - Lint code: npm run lint                               │
+│     - Commit changes: git commit                            │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  2. PUSH TO TERMUX (Galaxy S25 Ultra)                      │
+│     - Push to repository: git push                          │
+│     - Pull on device: git pull (in Termux)                  │
+│     - Install deps: npm install (if needed)                 │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  3. TEST IN EXPO GO 54 (Galaxy S25 Ultra)                  │
+│     - Start backend: npm run dev:backend (Terminal 1)       │
+│     - Start frontend: npm start (Terminal 2)                │
+│     - Open in Expo Go app                                   │
+│     - Test all features on device                           │
+│     - Verify functionality                                  │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  4. ITERATE                                                 │
+│     - If issues found → Return to Step 1                    │
+│     - If tests pass → Continue development                  │
+│     - Repeat until all building and testing complete        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step-by-Step Instructions
+
+#### Step 1: Build & Verify Locally
+
+On your development machine:
+
+```bash
+# 1. Make your code changes
+# 2. Run full verification suite
+npm test                    # All tests must pass (142/142)
+npm run verify:metro        # Metro bundler verification
+npm run verify:backend      # Backend isolation check
+npm run lint                # ESLint checks
+
+# 3. If all checks pass, commit
+git add .
+git commit -m "feat: Your feature description"
+git push
+```
+
+#### Step 2: Deploy to Termux (S25 Ultra)
+
+On your Galaxy S25 Ultra in Termux:
+
+```bash
+# Navigate to project directory
+cd ~/rork-ultimate-ai-command-center
+
+# Pull latest changes
+git pull
+
+# Install any new dependencies (if package.json changed)
+npm install
+
+# Verify Node version
+node --version  # Should be v20.x
+```
+
+#### Step 3: Test with Expo Go 54
+
+Start the development servers in Termux:
+
+```bash
+# Option A: Start both frontend and backend together
+npm run start:all
+
+# Option B: Start in separate Termux sessions
+# Session 1 - Backend:
+npm run dev:backend
+
+# Session 2 - Frontend:
+npm start
+```
+
+Then on your S25 Ultra:
+1. Open **Expo Go 54** app from home screen
+2. Scan the QR code from Metro bundler (or tap "Enter URL manually")
+3. Wait for app to load and compile
+4. **Test thoroughly**:
+   - All screens and navigation
+   - AI features (voice, chat, reasoning)
+   - Backend API endpoints
+   - Authentication flows
+   - Social media integrations
+   - Settings and configurations
+
+#### Step 4: Validate & Iterate
+
+After testing on device:
+
+```bash
+# If issues found:
+# 1. Note the issues
+# 2. Return to development machine
+# 3. Fix issues and repeat from Step 1
+
+# If everything works:
+# 1. Continue with next feature
+# 2. Keep this workflow for all changes
+```
+
+### Important Notes
+
+- **⚠️ NOT PRODUCTION READY**: This is the active development workflow. Production deployment is NOT configured until all building and testing are complete.
+- **Device Requirement**: Samsung Galaxy S25 Ultra with Termux and Expo Go 54 installed
+- **Node Version**: Must use Node 20.x LTS on both development machine and Termux
+- **Testing Environment**: All testing happens on physical device via Expo Go
+- **No Production Builds**: Do not create production APKs or deploy to production until development phase is complete
+
+### Backend-Specific Workflow
+
+For backend changes, use the compiled mode for stable testing:
+
+```bash
+# On Termux (S25 Ultra):
+npm run build:backend          # Compile TypeScript
+npm run start:backend:prod     # Run compiled version
+
+# Or for hot-reload development:
+npm run dev:backend            # tsx watch mode (has known limitations)
+```
+
+See [Backend Documentation](#backend-documentation) for details on backend development modes.
+
+### Troubleshooting This Workflow
+
+**Issue: Changes not appearing on device**
+```bash
+# On Termux:
+npm start -- --clear  # Clear Metro cache
+# Or restart Metro bundler completely
+```
+
+**Issue: Module not found after git pull**
+```bash
+# On Termux:
+rm -rf node_modules
+npm install
+npm start -- --clear
+```
+
+**Issue: Backend not accessible from Expo Go**
+```bash
+# Check backend is running and accessible:
+curl http://localhost:3000/
+# If not working, check .env file and restart backend
+```
 
 ---
 
