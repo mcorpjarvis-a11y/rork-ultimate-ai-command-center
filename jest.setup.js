@@ -44,6 +44,16 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
     clear: jest.fn(async () => {
       mockAsyncStore.clear();
     }),
+    getAllKeys: jest.fn(async () => Array.from(mockAsyncStore.keys())),
+    multiRemove: jest.fn(async (keys) => {
+      keys.forEach(key => mockAsyncStore.delete(key));
+    }),
+    multiGet: jest.fn(async (keys) => {
+      return keys.map(key => [key, mockAsyncStore.get(key) || null]);
+    }),
+    multiSet: jest.fn(async (keyValuePairs) => {
+      keyValuePairs.forEach(([key, value]) => mockAsyncStore.set(key, value));
+    }),
   },
 }));
 

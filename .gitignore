@@ -54,3 +54,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 .vercel
+
+# Documentation backups and archives (created by cleanup scripts)
+docs-backup-*/
+docs-archive-consolidated/
+
+# Temporary files
+/tmp/
