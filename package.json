@@ -13,6 +13,7 @@
     "start:frontend": "expo start",
     "start-web": "expo start --web",
     "start-web-dev": "DEBUG=expo* expo start --web",
+    "check:node": "node scripts/check-node-version.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -30,6 +31,9 @@
     "lint": "expo lint",
     "android": "expo run:android",
     "build:apk": "expo run:android --variant release"
+  },
+  "engines": {
+    "node": ">=18 <=20"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.62",
