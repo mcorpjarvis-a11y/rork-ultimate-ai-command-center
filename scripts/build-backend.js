@@ -59,7 +59,8 @@ async function build() {
       entryPoints: ['backend/server.express.ts'],
       bundle: true,
       platform: 'node',
-      target: 'node20',
+      // ✅ Target Node 22 for Termux compatibility
+      target: 'node22',
       outfile: 'backend/dist/server.express.js',
       external: reactNativePackages,
       packages: 'external', // Don't bundle node_modules

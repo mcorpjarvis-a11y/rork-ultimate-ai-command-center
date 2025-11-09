@@ -61,21 +61,37 @@ function log(prefix, color, message) {
   console.log(`${color}[${prefix}]${colors.reset} ${message}`);
 }
 
+console.log('📡 Building Backend Server...\n');
+
+// ✅ Build backend first to avoid React-Native parse errors under Node 22
+try {
+  execSync('npm run build:backend', { stdio: 'inherit' });
+  console.log('\n✅ Backend build completed!\n');
+} catch (error) {
+  console.error('❌ Failed to build backend:', error.message);
+  console.error('\nTroubleshooting:');
+  console.error('  1. Check that esbuild is installed: npm install');
+  console.error('  2. Verify backend/server.express.ts exists');
+  console.error('  3. Check Node version is compatible (Node 22.x supported)');
+  process.exit(1);
+}
+
 console.log('📡 Starting Backend Server...\n');
 
+// ✅ Run compiled backend safely with Node 22
 let backend;
 try {
   backend = spawn(
-    isWindows ? 'npx.cmd' : 'npx',
-    ['tsx', 'backend/server.express.ts'],
+    'node',
+    ['backend/dist/server.express.js'],
     { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
   );
 } catch (error) {
   console.error('❌ Failed to start backend server:', error.message);
   console.error('\nTroubleshooting:');
-  console.error('  1. Check that tsx is installed: npm install');
-  console.error('  2. Verify backend/server.express.ts exists');
-  console.error('  3. Check Node version is compatible (Node 20.x recommended)');
+  console.error('  1. Run: npm run build:backend');
+  console.error('  2. Verify backend/dist/server.express.js exists');
+  console.error('  3. Check Node version is compatible (Node 22.x supported)');
   process.exit(1);
 }
 

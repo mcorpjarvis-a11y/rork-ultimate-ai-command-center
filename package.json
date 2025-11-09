@@ -26,6 +26,7 @@
     "test:provider-registry": "node scripts/test-provider-registry.js",
     "verify": "npm run verify:metro && npm test && npm run lint",
     "verify:backend": "npm run build:backend && node scripts/verify-backend-isolated.js",
+    "verify:startup": "node scripts/test-startup.js",
     "verify:api-config": "node scripts/verify-api-config.js",
     "verify:metro": "node scripts/verify-metro.js",
     "lint": "expo lint",
@@ -33,7 +34,7 @@
     "build:apk": "expo run:android --variant release"
   },
   "engines": {
-    "node": ">=18 <=20"
+    "node": ">=22 <=22"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.62",
