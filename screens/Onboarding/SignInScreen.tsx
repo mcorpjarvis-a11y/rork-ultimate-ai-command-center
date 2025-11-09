@@ -89,11 +89,11 @@ export default function SignInScreen() {
         await MasterProfile.saveMasterProfile(masterProfile);
 
         console.log('[SignInScreen] Master profile created successfully');
-        router.replace('/');
+        router.replace('/onboarding/permissions');
         
         Alert.alert(
           'Welcome!',
-          `Account created for ${email}`,
+          `Account created for ${email}. Let's set up your permissions.`,
           [{ text: 'OK' }]
         );
       } else {
@@ -120,11 +120,11 @@ export default function SignInScreen() {
         }
 
         console.log('[SignInScreen] Sign-in successful');
-        router.replace('/');
+        router.replace('/onboarding/permissions');
         
         Alert.alert(
           'Welcome Back!',
-          `Signed in as ${email}`,
+          `Signed in as ${email}. Let's review your permissions.`,
           [{ text: 'OK' }]
         );
       }
@@ -202,12 +202,12 @@ export default function SignInScreen() {
 
       console.log('[SignInScreen] Master profile created successfully');
 
-      // Navigate to dashboard
-      router.replace('/');
+      // Navigate to permission manager
+      router.replace('/onboarding/permissions');
       
       Alert.alert(
         'Welcome!',
-        `Signed in as ${googleProfile.name || googleProfile.email}`,
+        `Signed in as ${googleProfile.name || googleProfile.email}. Let's set up your permissions.`,
         [{ text: 'OK' }]
       );
     } catch (error) {

@@ -10,12 +10,8 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const SPOTIFY_CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID || '';
-
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
+// Use Expo proxy for OAuth
+const USE_PROXY = true;
 
 const DEFAULT_SCOPES = [
   'user-read-email',
@@ -33,16 +29,26 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
+    // Create redirect URI using proxy
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
+    });
+
+    // Use client ID or proxy
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID || '');
+
     const request = new AuthSession.AuthRequest({
-      clientId: SPOTIFY_CLIENT_ID,
+      clientId,
       scopes,
       responseType: AuthSession.ResponseType.Code,
-      redirectUri: REDIRECT_URI,
+      redirectUri,
       usePKCE: true,
     });
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+      useProxy: USE_PROXY,
     });
 
     console.log('[SpotifyProvider] Auth result:', result.type);
@@ -55,7 +61,7 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
       }
 
       // Exchange code for tokens
-      const tokens = await exchangeCodeForTokens(code, request.codeVerifier!);
+      const tokens = await exchangeCodeForTokens(code, request.codeVerifier!, redirectUri);
       
       // Fetch user profile
       const profile = await fetchUserProfile(tokens.access_token);
@@ -85,13 +91,15 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 /**
  * Exchange authorization code for tokens
  */
-async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+async function exchangeCodeForTokens(code: string, codeVerifier: string, redirectUri: string): Promise<any> {
   try {
+    const clientId = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID || 'EXPO_PROXY';
+    
     const params = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      redirect_uri: REDIRECT_URI,
-      client_id: SPOTIFY_CLIENT_ID,
+      redirect_uri: redirectUri,
+      client_id: clientId,
       code_verifier: codeVerifier,
     });
 
@@ -125,10 +133,12 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
   try {
     console.log('[SpotifyProvider] Refreshing access token');
 
+    const clientId = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID || 'EXPO_PROXY';
+
     const params = new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token,
-      client_id: SPOTIFY_CLIENT_ID,
+      client_id: clientId,
     });
 
     const response = await fetch('https://accounts.spotify.com/api/token', {

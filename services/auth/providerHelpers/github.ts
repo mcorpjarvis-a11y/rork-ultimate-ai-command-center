@@ -12,12 +12,8 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const GITHUB_CLIENT_ID = process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || '';
-
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
+// Use Expo proxy for OAuth
+const USE_PROXY = true;
 
 const DEFAULT_SCOPES = ['read:user', 'user:email'];
 
@@ -43,6 +39,7 @@ async function startDeviceFlow(additionalScopes: string[] = []): Promise<AuthRes
   try {
     console.log('[GitHubProvider] Starting Device Flow');
 
+    const clientId = process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || 'EXPO_PROXY';
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes].join(' ');
 
     // Step 1: Request device code
@@ -53,7 +50,7 @@ async function startDeviceFlow(additionalScopes: string[] = []): Promise<AuthRes
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        client_id: GITHUB_CLIENT_ID,
+        client_id: clientId,
         scope: scopes,
       }),
     });
@@ -99,6 +96,7 @@ async function pollForAuthorization(
   intervalSeconds: number,
   expiresIn: number
 ): Promise<any> {
+  const clientId = process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || 'EXPO_PROXY';
   const startTime = Date.now();
   const expiresAt = startTime + (expiresIn * 1000);
 
@@ -113,7 +111,7 @@ async function pollForAuthorization(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          client_id: GITHUB_CLIENT_ID,
+          client_id: clientId,
           device_code: deviceCode,
           grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
         }),
@@ -155,14 +153,24 @@ async function startWebFlow(additionalScopes: string[] = []): Promise<AuthRespon
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
+    // Create redirect URI using proxy
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
+    });
+
+    // Use client ID or proxy
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || '');
+
     const request = new AuthSession.AuthRequest({
-      clientId: GITHUB_CLIENT_ID,
+      clientId,
       scopes,
-      redirectUri: REDIRECT_URI,
+      redirectUri,
     });
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+      useProxy: USE_PROXY,
     });
 
     console.log('[GitHubProvider] Auth result:', result.type);
@@ -175,7 +183,7 @@ async function startWebFlow(additionalScopes: string[] = []): Promise<AuthRespon
       }
 
       // Exchange code for tokens
-      const tokens = await exchangeCodeForTokens(code);
+      const tokens = await exchangeCodeForTokens(code, redirectUri);
       
       // Fetch user profile
       const profile = await fetchUserProfile(tokens.access_token);
@@ -205,8 +213,10 @@ async function startWebFlow(additionalScopes: string[] = []): Promise<AuthRespon
 /**
  * Exchange authorization code for tokens
  */
-async function exchangeCodeForTokens(code: string): Promise<any> {
+async function exchangeCodeForTokens(code: string, redirectUri: string): Promise<any> {
   try {
+    const clientId = process.env.EXPO_PUBLIC_GITHUB_CLIENT_ID || 'EXPO_PROXY';
+    
     const response = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
@@ -214,9 +224,9 @@ async function exchangeCodeForTokens(code: string): Promise<any> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        client_id: GITHUB_CLIENT_ID,
+        client_id: clientId,
         code,
-        redirect_uri: REDIRECT_URI,
+        redirect_uri: redirectUri,
       }),
     });
 

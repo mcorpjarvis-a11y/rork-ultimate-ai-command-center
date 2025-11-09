@@ -18,9 +18,6 @@ const USE_PROXY = true;
 
 const DEFAULT_SCOPES = ['openid', 'profile', 'email'];
 
-// Google's discovery document
-const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
-
 /**
  * Start Google OAuth authentication flow
  * Uses Expo's proxy - NO manual configuration needed!
@@ -33,6 +30,9 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
     if (Platform.OS === 'ios') {
       throw new Error('iOS is not supported. Please use Android.');
     }
+
+    // Google's discovery document - called inside function to avoid React hook at module level
+    const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
@@ -171,8 +171,11 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
   try {
     console.log('[GoogleProvider] Refreshing access token');
 
+    // Use EXPO_PROXY client ID for proxy mode
+    const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || 'EXPO_PROXY';
+
     const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID_ANDROID,
+      client_id: clientId,
       refresh_token,
       grant_type: 'refresh_token',
     });

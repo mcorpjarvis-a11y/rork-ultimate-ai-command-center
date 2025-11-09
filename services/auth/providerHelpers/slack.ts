@@ -1,7 +1,7 @@
 /**
- * Discord OAuth Provider Helper
- * Supports PKCE for mobile
- * Android/Expo/Termux only - NO iOS support
+ * Slack OAuth Provider Helper
+ * Uses OAuth 2.0 with OpenID Connect
+ * Android/Expo only - NO iOS support
  */
 
 import * as AuthSession from 'expo-auth-session';
@@ -13,16 +13,24 @@ WebBrowser.maybeCompleteAuthSession();
 // Use Expo proxy for OAuth
 const USE_PROXY = true;
 
-const DEFAULT_SCOPES = ['identify', 'email'];
+const SLACK_SCOPES = [
+  'openid',
+  'profile',
+  'email',
+  'channels:read',
+  'channels:write',
+  'chat:write',
+  'users:read',
+];
 
 /**
- * Start Discord OAuth authentication flow
+ * Start Slack OAuth authentication flow
  */
 export async function startAuth(additionalScopes: string[] = []): Promise<AuthResponse> {
   try {
-    console.log('[DiscordProvider] Starting authentication flow');
+    console.log('[SlackProvider] Starting authentication flow');
 
-    const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
+    const scopes = [...SLACK_SCOPES, ...additionalScopes];
 
     // Create redirect URI using proxy
     const redirectUri = AuthSession.makeRedirectUri({
@@ -31,7 +39,7 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
     });
 
     // Use client ID or proxy
-    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || '');
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_SLACK_CLIENT_ID || '');
 
     const request = new AuthSession.AuthRequest({
       clientId,
@@ -39,14 +47,17 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
       responseType: AuthSession.ResponseType.Code,
       redirectUri,
       usePKCE: true,
+      extraParams: {
+        user_scope: scopes.join(','),
+      },
     });
 
     const result = await request.promptAsync({
-      authorizationEndpoint: 'https://discord.com/api/oauth2/authorize',
+      authorizationEndpoint: 'https://slack.com/oauth/v2/authorize',
       useProxy: USE_PROXY,
     });
 
-    console.log('[DiscordProvider] Auth result:', result.type);
+    console.log('[SlackProvider] Auth result:', result.type);
 
     if (result.type === 'success') {
       const code = result.params.code;
@@ -69,16 +80,18 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
         scope: tokens.scope,
         scopes: scopes,
         expires_at: Date.now() + (tokens.expires_in * 1000),
+        team_id: tokens.team?.id,
+        team_name: tokens.team?.name,
         profile,
       };
     } else if (result.type === 'error') {
-      console.error('[DiscordProvider] Auth error:', result.error);
+      console.error('[SlackProvider] Auth error:', result.error);
       throw new Error(result.error?.message || 'Authentication failed');
     } else {
       throw new Error('Authentication cancelled by user');
     }
   } catch (error) {
-    console.error('[DiscordProvider] Authentication failed:', error);
+    console.error('[SlackProvider] Authentication failed:', error);
     throw error;
   }
 }
@@ -88,23 +101,18 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
  */
 async function exchangeCodeForTokens(code: string, codeVerifier: string, redirectUri: string): Promise<any> {
   try {
-    const clientId = process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || 'EXPO_PROXY';
-    const clientSecret = process.env.EXPO_PUBLIC_DISCORD_CLIENT_SECRET || '';
-    
+    const clientId = process.env.EXPO_PUBLIC_SLACK_CLIENT_ID || 'EXPO_PROXY';
+    const clientSecret = process.env.EXPO_PUBLIC_SLACK_CLIENT_SECRET || '';
+
     const params = new URLSearchParams({
-      client_id: clientId,
       code,
-      grant_type: 'authorization_code',
+      client_id: clientId,
+      client_secret: clientSecret,
       redirect_uri: redirectUri,
       code_verifier: codeVerifier,
     });
 
-    // Add client secret if available (not required for PKCE)
-    if (clientSecret) {
-      params.append('client_secret', clientSecret);
-    }
-
-    const response = await fetch('https://discord.com/api/oauth2/token', {
+    const response = await fetch('https://slack.com/api/oauth.v2.access', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -114,15 +122,20 @@ async function exchangeCodeForTokens(code: string, codeVerifier: string, redirec
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('[DiscordProvider] Token exchange error:', error);
+      console.error('[SlackProvider] Token exchange error:', error);
       throw new Error('Failed to exchange code for tokens');
     }
 
-    const tokens = await response.json();
-    console.log('[DiscordProvider] Tokens obtained successfully');
-    return tokens;
+    const data = await response.json();
+    
+    if (!data.ok) {
+      throw new Error(data.error || 'Token exchange failed');
+    }
+
+    console.log('[SlackProvider] Tokens obtained successfully');
+    return data;
   } catch (error) {
-    console.error('[DiscordProvider] Token exchange failed:', error);
+    console.error('[SlackProvider] Token exchange failed:', error);
     throw error;
   }
 }
@@ -132,22 +145,19 @@ async function exchangeCodeForTokens(code: string, codeVerifier: string, redirec
  */
 export async function refreshToken(refresh_token: string): Promise<AuthResponse> {
   try {
-    console.log('[DiscordProvider] Refreshing access token');
+    console.log('[SlackProvider] Refreshing access token');
 
-    const clientId = process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || 'EXPO_PROXY';
-    const clientSecret = process.env.EXPO_PUBLIC_DISCORD_CLIENT_SECRET || '';
+    const clientId = process.env.EXPO_PUBLIC_SLACK_CLIENT_ID || 'EXPO_PROXY';
+    const clientSecret = process.env.EXPO_PUBLIC_SLACK_CLIENT_SECRET || '';
 
     const params = new URLSearchParams({
-      client_id: clientId,
-      refresh_token,
       grant_type: 'refresh_token',
+      refresh_token,
+      client_id: clientId,
+      client_secret: clientSecret,
     });
 
-    if (clientSecret) {
-      params.append('client_secret', clientSecret);
-    }
-
-    const response = await fetch('https://discord.com/api/oauth2/token', {
+    const response = await fetch('https://slack.com/api/oauth.v2.access', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -157,22 +167,26 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('[DiscordProvider] Token refresh error:', error);
+      console.error('[SlackProvider] Token refresh error:', error);
       throw new Error('Failed to refresh token');
     }
 
-    const tokens = await response.json();
+    const data = await response.json();
+    
+    if (!data.ok) {
+      throw new Error(data.error || 'Token refresh failed');
+    }
     
     return {
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      expires_in: tokens.expires_in,
-      token_type: tokens.token_type,
-      scope: tokens.scope,
-      expires_at: Date.now() + (tokens.expires_in * 1000),
+      access_token: data.access_token,
+      refresh_token: data.refresh_token || refresh_token,
+      expires_in: data.expires_in,
+      token_type: data.token_type,
+      scope: data.scope,
+      expires_at: Date.now() + (data.expires_in * 1000),
     };
   } catch (error) {
-    console.error('[DiscordProvider] Token refresh failed:', error);
+    console.error('[SlackProvider] Token refresh failed:', error);
     throw error;
   }
 }
@@ -182,35 +196,27 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
  */
 export async function revokeToken(token: string): Promise<void> {
   try {
-    console.log('[DiscordProvider] Revoking token');
+    console.log('[SlackProvider] Revoking token');
 
-    const clientId = process.env.EXPO_PUBLIC_DISCORD_CLIENT_ID || 'EXPO_PROXY';
-    const clientSecret = process.env.EXPO_PUBLIC_DISCORD_CLIENT_SECRET || '';
-
-    const params = new URLSearchParams({
-      client_id: clientId,
-      token,
-    });
-
-    if (clientSecret) {
-      params.append('client_secret', clientSecret);
-    }
-
-    const response = await fetch('https://discord.com/api/oauth2/token/revoke', {
+    const response = await fetch('https://slack.com/api/auth.revoke', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: params.toString(),
+      body: new URLSearchParams({
+        token,
+      }).toString(),
     });
 
-    if (!response.ok) {
-      console.warn('[DiscordProvider] Token revocation may have failed');
+    const data = await response.json();
+    
+    if (!data.ok) {
+      console.warn('[SlackProvider] Token revocation may have failed:', data.error);
     } else {
-      console.log('[DiscordProvider] Token revoked successfully');
+      console.log('[SlackProvider] Token revoked successfully');
     }
   } catch (error) {
-    console.error('[DiscordProvider] Token revocation failed:', error);
+    console.error('[SlackProvider] Token revocation failed:', error);
     throw error;
   }
 }
@@ -220,9 +226,9 @@ export async function revokeToken(token: string): Promise<void> {
  */
 async function fetchUserProfile(accessToken: string): Promise<any> {
   try {
-    const response = await fetch('https://discord.com/api/users/@me', {
+    const response = await fetch('https://slack.com/api/users.identity', {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
     });
 
@@ -230,11 +236,16 @@ async function fetchUserProfile(accessToken: string): Promise<any> {
       throw new Error('Failed to fetch user profile');
     }
 
-    const profile = await response.json();
-    console.log('[DiscordProvider] User profile fetched:', profile.username);
-    return profile;
+    const data = await response.json();
+    
+    if (!data.ok) {
+      throw new Error(data.error || 'Failed to fetch user profile');
+    }
+
+    console.log('[SlackProvider] User profile fetched:', data.user.id);
+    return data.user;
   } catch (error) {
-    console.error('[DiscordProvider] Failed to fetch user profile:', error);
+    console.error('[SlackProvider] Failed to fetch user profile:', error);
     throw error;
   }
 }

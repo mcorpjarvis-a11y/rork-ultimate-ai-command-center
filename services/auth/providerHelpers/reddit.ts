@@ -10,12 +10,8 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const REDDIT_CLIENT_ID = process.env.EXPO_PUBLIC_REDDIT_CLIENT_ID || '';
-
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
+// Use Expo proxy for OAuth
+const USE_PROXY = true;
 
 const DEFAULT_SCOPES = ['identity', 'read', 'submit'];
 
@@ -29,11 +25,20 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
+    // Create redirect URI using proxy
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
+    });
+
+    // Use client ID or proxy
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_REDDIT_CLIENT_ID || '');
+
     const request = new AuthSession.AuthRequest({
-      clientId: REDDIT_CLIENT_ID,
+      clientId,
       scopes,
       responseType: AuthSession.ResponseType.Code,
-      redirectUri: REDIRECT_URI,
+      redirectUri,
       usePKCE: false, // Reddit doesn't require PKCE for installed apps
       extraParams: {
         duration: 'permanent', // Request refresh token
@@ -42,6 +47,7 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://www.reddit.com/api/v1/authorize',
+      useProxy: USE_PROXY,
     });
 
     console.log('[RedditProvider] Auth result:', result.type);
@@ -54,7 +60,7 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
       }
 
       // Exchange code for tokens
-      const tokens = await exchangeCodeForTokens(code);
+      const tokens = await exchangeCodeForTokens(code, redirectUri);
       
       // Fetch user profile
       const profile = await fetchUserProfile(tokens.access_token);
@@ -84,15 +90,17 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 /**
  * Exchange authorization code for tokens
  */
-async function exchangeCodeForTokens(code: string): Promise<any> {
+async function exchangeCodeForTokens(code: string, redirectUri: string): Promise<any> {
   try {
+    const clientId = process.env.EXPO_PUBLIC_REDDIT_CLIENT_ID || 'EXPO_PROXY';
+    
     // Reddit requires Basic Auth with client_id as username and empty password
-    const credentials = btoa(`${REDDIT_CLIENT_ID}:`);
+    const credentials = btoa(`${clientId}:`);
 
     const params = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: redirectUri,
     });
 
     const response = await fetch('https://www.reddit.com/api/v1/access_token', {
@@ -126,7 +134,8 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
   try {
     console.log('[RedditProvider] Refreshing access token');
 
-    const credentials = btoa(`${REDDIT_CLIENT_ID}:`);
+    const clientId = process.env.EXPO_PUBLIC_REDDIT_CLIENT_ID || 'EXPO_PROXY';
+    const credentials = btoa(`${clientId}:`);
 
     const params = new URLSearchParams({
       grant_type: 'refresh_token',
@@ -171,7 +180,8 @@ export async function revokeToken(token: string): Promise<void> {
   try {
     console.log('[RedditProvider] Revoking token');
 
-    const credentials = btoa(`${REDDIT_CLIENT_ID}:`);
+    const clientId = process.env.EXPO_PUBLIC_REDDIT_CLIENT_ID || 'EXPO_PROXY';
+    const credentials = btoa(`${clientId}:`);
 
     const params = new URLSearchParams({
       token,

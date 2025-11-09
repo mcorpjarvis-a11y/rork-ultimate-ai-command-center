@@ -355,6 +355,83 @@ export default function Settings() {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>OAuth Services (Connected Services)</Text>
+          <Text style={styles.sectionSubtitle}>
+            Manage your connected OAuth providers separately from API keys
+          </Text>
+          
+          {[
+            { id: 'google', name: 'Google', icon: '🔵', description: 'Gmail, Drive, YouTube' },
+            { id: 'github', name: 'GitHub', icon: '⚫', description: 'Code repositories' },
+            { id: 'discord', name: 'Discord', icon: '🟣', description: 'Server management' },
+            { id: 'reddit', name: 'Reddit', icon: '🟠', description: 'Community posts' },
+            { id: 'spotify', name: 'Spotify', icon: '🟢', description: 'Music playback' },
+            { id: 'twitter', name: 'Twitter/X', icon: '⚪', description: 'Social posts' },
+            { id: 'youtube', name: 'YouTube', icon: '🔴', description: 'Video upload' },
+            { id: 'instagram', name: 'Instagram', icon: '🟣', description: 'Photo posts' },
+            { id: 'notion', name: 'Notion', icon: '⚫', description: 'Workspace' },
+            { id: 'slack', name: 'Slack', icon: '🟣', description: 'Team chat' },
+          ].map((provider) => (
+            <View key={provider.id} style={styles.card}>
+              <View style={styles.accountRow}>
+                <View style={styles.accountInfo}>
+                  <Text style={styles.providerIcon}>{provider.icon}</Text>
+                  <View>
+                    <Text style={styles.accountName}>{provider.name}</Text>
+                    <Text style={styles.accountDescription}>{provider.description}</Text>
+                  </View>
+                </View>
+                
+                <TouchableOpacity
+                  style={[styles.connectButton, loading && styles.buttonDisabled]}
+                  onPress={async () => {
+                    try {
+                      setLoading(true);
+                      const isConnected = await AuthManager.isConnected(provider.id);
+                      
+                      if (isConnected) {
+                        Alert.alert(
+                          'Disconnect',
+                          `Disconnect ${provider.name}?`,
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            {
+                              text: 'Disconnect',
+                              style: 'destructive',
+                              onPress: async () => {
+                                await AuthManager.revokeProvider(provider.id);
+                                Alert.alert('Disconnected', `${provider.name} has been disconnected.`);
+                              },
+                            },
+                          ]
+                        );
+                      } else {
+                        const success = await AuthManager.startAuthFlow(provider.id);
+                        if (success) {
+                          Alert.alert('Success', `${provider.name} connected!`);
+                        }
+                      }
+                    } catch (error) {
+                      console.error(`[Settings] ${provider.name} error:`, error);
+                      Alert.alert('Error', `Failed to connect ${provider.name}.`);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text style={styles.connectButtonText}>Manage</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           
           <TouchableOpacity
@@ -777,5 +854,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  sectionSubtitle: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: -8,
+    marginBottom: 12,
+  },
+  providerIcon: {
+    fontSize: 24,
+    marginRight: 12,
+    width: 32,
+    height: 32,
+    textAlign: 'center',
+    lineHeight: 32,
+  },
+  accountDescription: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 2,
   },
 });

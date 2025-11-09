@@ -11,13 +11,8 @@ import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const GOOGLE_CLIENT_ID_ANDROID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || 
-  '623163723625-f8vjcngl8qvpupeqn3cb0l9vn1u9d09t.apps.googleusercontent.com';
-
-const REDIRECT_URI = AuthSession.makeRedirectUri({
-  scheme: 'myapp',
-  path: 'redirect',
-});
+// Use Expo proxy for OAuth (no manual client ID needed)
+const USE_PROXY = true;
 
 const YOUTUBE_SCOPES = [
   'openid',
@@ -36,16 +31,28 @@ export async function startAuth(): Promise<AuthResponse> {
   try {
     console.log('[YouTubeProvider] Starting authentication flow');
 
-    const request = new AuthSession.AuthRequest({
-      clientId: GOOGLE_CLIENT_ID_ANDROID,
-      scopes: YOUTUBE_SCOPES,
-      responseType: AuthSession.ResponseType.Code,
-      redirectUri: REDIRECT_URI,
-      usePKCE: true,
+    // Create redirect URI using proxy
+    const redirectUri = AuthSession.makeRedirectUri({
+      useProxy: USE_PROXY,
+      scheme: 'myapp',
     });
 
-    const result = await request.promptAsync({
-      authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+    // Use Expo proxy client ID
+    const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '');
+
+    // Get Google's discovery document
+    const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
+
+    const request = new AuthSession.AuthRequest({
+      clientId,
+      scopes: YOUTUBE_SCOPES,
+      responseType: AuthSession.ResponseType.Code,
+      redirectUri,
+      usePKCE: USE_PROXY,
+    });
+
+    const result = await request.promptAsync(discovery, {
+      useProxy: USE_PROXY,
     });
 
     if (result.type === 'success') {
@@ -55,7 +62,7 @@ export async function startAuth(): Promise<AuthResponse> {
         throw new Error('No authorization code received');
       }
 
-      const tokens = await exchangeCodeForTokens(code, request.codeVerifier!);
+      const tokens = await exchangeCodeForTokens(code, request.codeVerifier!, redirectUri);
       const profile = await fetchUserProfile(tokens.access_token);
       
       return {
@@ -79,7 +86,9 @@ export async function startAuth(): Promise<AuthResponse> {
   }
 }
 
-async function exchangeCodeForTokens(code: string, codeVerifier: string): Promise<any> {
+async function exchangeCodeForTokens(code: string, codeVerifier: string, redirectUri: string): Promise<any> {
+  const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || 'EXPO_PROXY';
+  
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: {
@@ -87,10 +96,10 @@ async function exchangeCodeForTokens(code: string, codeVerifier: string): Promis
     },
     body: new URLSearchParams({
       code,
-      client_id: GOOGLE_CLIENT_ID_ANDROID,
+      client_id: clientId,
       code_verifier: codeVerifier,
       grant_type: 'authorization_code',
-      redirect_uri: REDIRECT_URI,
+      redirect_uri: redirectUri,
     }).toString(),
   });
 
@@ -137,6 +146,8 @@ async function fetchUserProfile(accessToken: string): Promise<any> {
  * Refresh access token
  */
 export async function refreshToken(refreshToken: string): Promise<AuthResponse> {
+  const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || 'EXPO_PROXY';
+  
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: {
@@ -144,7 +155,7 @@ export async function refreshToken(refreshToken: string): Promise<AuthResponse> 
     },
     body: new URLSearchParams({
       refresh_token: refreshToken,
-      client_id: GOOGLE_CLIENT_ID_ANDROID,
+      client_id: clientId,
       grant_type: 'refresh_token',
     }).toString(),
   });
