@@ -1,0 +1,61 @@
+name: Backend Verification
+
+on:
+  push:
+    branches: [ main, develop, 'copilot/**' ]
+    paths:
+      - 'backend/**'
+      - 'services/**'
+      - 'config/**'
+      - 'scripts/build-backend.js'
+      - 'scripts/verify-backend-isolated.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/backend-verify.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - 'services/**'
+      - 'config/**'
+      - 'scripts/build-backend.js'
+      - 'scripts/verify-backend-isolated.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/backend-verify.yml'
+
+jobs:
+  backend-verify:
+    name: Verify Backend Isolation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build backend
+        run: npm run build:backend
+      
+      - name: Verify backend isolation
+        run: npm run verify:backend
+      
+      - name: Lint backend
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/dist/
+          retention-days: 7
