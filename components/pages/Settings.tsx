@@ -20,8 +20,11 @@ import {
   Trash2,
   Settings as SettingsIcon,
   Wand2,
+  Link2,
 } from 'lucide-react-native';
 import GoogleAuthAdapter from '@/services/auth/GoogleAuthAdapter';
+import AuthManager from '@/services/auth/AuthManager';
+import MasterProfile from '@/services/auth/MasterProfile';
 import UserProfileService, { UserProfile } from '@/services/user/UserProfileService';
 import GoogleDriveSync from '@/services/sync/GoogleDriveSync';
 import SetupWizard from '@/components/SetupWizard';
@@ -33,14 +36,110 @@ export default function Settings() {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [keyValue, setKeyValue] = useState('');
   const [showWizard, setShowWizard] = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
 
   useEffect(() => {
     loadProfile();
+    checkGoogleConnection();
   }, []);
 
   const loadProfile = async () => {
     const currentProfile = UserProfileService.getCurrentProfile();
     setProfile(currentProfile);
+  };
+
+  const checkGoogleConnection = async () => {
+    const isConnected = await AuthManager.isConnected('google');
+    setGoogleConnected(isConnected);
+  };
+
+  const handleConnectGoogle = async () => {
+    try {
+      setLoading(true);
+      console.log('[Settings] Starting Google connection flow');
+
+      const success = await AuthManager.startAuthFlow('google');
+
+      if (!success) {
+        Alert.alert('Connection Failed', 'Could not connect to Google. Please try again.');
+        return;
+      }
+
+      // Update master profile to include Google
+      const masterProfile = await MasterProfile.getMasterProfile();
+      if (masterProfile) {
+        // Get Google profile info
+        const googleToken = await AuthManager.getAccessToken('google');
+        if (googleToken) {
+          try {
+            const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+              headers: {
+                Authorization: `Bearer ${googleToken}`,
+              },
+            });
+
+            if (response.ok) {
+              const googleProfile = await response.json();
+              
+              // Update master profile with Google info if not already set
+              if (!masterProfile.avatar && googleProfile.picture) {
+                await MasterProfile.updateProfileDetails({
+                  avatar: googleProfile.picture,
+                });
+              }
+            }
+          } catch (error) {
+            console.warn('[Settings] Could not fetch Google profile:', error);
+          }
+        }
+      }
+
+      setGoogleConnected(true);
+      await loadProfile();
+      
+      Alert.alert(
+        'Connected!',
+        'Your Google account has been connected successfully.',
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('[Settings] Google connection error:', error);
+      Alert.alert(
+        'Error',
+        'An error occurred while connecting to Google. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisconnectGoogle = async () => {
+    Alert.alert(
+      'Disconnect Google',
+      'Are you sure you want to disconnect your Google account? You will lose access to Google Drive sync.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Disconnect',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await AuthManager.revokeProvider('google');
+              setGoogleConnected(false);
+              await loadProfile();
+              Alert.alert('Disconnected', 'Google account has been disconnected.');
+            } catch (error) {
+              console.error('[Settings] Google disconnect error:', error);
+              Alert.alert('Error', 'Failed to disconnect Google account.');
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleRerunWizard = () => {
@@ -197,6 +296,51 @@ export default function Settings() {
                 <Text style={styles.cardSubtitle}>{profile.email}</Text>
               </View>
             </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Connected Accounts</Text>
+          
+          <View style={styles.card}>
+            <View style={styles.accountRow}>
+              <View style={styles.accountInfo}>
+                <Text style={styles.googleIcon}>G</Text>
+                <View>
+                  <Text style={styles.accountName}>Google Account</Text>
+                  <Text style={styles.accountStatus}>
+                    {googleConnected ? 'Connected' : 'Not connected'}
+                  </Text>
+                </View>
+              </View>
+              
+              <TouchableOpacity
+                style={[
+                  styles.connectButton,
+                  googleConnected && styles.disconnectButton,
+                  loading && styles.buttonDisabled
+                ]}
+                onPress={googleConnected ? handleDisconnectGoogle : handleConnectGoogle}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <>
+                    {googleConnected ? null : <Link2 size={16} color="#fff" />}
+                    <Text style={styles.connectButtonText}>
+                      {googleConnected ? 'Disconnect' : 'Connect'}
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+            
+            {googleConnected && (
+              <Text style={styles.helpText}>
+                Google Drive sync is enabled for backup and restore
+              </Text>
+            )}
           </View>
         </View>
 
@@ -575,5 +719,53 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 12,
     textAlign: 'center',
+  },
+  accountRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  accountInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  googleIcon: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#00f2ff',
+    marginRight: 12,
+    width: 32,
+    height: 32,
+    textAlign: 'center',
+    lineHeight: 32,
+  },
+  accountName: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  accountStatus: {
+    color: '#888',
+    fontSize: 13,
+    marginTop: 2,
+  },
+  connectButton: {
+    backgroundColor: '#00f2ff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 6,
+  },
+  disconnectButton: {
+    backgroundColor: '#ff4444',
+  },
+  connectButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
