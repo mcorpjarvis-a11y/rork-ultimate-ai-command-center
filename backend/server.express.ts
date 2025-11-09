@@ -6,24 +6,38 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Validate environment before importing routes
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import { validateEnvironment, logEnvironmentInfo } from './config/environment';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import { apiLimiter } from './middleware/rateLimiting';
 
 const envConfig = validateEnvironment();
 logEnvironmentInfo(envConfig);
 
 // Import routes
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import voiceRoutes from './routes/voice';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import askRoutes from './routes/ask';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import integrationsRoutes from './routes/integrations';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import mediaRoutes from './routes/media';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import logsRoutes from './routes/logs';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import settingsRoutes from './routes/settings';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import systemRoutes from './routes/system';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import analyticsRoutes from './routes/analytics';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import trendsRoutes from './routes/trends';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import contentRoutes from './routes/content';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import monetizationRoutes from './routes/monetization';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import iotRoutes from './routes/iot';
 
 const app: Express = express();

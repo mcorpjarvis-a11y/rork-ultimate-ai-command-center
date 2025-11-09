@@ -51,7 +51,7 @@ async function acquireLock(): Promise<boolean> {
       // Try to create lock file exclusively
       fs.writeFileSync(LOCK_FILE, String(process.pid), { flag: 'wx' });
       return true;
-    } catch (error) {
+    } catch {
       // Lock exists, wait a bit
       await new Promise(resolve => setTimeout(resolve, 50));
     }
@@ -68,7 +68,7 @@ function releaseLock(): void {
     if (fs.existsSync(LOCK_FILE)) {
       fs.unlinkSync(LOCK_FILE);
     }
-  } catch (error) {
+  } catch {
     // Ignore errors on unlock
   }
 }

@@ -5,6 +5,7 @@
  * and works correctly in a Node environment.
  */
 
+// eslint-disable-next-line no-restricted-imports -- This test is specifically for the expo-secure-store shim
 import * as SecureStore from '../expo-secure-store';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -18,7 +19,7 @@ describe('expo-secure-store shim', () => {
       if (fs.existsSync(STORAGE_FILE)) {
         fs.unlinkSync(STORAGE_FILE);
       }
-    } catch (error) {
+    } catch {
       // Ignore cleanup errors
     }
   });
@@ -29,7 +30,7 @@ describe('expo-secure-store shim', () => {
       if (fs.existsSync(STORAGE_FILE)) {
         fs.unlinkSync(STORAGE_FILE);
       }
-    } catch (error) {
+    } catch {
       // Ignore cleanup errors
     }
   });
