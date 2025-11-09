@@ -338,14 +338,17 @@ export async function authenticate(scopes: string[]): Promise<AuthResult> {
 - [TESTING - Testing Strategy](#testing---testing-strategy)
 - [DONE - Completed Tasks](#done---completed-tasks)
 - [TODO - Remaining Tasks](#todo---remaining-tasks)
-  - [Phase 2: Advanced Features](#-phase-2-advanced-features-future-roadmap)
-    - [Autonomous Agent Mode](#-autonomous-agent-mode---0-)
-    - [Multimodal Vision & Perception](#️-multimodal-vision--perception---0-)
-    - [Emotional & Adaptive Personality](#-emotional--adaptive-personality---0-)
-    - [Long-Term Semantic Memory Graph](#-long-term-semantic-memory-graph---0-)
-    - [Self-Coding & Auto-Deployment Pipeline](#️-self-coding--auto-deployment-pipeline---0-)
-    - [Full-Duplex Conversational Flow](#️-full-duplex-conversational-flow---0-)
-    - [Systems Intelligence Framework](#-systems-intelligence-framework---0-)
+  - [Phase 1: Core Implementation](#-phase-1-core-implementation)
+    - [High Priority Tasks](#-high-priority-immediate-action-required)
+    - [Medium Priority Tasks](#-medium-priority-next-sprint)
+    - [Low Priority Tasks](#-low-priority-future-enhancements)
+  - [Phase 2: Expansion & Autonomy](#-phase-2-expansion--autonomy)
+    - [Toolchain Expansion & Ecosystem](#-toolchain-expansion--ecosystem--0)
+    - [Memory & Reasoning Engine](#-memory--reasoning-engine--0)
+    - [System Architecture Enhancements](#️-system-architecture-enhancements--0)
+    - [Behavioral Evolution Integration](#-behavioral-evolution-integration--0)
+    - [AI Independence Path](#-ai-independence-path--0)
+- [Execution Runbook](#-execution-runbook--real-integrations-only-no-placeholders)
 - [Implementation Status - Sections A-O](#implementation-status---sections-a-o)
   - [Section A: Authentication & Profile](#section-a-authentication--profile-system---100-)
   - [Section B: AI Providers](#section-b-ai-providers-integration---100-)
@@ -415,8 +418,7 @@ export async function authenticate(scopes: string[]): Promise<AuthResult> {
 | **🧠 Systems Intelligence** | 0% | 🔴 Not Started | Meta-coordination layer |
 
 ### Testing Status
-- ✅ **155 unit tests** passing (100%)
-- ✅ **142 integration tests** included in total
+- ✅ **155 tests** passing (100%)
 - ✅ **Coverage:** 50%+ across all modules
 - ✅ **CI/CD:** Ready for GitHub Actions integration
 
@@ -1048,211 +1050,28 @@ Exit codes:
 
 > **Summary: All major features (Sections A-O) are complete and production-ready.**
 
-This section tracks all completed features organized by category. All items marked [x] have been implemented, tested, and verified.
+### Section A: Project Setup & Configuration — 100% ✅
+### Section B: Metro Bundler & Build System — 100% ✅
+### Section C: Testing Infrastructure — 100% ✅
+### Section D: Verification Scripts — 100% ✅
+### Section E: OAuth & Token Management — 100% ✅
+### Section F: OAuth Provider Helpers — 100% ✅
+### Section G: Authentication UI — 100% ✅
+### Section H: AI Provider Integration — 100% ✅
+### Section I: Voice Services — 100% ✅
+### Section J: Social Media Integrations — 100% ✅
+### Section K: Monetization Tracking — 100% ✅
+### Section L: IoT Device Control — 100% ✅
+### Section M: Analytics & Dashboard — 100% ✅
+### Section N: Media & Storage — 100% ✅
+### Section O: Settings & Integrations UI — 100% ✅
 
-### 🏗️ Core Infrastructure (100% Complete)
-
-<details>
-<summary><b>A-D: Project Setup, Metro, Testing, Verification</b> - Click to expand</summary>
-
-#### A. Project Setup & Configuration ✅
-- [x] A1: React Native + Expo 54 setup with TypeScript
-- [x] A2: File-based routing with Expo Router
-- [x] A3: Android-only configuration (iOS removed)
-- [x] A4: Environment variable management (.env setup)
-- [x] A5: Git repository initialized with proper .gitignore
-- [x] A6: Package.json with all dependencies configured
-- [x] A7: TypeScript strict mode configuration
-
-#### B. Metro Bundler & Build System ✅
-- [x] B1: Metro bundler configuration optimized
-- [x] B2: Babel module resolver for @/ path alias
-- [x] B3: Metro cache clearing strategy
-- [x] B4: expo-av → expo-audio migration completed
-- [x] B5: @react-native/virtualized-lists added as direct dependency
-- [x] B6: blockList simplified (only build artifacts excluded)
-- [x] B7: TypeScript path alias support
-- [x] B8: Asset handling extended (db, mp3, ttf, obj, png, jpg)
-
-**Key Deliverables:** 3,239 modules bundled successfully, 8.38MB bundle size
-
-#### C. Testing Infrastructure ✅
-- [x] C1: Jest configuration with jest-expo preset
-- [x] C2: React Native Testing Library setup
-- [x] C3: Jest setup with native module mocks
-- [x] C4: 155/155 tests passing (100% pass rate)
-- [x] C5: Coverage thresholds configured (50% minimum)
-- [x] C6: Test pipeline script (test:all)
-- [x] C7: Auth tests (AuthManager, Provider Registry, Integration)
-- [x] C8: Metro config validation script
-- [x] C9: Provider registry validation script
-
-**Key Deliverables:** 155 tests passing, 50%+ coverage, Jest + RTL configured
-
-#### D. Verification Scripts ✅
-- [x] D1: verify-metro.js script created
-- [x] D2: Automated cache clearing
-- [x] D3: Bundle generation testing
-- [x] D4: Bundle artifact verification
-- [x] D5: CI/CD integration support
-- [x] D6: verify:metro npm script added
-- [x] D7: Exit code handling for CI
-
-**Key Deliverables:** Automated verification, CI-ready exit codes
-
-</details>
-
-### 🔐 Authentication System (100% Complete)
-
-<details>
-<summary><b>E-G: OAuth, Providers, UI</b> - Click to expand</summary>
-
-#### E. OAuth & Token Management ✅
-- [x] E1: AuthManager service (central orchestrator)
-- [x] E2: TokenVault (secure token storage with SecureStore)
-- [x] E3: MasterProfile (single-user profile management)
-- [x] E4: PKCE OAuth 2.0 flows for mobile
-- [x] E5: Device Flow support for headless environments
-- [x] E6: Automatic token refresh
-- [x] E7: Event-driven architecture (connected, disconnected, token_refreshed)
-
-**Key Deliverables:** Secure token management, PKCE flows, auto-refresh
-
-#### F. OAuth Provider Helpers ✅
-- [x] F1: Google OAuth (Drive, YouTube, Gmail)
-- [x] F2: GitHub OAuth with Device Flow
-- [x] F3: Discord OAuth
-- [x] F4: Spotify OAuth
-- [x] F5: Reddit OAuth (installed app)
-- [x] F6: Home Assistant local tokens
-- [x] F7: Provider configuration registry
-- [x] F8: Static imports (Metro compatibility)
-
-**Key Deliverables:** 10 OAuth providers integrated, static registry
-
-#### G. Authentication UI ✅
-- [x] G1: SignInScreen (first-launch onboarding)
-- [x] G2: ConnectionsHub (provider management interface)
-- [x] G3: Guest mode / skip sign-in option
-- [x] G4: Status indicators (Connected, Not Connected, Needs Re-Auth)
-- [x] G5: Local token wizard for smart home devices
-- [x] G6: Real-time updates via event subscriptions
-
-**Key Deliverables:** Complete OAuth UI, real-time status updates
-
-</details>
-
-### 🤖 AI & Voice Services (100% Complete)
-
-<details>
-<summary><b>H-I: AI Providers, Voice/Speech</b> - Click to expand</summary>
-
-#### H. AI Provider Integration ✅
-- [x] H1: AIService (multi-provider support)
-- [x] H2: FreeAIService (free-tier-first implementation)
-- [x] H3: OpenAI integration (GPT-4, GPT-3.5)
-- [x] H4: Anthropic integration (Claude)
-- [x] H5: Google Gemini integration
-- [x] H6: Groq integration (fastest free AI)
-- [x] H7: HuggingFace integration
-- [x] H8: Auto-fallback when keys unavailable
-- [x] H9: Streaming responses
-- [x] H10: Token usage tracking
-- [x] H11: Cost optimization
-
-**Key Deliverables:** 8 AI providers (5 free + 3 paid), auto-fallback, streaming
-
-#### I. Voice Services ✅
-- [x] I1: VoiceService (TTS with expo-speech)
-- [x] I2: JARVIS British voice (Daniel)
-- [x] I3: Audio recording with expo-audio
-- [x] I4: JarvisVoiceService (audio playback)
-- [x] I5: JarvisAlwaysListeningService (continuous listening)
-- [x] I6: Wake word detection
-- [x] I7: Speech recognition with expo-speech-recognition
-- [x] I8: WhisperService (OpenAI Whisper API integration)
-- [x] I9: Voice preference configuration
-- [x] I10: Auto-start functionality
-
-**Key Deliverables:** TTS, STT, wake word, continuous listening, British voice
-
-</details>
-
-### 📱 Social, Monetization, IoT (100% Complete)
-
-<details>
-<summary><b>D, E, F: Social Media, Revenue, Smart Home</b> - Click to expand</summary>
-
-#### D. Social Media Integrations ✅
-**Platforms:** YouTube, Twitter/X, Instagram, Facebook, LinkedIn, TikTok  
-**Features:** OAuth auth, scheduling, analytics, cross-platform posting  
-**Key Deliverables:** 6 platforms integrated, content calendar
-
-#### E. Monetization Tracking ✅
-**Features:** Revenue streams (YouTube, affiliate, sponsorship), CSV import, dashboard  
-**Key Deliverables:** Multi-source revenue tracking, YouTube Analytics API
-
-#### F. IoT Device Control ✅
-**Platforms:** Philips Hue, Google Nest, Ring, TP-Link Kasa, MQTT, Home Assistant  
-**Features:** Device discovery, real-time control, scenes, voice control  
-**Key Deliverables:** 6 IoT platforms, voice integration, automation
-
-</details>
-
-### 📊 Data, UI, Backend (100% Complete)
-
-<details>
-<summary><b>G-M: Analytics, Media, Settings, Security, Testing, Data, Frontend</b> - Click to expand</summary>
-
-#### G. Analytics & Dashboard ✅
-**Features:** Real-time aggregation, multi-platform metrics, caching (5-min TTL), cost tracking  
-**Key Deliverables:** Live dashboard, AI cost tracking, system health monitoring
-
-#### H. Media & Storage ✅
-**Features:** Multipart upload, validation, thumbnails, cloud storage (S3, GCS)  
-**Key Deliverables:** Secure upload, thumbnail gen, multiple storage backends
-
-#### I. Settings & Integrations UI ✅
-**Features:** 5 settings tabs (Accounts, AI, Voice, Monetization, IoT), key testing  
-**Key Deliverables:** Unified settings, real-time validation
-
-#### J. Security & Error Handling ✅
-**Features:** Helmet, CORS, rate limiting (100 req/15min), zod validation, structured logging  
-**Key Deliverables:** Enterprise-grade security, standardized errors
-
-#### K. Test Plan Implementation ✅
-**Features:** 155 unit/integration tests, fixtures for social APIs, CI-ready  
-**Key Deliverables:** 100% test pass rate, 50%+ coverage
-
-#### L. Backend Server ✅
-**Features:** Express.js TypeScript, 10 REST endpoints, hot reload (tsx), esbuild  
-**Key Deliverables:** 2,484 lines backend code, isolated from React Native
-
-#### M. Frontend Wiring ✅
-**Features:** React Query, live hooks, mutations, skeleton loaders, inline errors  
-**Key Deliverables:** No mocks in production, optimistic updates
-
-</details>
-
-### 📚 Documentation & Quality (100% Complete)
-
-<details>
-<summary><b>N-O: Acceptance, Delivery, Docs</b> - Click to expand</summary>
-
-#### N. Documentation ✅
-**Files:** MASTER_CHECKLIST.md, METRO_TROUBLESHOOTING.md, BACKEND_DEV.md, README.md, etc.  
-**Key Deliverables:** Single source of truth, comprehensive troubleshooting
-
-#### O. Security & Code Quality ✅
-**Features:** CodeQL scanning, API key encryption, OAuth token management, ESLint  
-**Key Deliverables:** Zero critical vulnerabilities, strict TypeScript
-
-</details>
+**Complete Details:** All implementation details, task IDs, and completion dates are documented in the [Implementation Status - Sections A-O](#implementation-status---sections-a-o) section below.
 
 ### ✅ Completed Major Milestones
 
 - ✅ **All Sections A-O implemented** (Authentication, AI, Voice, Social, Monetization, IoT, Analytics, Media, Settings, Security, Testing, Data, Frontend, Acceptance, Delivery)
-- ✅ **155/155 tests passing** (Updated 2025-11-09)
+- ✅ **155 tests passing** (Updated 2025-11-09)
 - ✅ **Metro bundler working on Node 20.x**
 - ✅ **Documentation consolidated into MASTER_CHECKLIST.md**
 - ✅ **OAuth providers implemented (10 providers)**
@@ -1265,2172 +1084,739 @@ This section tracks all completed features organized by category. All items mark
 
 ## TODO - Remaining Tasks 📋
 
-> **Current Focus: Production readiness, migration system, and Universal API Key Entry**
+> **Current Focus: Phase 1 Core Implementation - organized by priority (High → Medium → Low)**
 
-This section lists remaining tasks organized by priority. Most major features (A-O) are complete.
+This section lists remaining tasks for production readiness and future expansion.
+
+---
+
+## 🎯 PHASE 1: CORE IMPLEMENTATION
 
 ### 🔥 High Priority (Immediate Action Required)
 
-#### P. Metro Bundler Node 22 Compatibility ✅ (Completed)
-- [x] P1: Node version check in verify-metro.js already implemented
-- [x] P2: Node version warnings functional
-- [x] P3: Documentation complete in Metro section
-- [ ] P4: Test with Node 22 explicitly (optional, low priority)
+#### Y. Universal API Key Entry System 🔑 — 0%
+**Purpose:** Plug-and-play API key management for non-OAuth providers (OpenAI, Anthropic, Groq, etc.)
 
-#### Q. Documentation Consolidation 📝 (This PR - In Progress)
-- [x] Q1: Create comprehensive MASTER_CHECKLIST.md with Sections A-O ✅
-- [x] Q2: Add task IDs and completion dates ✅
-- [x] Q3: Update Table of Contents ✅
-- [x] Q4: Add Progress Dashboard with completion percentages ✅ **NEW**
-- [x] Q5: Add Section Y (Universal API Key Entry System) ✅ **NEW**
-- [x] Q6: Update all test count references (142→155) ✅ **NEW**
-- [x] Q7: Streamline completed sections with collapsible details ✅ **NEW**
-- [x] Q8: Enhance look-and-feel with emojis and badges ✅ **NEW**
+**Remaining Tasks:**
+- [ ] Y1: Create `ProviderKeyManager` service (CRUD, secure storage, export/import)
+- [ ] Y2: Implement `KeyValidator` service (syntax + live validation, caching)
+- [ ] Y3: Add API Keys settings tab UI (provider list, add/edit/remove, test buttons)
+- [ ] Y4: Integrate with JarvisAPIRouter (fallback chain: OAuth → Manual → Env)
+- [ ] Y5: Add validation tests (unit + integration + UI component tests)
+- [ ] Y6: Implement backup/restore (encrypted export/import with master password)
+- [ ] Y7: Update documentation (setup guides, key formats, troubleshooting)
+- [ ] Y8: Add telemetry (optional - track validation success rates)
+
+**Priority Rationale:** Critical for user onboarding; enables use without OAuth complexity.  
+**Estimated Effort:** 3-5 days | **Dependencies:** None
+
+---
+
+#### P. Metro Bundler Node 22 Compatibility ⚡ — 75%
+**Remaining Tasks:**
+- [x] P1: Node version check in verify-metro.js ✅
+- [x] P2: Node version warnings functional ✅
+- [x] P3: Documentation complete ✅
+- [ ] P4: Test with Node 22 explicitly (validate compatibility, update docs)
+
+**Priority Rationale:** Future-proofing for upcoming Node LTS.  
+**Estimated Effort:** 1-2 days | **Dependencies:** None
+
+---
+
+#### Q. Documentation Consolidation 📝 — 70%
+**Remaining Tasks:**
+- [x] Q1-Q8: MASTER_CHECKLIST.md updates complete ✅
 - [ ] Q9: Create CI/CD workflow file (.github/workflows/ci.yml)
 - [ ] Q10: Remove obsolete documentation files after verification
 - [ ] Q11: Update .env.example with all documented variables
 - [ ] Q12: Add "verify" npm script shortcut
 
-#### L. Data Persistence - Migration System 🗄️
-- [ ] L4a: Design migration system for schema changes
-- [ ] L4b: Implement version tracking in storage
-- [ ] L4c: Create migration runner
-- [ ] L4d: Add rollback capability
-- [ ] L4e: Document migration creation process
-
-**Priority Rationale:** Currently using file-based storage; migrations needed before adding complex features.
+**Priority Rationale:** Essential for developer onboarding.  
+**Estimated Effort:** 2-3 days | **Dependencies:** None
 
 ---
 
 ### 🟡 Medium Priority (Next Sprint)
 
-#### R. Enhanced Error Handling 🚨
-- [x] R1: Standardized error schema implemented ✅
-- [x] R2: Retry/backoff logic for AI providers ✅
-- [ ] R3: Add error recovery UI components
-- [ ] R4: Implement error reporting to monitoring service
-- [ ] R5: Add user-friendly error explanations
+#### L. Data Persistence & Migration System 🗄️ — 85%
+**Remaining Tasks:**
+- [x] L1-L3, L5: Data access layer complete ✅
+- [ ] L4a: Design migration system for schema changes
+- [ ] L4b: Implement version tracking in storage
+- [ ] L4c: Create migration runner (auto-run on startup)
+- [ ] L4d: Add rollback capability
+- [ ] L4e: Document migration creation process
+- [ ] L6: (Optional) Replace JSON with SQLite if needed
 
-**Status:** Core error handling complete; UI enhancements pending.
+**Priority Rationale:** Required before adding features that change data schema.  
+**Estimated Effort:** 4-5 days | **Dependencies:** None (blocks future schema changes)
 
-#### S. Performance Optimization ⚡
-- [ ] S1: Bundle size optimization review
-- [ ] S2: Lazy loading for screens (React.lazy)
-- [ ] S3: Image optimization (WebP conversion)
-- [ ] S4: Memory leak detection (React DevTools Profiler)
-- [ ] S5: Cache optimization (React Query config tuning)
+---
+
+#### R. Enhanced Error Handling 🚨 — 70%
+**Remaining Tasks:**
+- [x] R1-R2: Core error handling complete ✅
+- [ ] R3: Add error recovery UI components (error boundaries, retry buttons)
+- [ ] R4: Implement error reporting to monitoring service (Sentry)
+- [ ] R5: Add user-friendly error explanations (error message catalog)
+
+**Priority Rationale:** Improves UX and debugging.  
+**Estimated Effort:** 3-4 days | **Dependencies:** None
+
+---
+
+#### S. Performance Optimization ⚡ — 0%
+**Remaining Tasks:**
+- [ ] S1: Bundle size optimization (analyze, replace heavy deps, reduce by 20%)
+- [ ] S2: Lazy loading for screens (React.lazy with loading fallbacks)
+- [ ] S3: Image optimization (convert to WebP, responsive loading)
+- [ ] S4: Memory leak detection (profile with React DevTools, fix leaks)
+- [ ] S5: Cache optimization (tune React Query config)
 - [ ] S6: Code splitting for large dependencies
 
-**Target:** Reduce bundle size by 20%, improve startup time.
+**Priority Rationale:** Improves UX; not blocking but beneficial.  
+**Estimated Effort:** 5-7 days | **Dependencies:** None
 
-#### T. Testing Expansion 🧪
-- [x] T1: Unit tests (155 passing) ✅
-- [x] T2: Integration tests with fixtures ✅
-- [ ] T3: E2E tests with Detox (basic smoke tests)
+---
+
+#### T. Testing Expansion 🧪 — 50%
+**Remaining Tasks:**
+- [x] T1-T2: Unit/integration tests complete (155 passing) ✅
+- [ ] T3: E2E tests with Detox (smoke tests for critical paths)
 - [ ] T4: Visual regression tests (Storybook + Chromatic)
-- [ ] T5: Performance benchmarking
+- [ ] T5: Performance benchmarking (define budgets, track metrics)
 - [ ] T6: Device farm integration (BrowserStack/Sauce Labs)
-- [ ] T7: Load testing for backend APIs
+- [ ] T7: Load testing for backend APIs (k6, Artillery)
 
-**Current Coverage:** 155 tests passing, 50%+ coverage; E2E pending.
+**Priority Rationale:** Ensures quality; E2E valuable for regression prevention.  
+**Estimated Effort:** 6-8 days | **Dependencies:** None
 
 ---
 
 ### 🟢 Low Priority (Future Enhancements)
 
-#### U. Backend Enhancements 🖥️
-- [x] U1: Rate limiting implemented (100 req/15min) ✅
-- [x] U2: Request/response logging ✅
-- [x] U3: WebSocket for real-time updates ✅ (Completed: 2025-11-09)
-- [x] U4: API versioning (/api/v1/, /api/v2/) ✅ (Completed: 2025-11-09)
-- [x] U5: Health check dashboard UI ✅ (Completed: 2025-11-09)
-- [x] U6: API metrics and monitoring ✅ (Completed: 2025-11-09)
+#### U. Backend Enhancements & Hardening 🖥️ — 95%
+**Remaining Tasks:**
+- [x] U1-U6, UB1-UB12: All core backend tasks complete ✅
 - [ ] U7: GraphQL endpoint (optional alternative to REST)
 
-#### U-Backend. Backend Isolation & Hardening ✅ (Completed: 2025-11-09)
-- [x] UB1: Remove DOM lib from backend/tsconfig.json ✅
-- [x] UB2: Add typeRoots restriction (only @types) ✅
-- [x] UB3: Exclude frontend directories from backend compilation ✅
-- [x] UB4: Switch from tsc to esbuild for backend builds ✅
-- [x] UB5: Mark React Native/Expo packages as external ✅
-- [x] UB6: Add ESLint no-restricted-imports for RN/Expo ✅
-- [x] UB7: Create verify-backend-isolated.js script ✅
-- [x] UB8: Add backend-verify.yml CI workflow ✅
-- [x] UB9: Add esbuild to devDependencies ✅
-- [x] UB10: Create BACKEND_DEV.md documentation ✅
-- [x] UB11: Fix esbuild TransformError on react-native ✅
-- [x] UB12: Update MASTER_CHECKLIST.md with backend hardening info ✅
+**Priority Rationale:** REST API sufficient; GraphQL nice-to-have.  
+**Estimated Effort:** 4-5 days | **Dependencies:** None
 
-**Summary:** Backend isolation complete. Builds with esbuild, no React Native coupling.
+---
 
-#### TS-Phase. TypeScript Cleanup - Multi-Phase Project 📘
-**Phase 2: Frontend (UI Layer) - ✅ COMPLETE (2025-11-09)**
-- [x] TS2-1: Audit all TypeScript errors in `app/` and `components/` ✅
-- [x] TS2-2: Fix TS2339 errors (property access on Promise) ✅
-- [x] TS2-3: Fix TS2551 errors (method name typos) ✅
-- [x] TS2-4: Fix TS2576 errors (static method access) ✅
-- [x] TS2-5: Verify `npx tsc -p tsconfig.app.json --noEmit` returns 0 errors ✅
-- [x] TS2-6: Confirm no new ESLint errors introduced ✅
-- [x] TS2-7: Verify all tests still pass (155/155) ✅
-
-**Phase 3: Backend & Services - TODO (Future PR)**
+#### TS-Phase 3. TypeScript Cleanup — 0%
+**Remaining Tasks:**
 - [ ] TS3-1: Fix AuthManager type definitions (~18 errors)
 - [ ] TS3-2: Add proper API response types (~50 errors)
 - [ ] TS3-3: Resolve module path issues (@/ aliases in backend) (~30 errors)
 - [ ] TS3-4: Add platform guards for web-only globals (~25 errors)
 - [ ] TS3-5: Fix Timer/Timeout type conflicts (~5 errors)
 - [ ] TS3-6: Fix FormData and AI SDK type issues (~22 errors)
-- [ ] TS3-7: Verify `npx tsc -p backend/tsconfig.json --noEmit` returns 0 errors
-- [ ] TS3-8: Full repo check: `npx tsc --noEmit` returns 0 errors
+- [ ] TS3-7: Verify backend TypeScript check passes (0 errors)
+- [ ] TS3-8: Full repo check passes (0 errors)
 
-**Summary:** Phase 2 complete (0 frontend errors). Phase 3 has ~150 pre-existing backend errors (non-blocking).
-
-#### V. Feature Enhancements 🌟
-- [ ] V1: Additional voice options (ElevenLabs, Azure TTS)
-- [ ] V2: Theme customization (dark/light mode, custom colors)
-- [ ] V3: Advanced AI model selection UI
-- [ ] V4: Plugin system architecture
-- [ ] V5: Multi-device sync (cross-device state)
-- [ ] V6: Offline mode improvements
-- [ ] V7: Advanced automation workflows
-
-#### W. Developer Experience 👨‍💻
-- [ ] W1: VS Code debug configurations
-- [ ] W2: Detailed contributing guide (CONTRIBUTING.md)
-- [ ] W3: Code generation scripts (plop.js templates)
-- [ ] W4: API documentation generator (Swagger/OpenAPI)
-- [ ] W5: Development environment setup script
-- [ ] W6: Storybook for component development
+**Priority Rationale:** Pre-existing non-blocking errors; clean up for maintainability.  
+**Estimated Effort:** 5-7 days | **Dependencies:** None
 
 ---
 
-### 🚀 Production Readiness
+#### V. Feature Enhancements 🌟 — 0%
+**Tasks:** Additional voices, theme customization, advanced AI model selection, plugin system, multi-device sync, offline mode, automation workflows
 
-#### X. Build & Deployment 🏭
+**Estimated Effort:** 10-15 days | **Dependencies:** Core features complete
+
+---
+
+#### W. Developer Experience 👨‍💻 — 0%
+**Tasks:** VS Code debug configs, contributing guide, code generation scripts, API docs (Swagger), setup script, Storybook
+
+**Estimated Effort:** 6-8 days | **Dependencies:** None
+
+---
+
+#### X. Production Readiness 🏭 — 60%
+**Remaining Tasks:**
 - [ ] X1: Build production APK (signed release)
-- [ ] X2: Test on physical Galaxy S25 Ultra device
+- [ ] X2: Test on Galaxy S25 Ultra
 - [ ] X3: Performance testing on device
 - [ ] X4: Battery usage optimization
 - [ ] X5: Network usage optimization
 - [ ] X6: Final QA and user acceptance testing
-- [ ] X7: Distribution strategy (APK sideloading/Play Store)
+- [ ] X7: Distribution strategy (APK/Play Store)
 - [ ] X8: Production environment setup
 - [ ] X9: Monitoring and alerting setup
 - [ ] X10: Documentation for end users
 
-**Estimated Timeline:** 2-3 weeks after L4 (migration system) completion.
+**Priority Rationale:** Required for deployment.  
+**Estimated Effort:** 2-3 weeks | **Dependencies:** L4 should be complete
 
 ---
 
-### 🆕 New Feature: Universal API Key Entry System
+## 🚀 PHASE 2: EXPANSION & AUTONOMY
 
-#### Y. Universal API Key Entry System (Section Y) 🔑
-- [ ] Y1: Create `ProviderKeyManager` service
-  - Implement CRUD operations for keys
-  - Secure storage with SecureStore fallback
-  - Export/import with encryption
-
-- [ ] Y2: Implement `KeyValidator` service
-  - Syntax validation for each provider
-  - Live validation with minimal API calls
-  - Caching of validation results
-
-- [ ] Y3: Add API Keys settings tab UI
-  - Provider list with status indicators
-  - Add/Edit/Remove key modals
-  - Test button with loading states
-
-- [ ] Y4: Integrate with JarvisAPIRouter
-  - Update key lookup logic
-  - Maintain backward compatibility with OAuth
-  - Add fallback chain (OAuth → Manual → Env)
-
-- [ ] Y5: Add validation tests
-  - Unit tests for ProviderKeyManager
-  - Integration tests with mock providers
-  - UI component tests
-
-- [ ] Y6: Implement backup/restore
-  - Export keys as encrypted JSON
-  - Import with validation
-  - Master password protection
-
-- [ ] Y7: Update documentation
-  - Add setup guide for each provider
-  - Document key format requirements
-  - Add troubleshooting section
-
-- [ ] Y8: Add telemetry (optional)
-  - Track validation success rates
-  - Monitor key expiration patterns
-  - Alert on repeated failures
-
-**Priority:** Medium-High (depends on user feedback)  
-**Estimated Effort:** 3-5 days  
-**Dependencies:** None (independent feature)
-
-See [Section Y: Universal API Key Entry System](#section-y-universal-api-key-entry-system) for full specification.
+> **Phase 2 builds on Phase 1 foundation and requires all core features complete and stable.**
 
 ---
 
-## 🚀 Phase 2: Advanced Features (Future Roadmap)
+### 🔧 Toolchain Expansion & Ecosystem — 0%
 
-> **These features represent the next evolution of JARVIS beyond the current MVP.**
+**Purpose:** Extend JARVIS with plugin architecture and cross-AI routing.
 
-### 🤖 Autonomous Agent Mode - 0% 🔴
+**Tasks:**
+- [ ] TC-1: Universal Plugin Registry (manifest format, discovery, installation, sandboxing, marketplace UI)
+- [ ] TC-2: Module Forge (natural language→code generator, templates, AI integration, validation)
+- [ ] TC-3: Cross-AI Router (intelligent provider selection, load balancing, cost optimization, failover)
+- [ ] TC-4: Sandbox Command Set (isolated execution, resource limits, security boundaries, rollback)
 
-**Purpose:** Enable JARVIS to independently plan, execute, and verify multi-step tasks with minimal user intervention.
-
-#### Remaining Tasks:
-
-- [ ] AG-1: Core autonomy engine
-  - Let Jarvis plan, execute, and self-verify multi-step tasks
-  - Implement goal decomposition and task planning algorithms
-  - Create execution engine with state management
-
-- [ ] AG-2: Temporal planner
-  - Schedule and reprioritize background operations dynamically
-  - Implement priority queue with deadline awareness
-  - Add conflict resolution for competing tasks
-
-- [ ] AG-3: Goal memory
-  - Persistent ledger of objectives, states, and dependencies
-  - Create goal tracking database schema
-  - Implement dependency graph visualization
-
-- [ ] AG-4: Safety sentinel
-  - Confirmation layer and rollback for high-impact actions
-  - Define risk levels and approval thresholds
-  - Implement automated rollback mechanisms
-
-- [ ] AG-5: Contextual chain-of-thought logger
-  - Trace every autonomous decision for audit
-  - Create decision tree logging system
-  - Build audit trail UI for transparency
-
-**Dependencies:** Sections A-O must be complete  
-**Estimated Timeline:** 6-8 weeks  
-**Risk Level:** High (requires extensive testing)
+**Timeline:** 6-8 weeks | **Risk:** Medium | **Dependencies:** Phase 1 Y, L4, R
 
 ---
 
-### 👁️ Multimodal Vision & Perception - 0% 🔴
+### 🧠 Memory & Reasoning Engine — 0%
 
-**Purpose:** Give JARVIS the ability to see, interpret, and act on visual information from the device camera.
+**Purpose:** Long-term memory and local reasoning capabilities.
 
-#### Remaining Tasks:
+**Tasks:**
+- [ ] MR-1: Persistent Memory Graph (graph DB schema, vector embeddings, semantic search, memory consolidation, pruning, visualization UI)
+- [ ] MR-2: Lightweight Local Reasoning Model (integrate LLaMA/Phi-3, quantization, reasoning templates, confidence scoring, <500ms latency)
+- [ ] MR-3: Continuous Learning System (track user preferences, update behavior, reinforcement learning, progress dashboard, A/B testing)
+- [ ] MR-4: Daily Reflection Cycles (summarize interactions, identify improvements, generate tasks, track progress, send reports)
 
-- [ ] MV-1: Camera input and stream capture
-  - Implement via Expo Camera API
-  - Add permission management
-  - Support photo and video capture modes
-
-- [ ] MV-2: Real-time object and face detection
-  - Integrate on-device ML Kit
-  - Implement bounding box overlay UI
-  - Add confidence scoring
-
-- [ ] MV-3: OCR + visual text parser
-  - Enable reading screens or documents
-  - Integrate Tesseract or Google Vision OCR
-  - Add text extraction and formatting
-
-- [ ] MV-4: Scene graph builder
-  - Map relationships between visible entities
-  - Create spatial relationship engine
-  - Implement object tracking across frames
-
-- [ ] MV-5: Vision-to-Command translator
-  - Convert "what I see" into actionable intents
-  - Build natural language vision query system
-  - Create command mapping from visual context
-
-**Dependencies:** AG (Autonomous Agent) for decision-making  
-**Estimated Timeline:** 8-10 weeks  
-**Hardware Requirements:** Device camera, ML Kit support
+**Timeline:** 8-10 weeks | **Risk:** High (complex ML) | **Dependencies:** Phase 1 L4, TC-1
 
 ---
 
-### 💠 Emotional & Adaptive Personality - 0% 🔴
+### 🏗️ System Architecture Enhancements — 0%
 
-**Purpose:** Make JARVIS emotionally intelligent and adaptable to user mood and context.
+**Purpose:** Scale architecture for complex autonomous operations.
 
-#### Remaining Tasks:
+**Tasks:**
+- [ ] SA-1: Unified Data Schema (normalized DB schema, validation, migration from file storage, indexing, archival)
+- [ ] SA-2: Event Bus Architecture (pub/sub system, event types/schemas, replay capability, logging, workflow engine)
+- [ ] SA-3: Task Runtime Engine (execution framework, scheduling, prioritization, dependency management, status tracking, cancellation/timeout)
+- [ ] SA-4: Local Knowledge Base Pipeline (document ingestion, chunking, embeddings, RAG, KB management UI)
+- [ ] SA-5: Code Reflection & Self-Patch Engine (analyze own codebase, generate fixes, test patches, auto-apply, track improvements)
 
-- [ ] EP-1: Emotion state engine
-  - Derive affect from sentiment, tone, and conversation flow
-  - Implement emotion classification model
-  - Track emotional trajectory over conversations
-
-- [ ] EP-2: Response modulation
-  - Tone, cadence, and phrasing shift with emotional context
-  - Adjust voice parameters based on detected emotion
-  - Create response templates for different emotional states
-
-- [ ] EP-3: Personality memory
-  - Learn user preferences, humor, and mood trends
-  - Build user personality profile database
-  - Implement preference learning algorithms
-
-- [ ] EP-4: Contextual empathy
-  - Mirror user stress or enthusiasm appropriately
-  - Detect emotional cues from text and voice
-  - Adjust response empathy levels dynamically
-
-- [ ] EP-5: Dynamic persona templates
-  - Switchable personas: "Professional," "Witty," "Calm"
-  - Create persona configuration system
-  - Implement live persona switching
-
-**Dependencies:** Voice Services (Section C), SM (Semantic Memory)  
-**Estimated Timeline:** 5-7 weeks  
-**ML Requirements:** Sentiment analysis models
+**Timeline:** 10-12 weeks | **Risk:** High (architectural complexity) | **Dependencies:** Phase 1 L4, MR-1, TC-3
 
 ---
 
-### 🧩 Long-Term Semantic Memory Graph - 0% 🔴
+### 💠 Behavioral Evolution Integration — 0%
 
-**Purpose:** Enable JARVIS to remember and recall information across sessions with semantic understanding.
+**Purpose:** Adaptive personality and emotional intelligence.
 
-#### Remaining Tasks:
+**Tasks:**
+- [ ] BE-1: Merge Behavioral Evolution with Personality Core (emotion detection, tone adjustments, personality traits, persona switching, configuration UI)
+- [ ] BE-2: Adaptive Learning from Emotional Context (detect user satisfaction, adjust response style, learn preferences, track trends, empathy-based responses)
+- [ ] BE-3: Empathy Feedback Loop (sentiment analysis, recognize emotions, adjust assistance level, proactive help, effectiveness metrics)
 
-- [ ] SM-1: Knowledge-graph persistence
-  - Store entities, relations, and recurring topics
-  - Implement graph database (Neo4j or similar)
-  - Create entity extraction pipeline
-
-- [ ] SM-2: Temporal context recall
-  - Retrieve conversations across days or projects
-  - Implement time-based indexing
-  - Add conversation threading
-
-- [ ] SM-3: Memory pruning
-  - Summarize and compress redundant data automatically
-  - Create importance scoring algorithm
-  - Implement periodic cleanup jobs
-
-- [ ] SM-4: Vector search gateway
-  - Embed and query long-term context efficiently
-  - Integrate vector database (Pinecone, Weaviate, or local)
-  - Implement semantic similarity search
-
-- [ ] SM-5: Insight synthesis
-  - Generate "Jarvis remembers that…" summaries
-  - Create automated insight extraction
-  - Build proactive reminder system
-
-**Dependencies:** Data Persistence (Section L)  
-**Estimated Timeline:** 6-8 weeks  
-**Storage Requirements:** Graph database, vector store
+**Timeline:** 6-8 weeks | **Risk:** Medium (ML model quality) | **Dependencies:** MR-1, MR-3, SA-2
 
 ---
 
-### ⚙️ Self-Coding & Auto-Deployment Pipeline - 0% 🔴
+### 🤖 AI Independence Path — 0%
 
-**Purpose:** Allow JARVIS to modify and improve his own codebase safely.
+**Purpose:** Enable JARVIS to operate independently with minimal user intervention.
 
-#### Remaining Tasks:
+**Tasks:**
+- [ ] AI-1: Offline Reasoning Fallback (package LLM <2GB, auto-fallback when offline, capability indicators, mobile optimization, update mechanism)
+- [ ] AI-2: Secure Self-Update System (OTA updates, model versioning/rollback, signature verification, update scheduling, user approval)
+- [ ] AI-3: Ingestion Pipeline → Semantic Memory (connect ingestion to memory graph, automatic knowledge extraction, link concepts, forgetting curve, manual editing UI)
+- [ ] AI-4: Self-Planning for Learning Objectives (identify knowledge gaps, generate learning plans, schedule learning tasks, execute and update KB, track progress)
 
-- [ ] SD-1: Autonomous code-generation agent
-  - Safe PR creation and patching
-  - Implement code generation with AI assistance
-  - Add automated code review checks
-
-- [ ] SD-2: Sandbox testing layer
-  - Validate builds and run smoke tests automatically
-  - Create isolated test environments
-  - Implement automated rollback on failure
-
-- [ ] SD-3: Auto-commit + rollback system
-  - Version tagging and change tracking
-  - Implement git automation safely
-  - Add rollback triggers and mechanisms
-
-- [ ] SD-4: Deployment orchestrator
-  - Expo ↔ Termux continuous delivery bridge
-  - Create deployment pipeline automation
-  - Add environment-specific configurations
-
-- [ ] SD-5: Adaptive optimization
-  - Jarvis refactors his own inefficient routines
-  - Implement performance monitoring
-  - Create self-improvement suggestions
-
-**Dependencies:** Backend hardening (Section U-Backend), Testing (Section K)  
-**Estimated Timeline:** 10-12 weeks  
-**Risk Level:** Critical (requires extensive safeguards)
+**Timeline:** 8-10 weeks | **Risk:** High (cutting-edge autonomous AI) | **Dependencies:** MR-1, MR-2, SA-4, BE-2
 
 ---
 
-### 🗣️ Full-Duplex Conversational Flow - 0% 🔴
+### 🎯 Phase 2 Summary
 
-**Purpose:** Enable natural, interruption-aware, two-way conversations with JARVIS.
+| Category | Complexity | Timeline | Dependencies |
+|----------|-----------|----------|--------------|
+| **Toolchain Expansion** | Medium | 6-8 weeks | Phase 1 Y, L4, R |
+| **Memory & Reasoning** | High | 8-10 weeks | Phase 1 L4, Toolchain |
+| **System Architecture** | High | 10-12 weeks | Phase 1 L4, Memory |
+| **Behavioral Evolution** | Medium | 6-8 weeks | Memory, Architecture |
+| **AI Independence** | High | 8-10 weeks | All above |
 
-#### Remaining Tasks:
+**Total Phase 2 Timeline:** 9-12 months (with parallel development)
 
-- [ ] VF-1: Streaming speech-to-intent engine
-  - Real-time recognition with live processing
-  - Implement low-latency STT pipeline
-  - Add incremental intent detection
-
-- [ ] VF-2: Mid-response interruption
-  - Handle "Jarvis, pause / stop / adjust…" commands
-  - Implement interrupt detection
-  - Add graceful response cancellation
-
-- [ ] VF-3: Overlap handler
-  - Natural conversational turn-taking
-  - Detect speech overlaps
-  - Implement priority-based speaker selection
-
-- [ ] VF-4: Voice-context correction
-  - Support "Actually, I meant…" clarifications
-  - Implement context revision system
-  - Add conversation state rollback
-
-- [ ] VF-5: Adaptive latency control
-  - Jarvis anticipates when to speak vs listen
-  - Create response timing optimizer
-  - Implement silence detection thresholds
-
-**Dependencies:** Voice Services (Section C), EP (Emotional Personality)  
-**Estimated Timeline:** 7-9 weeks  
-**Hardware Requirements:** Low-latency audio processing
+**Prerequisites:**
+- ✅ Phase 1 100% complete
+- ✅ All 155+ tests passing
+- ✅ Production deployment successful
+- ✅ User feedback collected
+- ✅ Performance baselines established
 
 ---
 
-### 🧠 Systems Intelligence Framework - 0% 🔴
 
-**Purpose:** Create a meta-intelligence layer that coordinates all JARVIS subsystems.
+## 📖 Execution Runbook — Real Integrations Only (No Placeholders)
 
-#### Remaining Tasks:
-
-- [ ] SI-1: Cross-service reasoning bus
-  - Link AI, Vision, Memory, and Personality modules
-  - Implement service mesh architecture
-  - Create inter-module communication protocol
-
-- [ ] SI-2: Internal diagnostics
-  - Self-monitor resource use, latency, and model drift
-  - Implement health check system
-  - Add performance anomaly detection
-
-- [ ] SI-3: Goal arbitration
-  - Balance competing priorities between modules
-  - Create priority resolution algorithms
-  - Implement resource allocation system
-
-- [ ] SI-4: Global telemetry dashboard
-  - Voice + backend metrics in unified view
-  - Create real-time monitoring UI
-  - Add historical trend analysis
-
-- [ ] SI-5: Adaptive upgrade API
-  - Jarvis evolves capabilities without rebuilds
-  - Implement hot-reload for ML models
-  - Add capability versioning system
-
-**Dependencies:** All Phase 2 modules  
-**Estimated Timeline:** 8-10 weeks  
-**Integration Scope:** Cross-cutting across all features
+> **⚠️ GROUND RULES FOR IMPLEMENTATION**
+>
+> This runbook provides step-by-step instructions for building **real, end-to-end integrations**.
+> - ❌ **NO MOCKS** - Every feature must have real data, real APIs, real storage
+> - ✅ **ONE PIECE AT A TIME** - Complete and verify each step before moving to next
+> - ✅ **VERIFY AFTER EACH STEP** - Run tests, lint, and manual checks immediately
+> - ✅ **COMMIT FREQUENTLY** - Commit working code after each completed task
 
 ---
 
-### ✅ Phase 2 Checklist Maintenance
+### 🔧 Standard Command Flow (Run Before/After Every Step)
 
-**Important:** After completing any Phase 2 milestone:
-
-- [ ] Update progress percentage in Progress Dashboard
-- [ ] Document new capabilities in MASTER_CHECKLIST.md
-- [ ] Add Phase 2 section to "DONE - Completed Tasks"
-- [ ] Update tests to cover new Phase 2 functionality
-- [ ] Create migration guide for breaking changes
-- [ ] Update API documentation with new endpoints
-
----
-
-### 📊 Summary Statistics
-
-**Phase 1 - Completed:**
-- ✅ 15 major sections (A-O) - 100% complete
-- ✅ 155 tests passing
-- ✅ 10 OAuth providers
-- ✅ 8 AI providers
-- ✅ 6 IoT platforms
-- ✅ 10 backend endpoints
-- ✅ Node 20.x verified
-- ✅ Metro bundler optimized
-
-**Phase 1 - Remaining:**
-- 🟡 Migration system (L4) - High priority
-- 🟡 CI/CD workflow file (Q9) - High priority
-- 🟢 Production APK build (X1) - After testing
-- 🔵 Universal API Key Entry (Y) - New feature
-- 🔵 E2E tests (T3) - Enhancement
-- 🔵 Performance optimization (S) - Enhancement
-
-**Phase 2 - Advanced Features (0% complete):**
-- 🔴 Autonomous Agent Mode (AG) - 5 tasks
-- 🔴 Multimodal Vision (MV) - 5 tasks
-- 🔴 Emotional Personality (EP) - 5 tasks
-- 🔴 Semantic Memory Graph (SM) - 5 tasks
-- 🔴 Self-Coding Pipeline (SD) - 5 tasks
-- 🔴 Full-Duplex Conversation (VF) - 5 tasks
-- 🔴 Systems Intelligence (SI) - 5 tasks
-- **Total:** 35 Phase 2 tasks planned
-
-**Current Status:** 
-- **Phase 1:** MVP feature-complete at 92%
-- **Phase 2:** Planning stage (0%)
-- **Focus:** Production readiness + Universal API Key Entry
-
-**Next Session Goals:**
-1. Complete Q9: Create CI/CD workflow
-2. Implement L4: Migration system
-3. Start Y: Universal API Key Entry System (if time permits)
-4. Build and test production APK (X1-X3)
-
----
-
-## ⚠️ Node.js Version Requirement
-
-### Overview
-
-This project **requires Node.js 20.x LTS**. Node.js 21 or higher will cause the application to fail during startup.
-
-### Why This Matters
-
-React Native 0.81.x tooling (Metro bundler and esbuild) is **not compatible** with Node.js 21 or 22. Running the project on an unsupported Node version will result in:
-
-- **TransformError** during Metro bundling
-- Build failures with cryptic error messages
-- esbuild compilation errors
-
-### Automatic Version Checking
-
-The project includes a preflight check that validates your Node.js version before starting any services:
-
+**Before Starting Any Work:**
 ```bash
-# Check your Node version manually
-npm run check:node
+# 1. Ensure you're on latest code
+git pull origin main
 
-# When you run start:all, version is checked automatically
+# 2. Verify current state
+npm test                 # Should show 155/155 passing
+npm run verify:metro     # Should succeed
+npm run verify:backend   # Should succeed
+
+# 3. Create feature branch
+git checkout -b feature/your-feature-name
+```
+
+**After Each Implementation Step:**
+```bash
+# 1. Lint your changes
+npm run lint             # Fix any errors before proceeding
+
+# 2. Type check
+npx tsc --noEmit         # Fix TypeScript errors in frontend
+npx tsc -p backend/tsconfig.json --noEmit  # Backend errors OK for now
+
+# 3. Run tests
+npm test                 # All tests must pass
+
+# 4. Verify integrations
+npm run verify:metro     # Frontend bundler working
+npm run verify:backend   # Backend builds successfully
+
+# 5. Manual verification
+npm run start:all        # Start both services
+# Test feature on device/emulator
+
+# 6. Commit if everything works
+git add .
+git commit -m "feat(area): specific change made [TaskID]"
+git push origin feature/your-feature-name
+```
+
+---
+
+### 📋 Phase 1 Implementation Order (Dependency-Aware)
+
+The following order respects dependencies and prioritizes easiest integrations first:
+
+```
+Y (API Key Manager) → Q9-Q12 (CI/Docs) → L4 (Migrations) → R3-R5 (Error UI) 
+  → S (Performance) → T3-T7 (Testing) → X (Production) → P4 (Node 22) 
+  → U7 (GraphQL) → TS3 (TypeScript) → V (Features) → W (DevEx)
+```
+
+---
+
+### 🔑 Step 1: Y - Universal API Key Manager (High Priority)
+
+**Goal:** Enable users to manually enter and test API keys for non-OAuth providers.
+
+#### Y1: Create ProviderKeyManager Service
+
+**DO:**
+1. Create `services/keys/ProviderKeyManager.ts`
+2. Implement interface:
+   ```typescript
+   interface ProviderKeyManager {
+     saveKey(providerId: string, apiKey: string, metadata?: object): Promise<void>
+     getKey(providerId: string): Promise<string | null>
+     deleteKey(providerId: string): Promise<void>
+     listKeys(): Promise<ProviderKey[]>
+     exportKeys(password: string): Promise<string>  // Encrypted JSON
+     importKeys(data: string, password: string): Promise<void>
+   }
+   ```
+3. Use SecureStore for encryption:
+   ```typescript
+   import * as SecureStore from 'expo-secure-store';
+   await SecureStore.setItemAsync(`provider_key_${providerId}`, encryptedKey);
+   ```
+4. Fallback to AsyncStorage if SecureStore unavailable (web)
+
+**VERIFY:**
+```bash
+# 1. Unit tests
+npm test -- ProviderKeyManager.test.ts
+# Expected: Tests for saveKey, getKey, deleteKey, listKeys, export/import
+
+# 2. Manual test in app
 npm run start:all
+# Navigate to Settings → API Keys (create temporarily)
+# Try saving a test key and retrieving it
 ```
 
-**What happens on Node 21+:**
-- The preflight check stops startup immediately
-- A clear error message is displayed
-- Metro bundler never initializes (prevents confusing crashes)
-- Exit code 1 is returned
+**ACCEPTANCE:**
+- [ ] Keys saved successfully to SecureStore
+- [ ] Keys retrievable after app restart
+- [ ] Exported keys are encrypted
+- [ ] Import validates password
+- [ ] Unit tests passing (5+ tests)
 
-**What happens on Node 18-20:**
-- ✅ Version check passes
-- Services start normally
-- No interruption to your workflow
-
-### Supported Versions
-
-| Node Version | Status | Notes |
-|--------------|--------|-------|
-| Node 20.x LTS | ✅ **Recommended** | Fully tested and optimal |
-| Node 18.x LTS | ✅ Supported | Works but 20.x preferred |
-| Node 17 or below | ❌ Too old | Missing required features |
-| Node 21 or above | ❌ Not compatible | Metro/esbuild will crash |
-
-### How to Fix Version Issues
-
-#### Using nvm (Recommended for Desktop/Linux)
-
+**COMMIT:**
 ```bash
-# Install Node 20 LTS
-nvm install 20
-
-# Switch to Node 20
-nvm use 20
-
-# Set Node 20 as default
-nvm alias default 20
-
-# Verify the version
-node --version  # Should show v20.x.x
+git add services/keys/
+git commit -m "feat(keys): implement ProviderKeyManager with secure storage [Y1]"
 ```
-
-#### Using Termux (Android Devices)
-
-If you're developing on a Samsung Galaxy S25 Ultra or other Android device using Termux:
-
-```bash
-# Uninstall current Node.js
-pkg uninstall nodejs
-
-# Install Node.js LTS (will install compatible version)
-pkg install nodejs-lts
-
-# Verify the version
-node --version  # Should show v20.x.x
-```
-
-#### Direct Download
-
-Download Node.js 20 LTS from the official website:
-- [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
-- Select "LTS (Long Term Support)" version
-
-### Troubleshooting
-
-**Problem:** I already have Node 20 but still get errors
-- Clear npm cache: `npm cache clean --force`
-- Remove node_modules: `rm -rf node_modules package-lock.json`
-- Reinstall: `npm install`
-
-**Problem:** nvm not found
-- Install nvm: [https://github.com/nvm-sh/nvm#installing-and-updating](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-**Problem:** Need different Node versions for different projects
-- Use nvm to switch between versions per project
-- Or use Docker containers for isolated environments
 
 ---
 
-## Metro Troubleshooting
+#### Y2: Implement KeyValidator Service
 
-This section documents Metro bundler issues, solutions, and best practices for the Rork Ultimate AI Command Center project.
-
-### Quick Verification
-
-To verify Metro is working correctly:
-
-```bash
-npm run verify:metro
-```
-
-This script will:
-1. Clear all Metro caches
-2. Test bundle generation for Android
-3. Verify bundle contents
-4. Report any errors
-
-### Node Version Compatibility
-
-**Recommended**: Node 20.x LTS (v20.19.5 tested and verified)
-
-**Current Node Version Check**:
-```bash
-node --version  # Should output v20.x.x
-```
-
-#### Node 22.x Issues
-
-**Problem**: React Native 0.81.5 with esbuild under Node v22.20.0 can exhibit TransformError issues:
-```
-TransformError: Unexpected "typeof" from react-native/index.js
-```
-
-**Root Cause**: 
-- Node 22 includes newer JavaScript features and engine optimizations
-- esbuild in Metro bundler may not fully support Node 22 yet
-- React Native 0.81.5 was tested primarily with Node 16-20
-
-**Solutions**:
-
-1. **Recommended: Use Node 20.x LTS**
-   ```bash
-   # Using nvm (Node Version Manager)
-   nvm install 20
-   nvm use 20
-   
-   # Verify version
-   node --version  # Should show v20.x.x
+**DO:**
+1. Create `services/keys/KeyValidator.ts`
+2. Add syntax validators for each provider:
+   ```typescript
+   const validators = {
+     openai: (key: string) => /^sk-(proj-)?[a-zA-Z0-9]{32,}$/.test(key),
+     anthropic: (key: string) => /^sk-ant-[a-zA-Z0-9\-]{95}$/.test(key),
+     groq: (key: string) => /^gsk_[a-zA-Z0-9]{52}$/.test(key),
+     google: (key: string) => /^AI[a-zA-Z0-9_\-]{35}$/.test(key),
+     huggingface: (key: string) => /^hf_[a-zA-Z0-9]{36}$/.test(key),
+   }
    ```
-
-2. **If you must use Node 22**: Add experimental flag (not recommended)
-   ```bash
-   NODE_OPTIONS="--experimental-vm-modules" npm start
+3. Implement live validation with minimal API call:
+   ```typescript
+   async function validateOpenAI(key: string): Promise<ValidationResult> {
+     const response = await fetch('https://api.openai.com/v1/models', {
+       headers: { 'Authorization': `Bearer ${key}` }
+     });
+     return { valid: response.ok, message: response.ok ? 'Key is valid' : 'Invalid key' };
+   }
    ```
-   
-   Note: This is experimental and may have other side effects.
+4. Cache validation results (5 min TTL)
 
-3. **Version Check Script** (Enhanced verify-metro.js)
-   - Automatically warns if Node > 20
-   - Provides actionable remediation steps
-   - Suggests downgrading to Node 20 LTS
-
-### Common Issues and Solutions
-
-#### Issue 1: `expo-av` Plugin Not Found
-
-**Symptom:**
-```
-PluginError: Failed to resolve plugin for module "expo-av"
-```
-
-**Root Cause:** The project uses `expo-audio` but `app.json` was configured with the deprecated `expo-av` plugin.
-
-**Solution:** ✅ **RESOLVED**
-- Updated `app.json` to use `expo-audio` plugin instead of `expo-av`
-- The `expo-audio` package (v1.0.14) was already installed and being used in code
-
-#### Issue 2: Missing `@react-native/virtualized-lists`
-
-**Symptom:**
-```
-Error: Unable to resolve module @react-native/virtualized-lists
-```
-
-**Root Cause:** React Native 0.81.5 includes this as a nested dependency, but Metro requires it at the root level for proper resolution.
-
-**Solution:** ✅ **RESOLVED**
-- Installed `@react-native/virtualized-lists@0.81.5` as a direct dependency
-- Ensures Metro can properly resolve the module
-
-#### Issue 3: Overly Aggressive `blockList` in Metro Config
-
-**Symptom:**
-```
-Failed to get the SHA-1 for: /path/to/expo/node_modules/@expo/cli/build/metro-require/require.js
-```
-
-**Root Cause:** The metro.config.js `blockList` was excluding nested node_modules, which blocked legitimate Expo dependencies.
-
-**Solution:** ✅ **RESOLVED**
-- Simplified `blockList` to only exclude actual build artifacts:
-  - `backend/dist/`
-  - `.git/`
-- Removed nested node_modules blocking which was causing issues with Expo's internal dependencies
-
-#### Issue 4: TransformError with Node 22
-
-**Symptom:**
-```
-TransformError: Unexpected "typeof" from react-native/index.js
-```
-
-**Root Cause:** React Native 0.81.5 + esbuild incompatibility with Node 22.
-
-**Solution:** ✅ **DOCUMENTED**
-- Use Node 20.x LTS (recommended)
-- Enhanced verify-metro.js to check Node version
-- Added warning if Node > 20
-- Documented workarounds in this section
-
-### Metro Configuration
-
-Our current `metro.config.js` provides:
-
-1. **Path Alias Support**: `@/` resolves to project root
-2. **TypeScript Support**: `.ts`, `.tsx` file extensions
-3. **Modern Module Formats**: `.mjs`, `.cjs` support
-4. **Asset Handling**: Extended asset extensions for media files
-5. **Minimal BlockList**: Only excludes build artifacts and git directory
-
-```javascript
-// metro.config.js (current configuration)
-const { getDefaultConfig } = require('expo/metro-config');
-const path = require('path');
-
-const config = getDefaultConfig(__dirname);
-
-config.resolver = {
-  ...config.resolver,
-  extraNodeModules: {
-    '@': path.resolve(__dirname, './'),
-  },
-  sourceExts: [...(config.resolver?.sourceExts || []), 'ts', 'tsx', 'mjs', 'cjs'],
-  assetExts: [...(config.resolver?.assetExts || []), 'db', 'mp3', 'ttf', 'obj', 'png', 'jpg'],
-  blockList: [
-    /backend\/dist\/.*/,
-    /\.git\/.*/,
-  ].map((re) => new RegExp(re)),
-};
-
-module.exports = config;
-```
-
-### Babel Configuration
-
-Our `babel.config.js` ensures proper module resolution:
-
-```javascript
-// babel.config.js (current configuration)
-module.exports = function(api) {
-  api.cache(true);
-  return {
-    presets: ['babel-preset-expo'],  // Metro React Native Babel preset
-    plugins: [
-      [
-        'module-resolver',
-        {
-          root: ['./'],
-          alias: {
-            '@': './'
-          }
-        }
-      ]
-    ]
-  };
-};
-```
-
-**Key Points**:
-- `babel-preset-expo` is equivalent to `module:metro-react-native-babel-preset`
-- Module resolver plugin handles @/ path alias
-- esbuild is NOT explicitly invoked (uses default Metro transform)
-
-### Cache Clearing
-
-If you encounter bundling issues, try clearing caches in this order:
-
-#### 1. Metro Cache (First try)
+**VERIFY:**
 ```bash
-npm start -- --clear
-# or
-expo start --clear
+# 1. Unit tests for syntax validation
+npm test -- KeyValidator.test.ts
+
+# 2. Manual test with real key
+# In app, try testing a real API key
+# Should see success/failure message
+
+# 3. Test caching
+# Validate same key twice quickly
+# Second call should be instant (cached)
 ```
 
-#### 2. Full Cache Clear (More thorough)
+**ACCEPTANCE:**
+- [ ] Syntax validation working for all providers
+- [ ] Live validation works with real keys
+- [ ] Invalid keys return helpful error messages
+- [ ] Validation results cached for 5 minutes
+- [ ] Unit tests passing (8+ tests)
+
+**COMMIT:**
 ```bash
-# Clear node_modules cache
-rm -rf node_modules/.cache
-
-# Clear Expo cache
-rm -rf .expo/.metro
-
-# Restart with clean cache
-npm start -- --clear
+git commit -m "feat(keys): add KeyValidator with syntax and live validation [Y2]"
 ```
-
-#### 3. Nuclear Option (Last resort)
-```bash
-# Remove all caches and reinstall
-rm -rf node_modules
-rm -rf .expo
-rm -rf node_modules/.cache
-npm install
-npm start -- --clear
-```
-
-#### 4. Watchman (if installed)
-```bash
-# Clear Watchman cache
-watchman watch-del-all
-
-# Restart Metro
-npm start
-```
-
-### Verification Script Details
-
-The `verify:metro` script performs automated verification:
-
-```bash
-npm run verify:metro
-```
-
-**What it does:**
-1. Clears all caches (node_modules/.cache, .expo/.metro, watchman)
-2. Runs `expo export --platform android` to test full bundle generation
-3. Verifies bundle artifacts are created correctly
-4. Cleans up temporary files
-5. Exits with appropriate status code for CI integration
-
-**Expected output:**
-```
-🔍 Starting Metro Bundler Verification...
-
-📦 Step 1: Clearing Metro caches...
-  ✓ Cleared node_modules/.cache
-  ⚠ Watchman not available (optional)
-  ✓ Cleared .expo/.metro cache
-✅ Cache clearing complete
-
-🔨 Step 2: Testing Metro bundle generation...
-   Output directory: /tmp/metro-verification-bundle
-[... bundling output ...]
-✅ Metro bundle generation successful
-
-🔎 Step 3: Verifying bundle contents...
-  ✓ Bundle files present
-  ✓ Entry bundle found
-  ✓ Metadata file present
-✅ Bundle verification complete
-
-🧹 Cleaning up temporary files...
-  ✓ Temporary bundle removed
-
-✨ Metro Bundler Verification PASSED ✨
-```
-
-### CI Integration
-
-The verification script is designed for CI/CD pipelines:
-
-```yaml
-# .github/workflows/ci.yml
-- name: Verify Metro Bundler
-  run: npm run verify:metro
-```
-
-Exit codes:
-- `0`: All checks passed
-- `1`: Verification failed (cache clearing, bundling, or verification errors)
-
-### Environment Variables
-
-Metro bundling loads environment variables from:
-1. `.env.production` (production builds)
-2. `.env` (fallback)
-
-Ensure these files exist with required variables. See `.env.example` for template.
-
-### Platform-Specific Considerations
-
-#### Android
-- Bundle format: Hermes Bytecode (.hbc)
-- Entry point: `node_modules/expo-router/entry.js`
-- Config: `app.json` android section
-
-#### Expo Go
-- Development builds work with standard Metro bundling
-- Production exports require proper signing and configuration
-- Use `expo start` for development
-- Use `expo export` for production builds
-
-### Dependencies
-
-Key packages for Metro functionality:
-- `expo` (v54.0.23): Framework and bundler
-- `react-native` (v0.81.5): Core framework
-- `@react-native/virtualized-lists` (v0.81.5): Required for FlatList
-- `expo-router` (v6.0.14): Navigation and entry point
-- `expo-audio` (v1.0.14): Audio functionality (replaces expo-av)
-
-### TypeScript Considerations
-
-- TypeScript compilation errors do NOT block Metro bundling
-- Backend-only TypeScript errors (in `backend/` directory) don't affect React Native bundle
-- Metro bundles JavaScript, so runtime-only issues surface at app startup
-- Run `npx tsc --noEmit` separately to check TypeScript errors
-
-### Known Issues
-
-#### Non-Critical Issues
-
-1. **Backend TypeScript Errors**: ~65 TypeScript errors in backend code don't affect Metro or React Native app
-2. **Jest Worker Process Warning**: Tests pass (155/155), warning is cosmetic
-
-#### Resolved Issues
-
-1. ✅ expo-av plugin not found
-2. ✅ Missing @react-native/virtualized-lists
-3. ✅ Overly restrictive blockList
-4. ✅ Node 22 compatibility documented
-
-### Getting Help
-
-If you encounter Metro issues not covered here:
-
-1. Run `npm run verify:metro` to get detailed error output
-2. Check `expo-doctor` output: `npx expo-doctor`
-3. Review Metro logs during `expo start --clear`
-4. Check this guide for similar symptoms
-5. Clear caches and try again
-6. Verify Node version is 20.x LTS
-
-### Useful Commands
-
-```bash
-# Start Metro bundler
-npm start
-
-# Start with cache clear
-npm start -- --clear
-
-# Verify Metro setup
-npm run verify:metro
-
-# Check Node version
-node --version
-
-# Check dependency health
-npx expo-doctor
-
-# Test bundle generation
-expo export --platform android --output-dir /tmp/test-bundle
-
-# Type check (separate from Metro)
-npx tsc --noEmit
-
-# Run tests
-npm test
-```
-
-### Change History
-
-#### 2025-11-09: Node Version Guidance & Documentation Consolidation
-- Added Node 20.x LTS recommendation
-- Documented Node 22 TransformError issue
-- Enhanced Metro troubleshooting section
-- Consolidated all documentation into MASTER_CHECKLIST.md
-
-#### 2025-11-09: Initial Metro Fixes
-- Replaced expo-av with expo-audio in app.json
-- Added @react-native/virtualized-lists as direct dependency
-- Simplified metro.config.js blockList
-- Created verify:metro script
-- Metro bundling now works successfully: 3239 modules, 8.38MB bundle
 
 ---
 
-## Security & Vulnerability Scanning
+#### Y3: Add API Keys Settings Tab UI
 
-### CodeQL Security Scanning
+**DO:**
+1. Create `screens/settings/APIKeysTab.tsx`
+2. Show list of providers with status badges:
+   ```tsx
+   <View>
+     {providers.map(p => (
+       <ProviderCard
+         name={p.name}
+         status={p.isValid ? '✅ Connected' : '❌ Invalid'}
+         lastTested={p.lastValidated}
+         onTest={() => validateKey(p.id)}
+         onEdit={() => openEditModal(p.id)}
+         onRemove={() => removeKey(p.id)}
+       />
+     ))}
+     <Button onPress={openAddModal}>+ Add New Provider</Button>
+   </View>
+   ```
+3. Create modal for adding/editing keys with test functionality
 
-This project uses CodeQL for automated security vulnerability scanning.
-
-#### Running CodeQL Locally
-
+**VERIFY:**
 ```bash
-# CodeQL is run automatically in CI/CD
-# To run locally, install CodeQL CLI:
-# https://github.com/github/codeql-cli-binaries/releases
+# 1. Component tests
+npm test -- APIKeysTab.test.tsx
 
-# Run analysis
-codeql database create codeql-db --language=javascript
-codeql database analyze codeql-db --format=sarif-latest --output=results.sarif
+# 2. Manual UI test
+npm run start:all
+# Test: Add key, Test validation, Edit key, Remove key, Export/import
+
+# 3. Take screenshot for PR
 ```
 
-#### Security Best Practices
+**ACCEPTANCE:**
+- [ ] UI renders provider list correctly
+- [ ] Add/Edit modal works smoothly
+- [ ] Test button shows loading state
+- [ ] Status indicators update after validation
+- [ ] Component tests passing (6+ tests)
 
-1. **API Keys & Secrets**
-   - Never commit secrets to version control
-   - Use environment variables (.env)
-   - Use SecureStore for sensitive data on device
-   - Rotate keys regularly
-
-2. **Token Management**
-   - Store tokens in SecureStore (hardware-encrypted)
-   - Automatic token refresh
-   - Revoke tokens on sign-out
-   - Never log tokens
-
-3. **Input Validation**
-   - Validate all user inputs
-   - Sanitize data before storage
-   - Type checking with TypeScript
-   - Zod schemas for runtime validation
-
-4. **Network Security**
-   - HTTPS for all API calls
-   - Certificate pinning (consider for production)
-   - Timeout configurations
-   - Error handling without data leaks
-
-5. **Error Handling**
-   - Catch and log errors securely
-   - Don't expose sensitive data in error messages
-   - User-friendly error messages
-   - Proper error boundaries in React
-
-### Known Security Issues
-
-#### Non-Issues (False Positives)
-- AsyncStorage usage: Appropriate for non-sensitive data
-- Console.log in tests: Only in test environment
-
-#### Resolved Issues
-- ✅ Secure token storage implemented (SecureStore)
-- ✅ API keys moved to environment variables
-- ✅ OAuth PKCE implementation (no client secrets in app)
-- ✅ Input validation added to all forms
+**COMMIT:**
+```bash
+git commit -m "feat(keys): add API Keys settings tab UI [Y3]"
+```
 
 ---
 
-## Backend Documentation
+#### Y4: Integrate with JarvisAPIRouter
 
-### Backend Overview
+**DO:**
+1. Update `services/JarvisAPIRouter.ts`:
+   ```typescript
+   async function getProviderKey(providerId: string): Promise<string | null> {
+     // Priority 1: OAuth token (existing)
+     const oauthToken = await AuthManager.getAccessToken(providerId);
+     if (oauthToken) return oauthToken;
+     
+     // Priority 2: Manual API key (NEW)
+     const manualKey = await ProviderKeyManager.getKey(providerId);
+     if (manualKey) return manualKey;
+     
+     // Priority 3: Environment variable (existing)
+     const envKey = getEnvKey(providerId);
+     if (envKey) return envKey;
+     
+     return null;
+   }
+   ```
+2. Test fallback chain
+3. Maintain backward compatibility
 
-The JARVIS backend is a fully TypeScript-enabled Express.js server that provides REST API endpoints for the JARVIS AI Command Center.
-
-### Technology Stack
-
-- **Runtime**: Node.js 20+
-- **Language**: TypeScript 5.9.x
-- **Framework**: Express.js with full TypeScript types
-- **Build Tool**: esbuild (with React Native packages as external)
-- **Dev Runtime**: tsx (for hot reloading)
-- **Module System**: CommonJS
-- **Isolation**: Backend isolated from React Native/Expo dependencies
-
-### Backend Isolation & Hardening
-
-**Status**: ✅ Complete (as of 2025-11-09)
-
-The backend has been hardened to prevent React Native/Expo coupling and DOM type leakage:
-
-#### Key Improvements
-
-1. **No DOM Types**: Removed `"DOM"` from `backend/tsconfig.json` lib array
-   - Only `["ES2020"]` lib is used
-   - No browser globals (window, document, etc.) available
-   - Prevents accidental browser API usage
-
-2. **esbuild Build System**: Switched from tsc to esbuild
-   - Marks React Native/Expo packages as external (not bundled)
-   - Prevents esbuild TransformError on `react-native/index.js`
-   - Faster builds with proper module handling
-
-3. **ESLint Safeguards**: Added `no-restricted-imports` rules
-   - Blocks: `react-native`, `expo`, `react`, `react-dom`
-   - Automatic detection of forbidden imports during linting
-   - Prevents accidental React Native coupling
-
-4. **CI Verification**: Added `backend-verify.yml` workflow
-   - Automatically builds backend on changes
-   - Runs verification checks
-   - Ensures continued isolation
-
-**Documentation**: See [BACKEND_DEV.md](../BACKEND_DEV.md) for complete details
-
-**Known Limitation**: Services folder imports React Native modules (AsyncStorage, Platform, etc.), causing runtime issues. Use `npm run dev:backend` for development. Future work: refactor services layer.
-
-### Directory Structure
-
-```
-backend/
-├── config/
-│   └── environment.ts      # Environment validation and configuration
-├── routes/
-│   ├── analytics.ts        # Analytics and metrics endpoints
-│   ├── ask.ts             # AI reasoning endpoints (Groq, Gemini, HF)
-│   ├── content.ts         # Content management
-│   ├── integrations.ts    # Social media integrations
-│   ├── logs.ts            # System logging
-│   ├── media.ts           # Media upload/storage
-│   ├── settings.ts        # App settings
-│   ├── system.ts          # System health and info
-│   ├── trends.ts          # Trend discovery
-│   └── voice.ts           # TTS/STT endpoints
-├── trpc/
-│   ├── app-router.ts      # tRPC router configuration
-│   ├── create-context.ts  # tRPC context
-│   └── routes/            # tRPC procedure routes
-├── dist/                  # Compiled JavaScript output (gitignored)
-├── hono.ts               # Hono server with tRPC support
-├── server.express.ts     # Main Express server
-├── server.ts             # Hono server entry point
-└── tsconfig.json         # Backend TypeScript configuration
-```
-
-### Getting Started
-
-#### Prerequisites
-- Node.js 20 or later
-- npm package manager
-
-#### Installation
+**VERIFY:**
 ```bash
-# Install dependencies (from project root)
-npm install
+# 1. Integration tests
+npm test -- JarvisAPIRouter.test.ts
+
+# 2. End-to-end test - try all scenarios:
+#   a) Provider with OAuth → should use OAuth
+#   b) Provider with manual key only → should use manual key
+#   c) Provider with env var only → should use env var
+#   d) Provider with all three → should prefer OAuth
+
+# 3. Verify no regressions
+npm test  # All 155 tests still passing
 ```
 
-#### Environment Setup
+**ACCEPTANCE:**
+- [ ] Fallback chain works (OAuth → Manual → Env)
+- [ ] Existing OAuth flow unaffected
+- [ ] Manual keys work for all providers
+- [ ] Integration tests passing
+- [ ] All 155 existing tests still passing
 
-Create a `.env` file in the project root with the following variables:
-
+**COMMIT:**
 ```bash
-# Server Configuration
-PORT=3000                    # Backend server port (default: 3000)
-HOST=0.0.0.0                # Server host (default: 0.0.0.0)
-NODE_ENV=development        # Environment (development/production)
-FRONTEND_URL=*              # CORS allowed origin (default: *)
-
-# AI API Keys (at least one recommended)
-EXPO_PUBLIC_GROQ_API_KEY=your_groq_key          # Groq (fastest, free)
-EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_key     # Google Gemini
-EXPO_PUBLIC_HF_API_TOKEN=your_hf_token         # HuggingFace
-EXPO_PUBLIC_OPENAI_API_KEY=your_openai_key     # OpenAI
-
-# Optional Integrations
-YOUTUBE_API_KEY=your_youtube_key
-DISCORD_BOT_TOKEN=your_discord_token
-TWITTER_API_KEY=your_twitter_key
-GOOGLE_CLIENT_ID=your_google_client_id
+git commit -m "feat(keys): integrate ProviderKeyManager with JarvisAPIRouter [Y4]"
 ```
 
-**Environment Validation**: The backend automatically validates environment variables on startup and provides helpful warnings if AI API keys are missing.
+---
 
-### Development Workflow
+#### Y5-Y8: Complete Remaining Tasks
 
-#### Development Mode (Hot Reload - Recommended)
+Follow similar pattern for:
+- **Y5:** Add validation tests (unit + integration)
+- **Y6:** Implement backup/restore (encrypted export/import)
+- **Y7:** Update documentation
+- **Y8:** Add telemetry (optional)
+
+**Final Verification for Section Y:**
 ```bash
-# Run with tsx watch (auto-reloads on file changes)
-npm run dev:backend
-
-# This uses tsx directly on TypeScript sources
-# Best for active development with hot reload
-```
-
-#### Production Build & Run
-```bash
-# Build backend (compiles with esbuild)
-npm run build:backend
-
-# Run compiled production build
-npm run start:backend:prod
-
-# Or do both in one command
-npm run start:backend
-```
-
-#### Backend Verification
-```bash
-# Build and verify backend isolation
+npm test                 # 160+ tests passing
+npm run lint
+npm run verify:metro
 npm run verify:backend
-
-# This builds the backend and spawns a test server
-# to verify it starts without errors
+npm run start:all        # Manual end-to-end test
 ```
 
-**Note**: The `start:backend` script now builds first, then runs the compiled output. For development with hot reload, use `dev:backend` instead.
+---
 
-#### Run All Services
+### 📝 Step 2: Q9-Q12 - Complete Documentation & CI
+
+#### Q9: Create CI/CD Workflow
+
+**DO:**
+Create `.github/workflows/ci.yml`:
+```yaml
+name: JARVIS CI Pipeline
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --coverage
+      - run: npm run verify:metro
+      - run: npm run build:backend
+```
+
+**VERIFY:**
 ```bash
-# Start both backend and frontend
-npm run start:all
+npx yaml-lint .github/workflows/ci.yml
+git push  # Check GitHub Actions tab
 ```
 
-### API Endpoints
+**ACCEPTANCE:**
+- [ ] Workflow syntax valid
+- [ ] CI runs successfully on push
+- [ ] All jobs pass
 
-#### Core Endpoints
+---
 
-##### Health Check
-```
-GET /
-Response: { 
-  status: 'online', 
-  message: 'JARVIS Backend API is running', 
-  version: '1.0.0', 
-  timestamp: ISO-8601 
-}
-```
+#### Q10-Q12: Environment & Scripts
 
-##### Voice
-```
-POST /api/voice/tts         - Text-to-speech
-POST /api/voice/stt         - Speech-to-text
-GET  /api/voice/config      - Voice configuration
-```
-
-##### AI Reasoning
-```
-POST /api/ask               - Ask AI a question
-GET  /api/ask/models        - Get available AI models
-```
-
-##### Integrations
-```
-GET  /api/integrations               - List all integrations
-GET  /api/integrations/accounts      - Connected social accounts
-POST /api/integrations/post          - Post to social media
-POST /api/integrations/test/:service - Test integration
-```
-
-##### Analytics
-```
-GET  /api/analytics                  - Overview dashboard
-GET  /api/analytics/:platform        - Platform-specific analytics
-POST /api/analytics/query            - Complex analytics query
-POST /api/analytics/revenue          - Revenue metrics
-POST /api/analytics/events           - Track event
-POST /api/analytics/insights         - AI insights
-```
-
-##### Trends
-```
-POST /api/trends/discover            - Discover trending topics
-GET  /api/trends/:id                 - Get specific trend
-POST /api/trends/:id/analyze         - Analyze trend
-```
-
-##### Content
-```
-GET    /api/content                  - List all content
-POST   /api/content                  - Create content
-GET    /api/content/:id              - Get specific content
-PUT    /api/content/:id              - Update content
-DELETE /api/content/:id              - Delete content
-```
-
-##### Media
-```
-POST   /api/media/upload             - Upload media file
-GET    /api/media/file/:filename     - Get media file
-GET    /api/media/list               - List media files
-DELETE /api/media/file/:filename     - Delete media file
-```
-
-##### Settings
-```
-GET    /api/settings                 - Get all settings
-POST   /api/settings                 - Update settings
-GET    /api/settings/:key            - Get specific setting
-PUT    /api/settings/:key            - Update specific setting
-```
-
-##### System
-```
-GET /api/system/status              - System status
-GET /api/system/health              - Health check
-GET /api/system/info                - API information
-```
-
-##### Health & Monitoring (U3-U6 Implementation)
-```
-GET    /api/health                   - Basic health check (fast)
-GET    /api/health/detailed          - Comprehensive health with metrics
-GET    /api/health/ready             - Readiness probe (k8s)
-GET    /api/health/live              - Liveness probe (k8s)
-GET    /api/metrics                  - Prometheus-style metrics
-WS     /ws                          - WebSocket real-time updates
-```
-
-**WebSocket Events:**
-- `system_health` - System status changes
-- `iot_update` - IoT device state changes
-- `social_post` - Social media post updates
-- `analytics` - Analytics refresh notifications
-- `job_complete` - Background job completion
-- `notification` - General notifications
-
-**API Versioning (U4):**
-All endpoints support versioning through:
-1. URL path: `/api/v1/resource` or `/api/v2/resource`
-2. Header: `Accept: application/vnd.jarvis.v1+json`
-3. Query param: `/api/resource?version=1`
-
-Default version: v1
-
-##### Logs
-```
-GET    /api/logs                    - Get logs
-POST   /api/logs                    - Add log entry
-DELETE /api/logs                    - Clear logs
-```
-
-### TypeScript Configuration
-
-#### Backend tsconfig.json
-
-Key settings:
-- **Target**: ES2020 (modern Node.js features)
-- **Module**: CommonJS (Node.js compatibility)
-- **Strict Mode**: Enabled with practical relaxations
-- **Source Maps**: Enabled for debugging
-- **Output**: `backend/dist/`
-
-#### Type Safety Features
-
-All routes use proper Express.js TypeScript types:
-
-```typescript
-import express, { Request, Response, Router } from 'express';
-
-interface RequestBody {
-  field: string;
-}
-
-router.post('/endpoint', async (req: Request<{}, {}, RequestBody>, res: Response) => {
-  const { field } = req.body;
-  // Full type safety and IntelliSense
-  res.json({ success: true });
-});
-```
-
-### Build System
-
-#### Scripts
-
-| Script | Command | Description |
-|--------|---------|-------------|
-| `start:backend` | `tsx backend/server.express.ts` | Development mode with tsx |
-| `dev:backend` | `tsx watch backend/server.express.ts` | Development with hot reload |
-| `build:backend` | `tsc -p backend/tsconfig.json` | Compile TypeScript |
-| `start:backend:prod` | `node backend/dist/server.express.ts` | Run production build |
-
-#### Build Process
-
-1. TypeScript files in `backend/**/*.ts` are compiled
-2. Output JavaScript placed in `backend/dist/`
-3. Source maps generated for debugging
-4. Type declarations generated
-
-#### Gitignore
-
-The following are excluded from git:
-```
-backend/dist/           # Compiled output
-backend/**/*.js         # Compiled JS files
-backend/**/*.js.map     # Source maps
-backend/**/*.d.ts       # Type declarations
-```
-
-### Error Handling
-
-#### Environment Errors
-The backend validates environment variables on startup:
-
-```typescript
-// Throws EnvironmentError if critical variables are missing
-const envConfig = validateEnvironment();
-
-// Logs warnings for missing optional variables (like AI keys)
-logEnvironmentInfo(envConfig);
-```
-
-#### HTTP Error Handling
-All routes include proper error handling:
-
-```typescript
-try {
-  // Route logic
-} catch (error) {
-  console.error('[Route] Error:', error);
-  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-  res.status(500).json({ error: errorMessage });
-}
-```
-
-### Production Deployment
-
-#### Recommended Process
-
-1. **Build the backend**:
-   ```bash
-   npm run build:backend
-   ```
-
-2. **Verify build**:
-   ```bash
-   # Check dist folder contains compiled files
-   ls -la backend/dist/
-   ```
-
-3. **Set environment variables** on your production server
-
-4. **Run production build**:
-   ```bash
-   npm run start:backend:prod
-   ```
-
-5. **Use a process manager** (PM2, systemd, etc.):
-   ```bash
-   pm2 start backend/dist/server.express.js --name jarvis-backend
-   ```
-
-#### Environment Variables in Production
-
-Ensure these are set:
-- `NODE_ENV=production`
-- `PORT=<your-port>`
-- `HOST=0.0.0.0` (or your specific host)
-- At least one AI API key
-- `FRONTEND_URL=<your-frontend-url>` (for CORS)
-
-### Troubleshooting
-
-#### "Cannot find module" errors
-- Run `npm install` to install dependencies
-- Check that `node_modules` exists
-- Verify TypeScript files are properly imported
-
-#### TypeScript compilation errors
-- Check `backend/tsconfig.json` configuration
-- Run `npm run build:backend` to see full error output
-- Ensure all type dependencies are installed (`@types/*` packages)
-
-#### Port already in use
-- Change `PORT` in `.env` file
-- Or kill the process using the port:
-  ```bash
-  # Find process using port 3000
-  lsof -ti:3000
-  # Kill it
-  kill -9 <PID>
+**DO:**
+- **Q10:** Archive obsolete docs
+- **Q11:** Update `.env.example` with all variables
+- **Q12:** Add verify script:
+  ```json
+  "scripts": {
+    "verify": "npm test && npm run verify:metro && npm run verify:backend && npm run lint"
+  }
   ```
 
-#### AI endpoints not working
-- Check that at least one AI API key is configured
-- Verify API keys are valid
-- Check console for environment warnings on startup
+**VERIFY:**
+```bash
+npm run verify  # Should run all checks
+```
+
+**COMMIT:**
+```bash
+git commit -m "docs: complete documentation consolidation [Q9-Q12]"
+```
 
 ---
 
-## Authentication System
+### 🗄️ Step 3: L4 - Migration System
 
-### Overview
+**Goal:** Add version-controlled schema migrations.
 
-A production-ready, single-user, local-first authentication and connection system for Android-only applications (Expo Go, Android APK, and Termux).
+**DO:**
+1. Create `services/storage/migrations/` directory
+2. Define migration file format with up/down functions
+3. Create `MigrationRunner.ts` for auto-running migrations
+4. Add version tracking to storage
+5. Document migration creation process
 
-This authentication system eliminates the need for manual API keys by handling OAuth 2.0 flows and secure on-device token storage.
-
-### Supported Features
-
-- ✅ **PKCE OAuth 2.0** for mobile (Expo Go, Android APK)
-- ✅ **Device Flow** for headless environments (Termux)
-- ✅ **Local Tokens** for smart home devices
-- ✅ **Automatic Token Refresh**
-- ✅ **Event-Driven Architecture**
-- ✅ **Secure On-Device Storage**
-
-### Supported Platforms
-
-- **Expo Go (Android)**: Full OAuth support with PKCE
-- **Android APK (Release)**: Production-ready builds
-- **Termux**: Device Flow where supported, fallback to manual flows
-
-**⚠️ Important**: NO iOS/Apple support. This is an Android-only implementation.
-
-### Core Services
-
-#### AuthManager
-The central orchestrator for all authentication operations.
-
-```typescript
-import AuthManager from '@/services/auth/AuthManager';
-
-// Start OAuth flow
-await AuthManager.startAuthFlow('google');
-
-// Get access token (auto-refreshes if expired)
-const token = await AuthManager.getAccessToken('google');
-
-// Refresh token manually
-await AuthManager.refreshAccessToken('google');
-
-// Revoke and disconnect
-await AuthManager.revokeProvider('google');
-
-// Check connection status
-const isConnected = await AuthManager.isConnected('google');
-const status = await AuthManager.getProviderStatus('google');
-
-// List all connected providers
-const providers = await AuthManager.getConnectedProviders();
-
-// Add local token (for smart home devices)
-await AuthManager.addLocalToken('homeassistant', 'your-token', {
-  baseUrl: 'http://homeassistant.local:8123'
-});
+**VERIFY:**
+```bash
+# Create test migration
+# Run migration
+# Verify data changed
+# Test rollback
+# Verify data restored
 ```
 
-#### TokenVault
-Secure token storage using hardware-encrypted storage (SecureStore).
+**ACCEPTANCE:**
+- [ ] Migrations run automatically on app start
+- [ ] Version tracking works
+- [ ] Rollback working
+- [ ] Documentation complete
+- [ ] Tests passing (10+ tests)
 
-```typescript
-import TokenVault from '@/services/auth/TokenVault';
-
-// Save token
-await TokenVault.saveToken('provider', {
-  access_token: 'token',
-  refresh_token: 'refresh',
-  expires_in: 3600,
-  scopes: ['read', 'write']
-});
-
-// Get token
-const tokenData = await TokenVault.getToken('provider');
-
-// Remove token
-await TokenVault.removeToken('provider');
-
-// List all providers with tokens
-const providers = await TokenVault.listProviders();
-
-// Check if token is expired
-const isExpired = TokenVault.isTokenExpired(tokenData);
+**COMMIT:**
+```bash
+git commit -m "feat(storage): implement migration system [L4a-L4e]"
 ```
-
-#### MasterProfile
-Single-user profile management.
-
-```typescript
-import MasterProfile from '@/services/auth/MasterProfile';
-
-// Get profile
-const profile = await MasterProfile.getMasterProfile();
-
-// Save profile
-await MasterProfile.saveMasterProfile({
-  id: 'user-id',
-  email: 'user@example.com',
-  name: 'User Name',
-  avatar: 'https://...',
-  createdAt: new Date().toISOString(),
-  connectedProviders: ['google', 'github']
-});
-
-// Add connected provider
-await MasterProfile.addConnectedProvider('discord');
-
-// Remove connected provider
-await MasterProfile.removeConnectedProvider('discord');
-
-// Clear profile
-await MasterProfile.clearMasterProfile();
-```
-
-### Provider Helpers
-
-Each provider has a dedicated helper module in `services/auth/providerHelpers/`:
-
-#### Implemented Providers
-
-- **google.ts** - Google OAuth (Drive, YouTube, Gmail, etc.)
-- **github.ts** - GitHub OAuth with Device Flow
-- **discord.ts** - Discord OAuth
-- **spotify.ts** - Spotify OAuth
-- **reddit.ts** - Reddit OAuth (installed app)
-- **homeassistant.ts** - Home Assistant local tokens
-
-#### Provider Configuration
-
-```typescript
-import { PROVIDERS, getProvider } from '@/services/auth/providerHelpers/config';
-
-// Get provider config
-const googleConfig = getProvider('google');
-
-// List all providers
-const allProviders = PROVIDERS;
-
-// Get device flow providers
-import { getDeviceFlowProviders } from '@/services/auth/providerHelpers/config';
-const deviceFlowProviders = getDeviceFlowProviders();
-```
-
-### Events
-
-AuthManager uses an event bus for real-time updates:
-
-```typescript
-// Subscribe to events
-AuthManager.on('connected', (provider, data) => {
-  console.log(`Connected to ${provider}`);
-});
-
-AuthManager.on('disconnected', (provider) => {
-  console.log(`Disconnected from ${provider}`);
-});
-
-AuthManager.on('token_refreshed', (provider, data) => {
-  console.log(`Token refreshed for ${provider}`);
-});
-
-// Unsubscribe
-AuthManager.off('connected', handler);
-```
-
-### UI Components
-
-#### SignInScreen
-First-launch onboarding screen for Google Sign-In.
-
-Features:
-- Google Sign-In button
-- Creates Master Profile on success
-- Skip option for anonymous usage
-- Auto-navigates to dashboard
-
-#### ConnectionsHub
-Provider connection management interface.
-
-Features:
-- Grid layout with provider tiles
-- Status indicators (Connected, Not Connected, Needs Re-Auth)
-- Connect/disconnect actions
-- Local token wizard for smart home devices
-- Real-time updates via event subscriptions
-
-### Security
-
-#### Token Storage
-- All tokens stored using `SecureKeyStorage`
-- Hardware-encrypted on native platforms (Android Keystore)
-- Fallback to AsyncStorage on web (for development only)
-
-#### OAuth Flows
-- **PKCE** (Proof Key for Code Exchange) for all mobile flows
-- No client secrets in mobile app code
-- Device Flow for headless environments
-
-#### Best Practices
-- ✅ Never log tokens
-- ✅ Never commit secrets
-- ✅ Use environment variables for client IDs
-- ✅ Validate tokens before API calls
-- ✅ Handle token refresh automatically
-- ✅ Revoke tokens on sign-out
-
-### Environment Variables
-
-Create a `.env` file with your OAuth client IDs:
-
-```env
-# Google OAuth
-EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID=your_google_client_id
-
-# GitHub OAuth
-EXPO_PUBLIC_GITHUB_CLIENT_ID=your_github_client_id
-
-# Discord OAuth
-EXPO_PUBLIC_DISCORD_CLIENT_ID=your_discord_client_id
-
-# Spotify OAuth
-EXPO_PUBLIC_SPOTIFY_CLIENT_ID=your_spotify_client_id
-
-# Reddit OAuth
-EXPO_PUBLIC_REDDIT_CLIENT_ID=your_reddit_client_id
-```
-
-**Important**: 
-- Use `.env.example` as a template
-- Never commit `.env` to version control
-- Client secrets are NOT required for PKCE flows
-- Do NOT include client secrets in mobile apps
 
 ---
 
-## API Keys Setup
+### 🚨 Step 4: R3-R5 - Enhanced Error Handling
 
-### Overview
+**DO:**
+1. Create `ErrorBoundary` component
+2. Add offline detection
+3. Add retry buttons for failed API calls
+4. Integrate Sentry for error reporting
+5. Create error message catalog
 
-This section lists ALL API keys needed for JARVIS to function at full capacity. Keys are categorized by **FREE** (always use these first) and **PAID** (use only for complex tasks).
-
-### FREE AI MODELS (Pre-configured - Just Get Free Keys)
-
-#### 1. **Hugging Face Inference API** 🤗
-- **Status**: FREE (Rate limited, but generous)
-- **What it provides**: Text generation, Image generation, Audio transcription
-- **How to get**:
-  1. Go to https://huggingface.co/join
-  2. Sign up for free
-  3. Go to https://huggingface.co/settings/tokens
-  4. Create new token → Copy it
-- **Where to add in JARVIS**: API Keys page → Add as "Hugging Face"
-- **Models included**:
-  - Text: Mistral 7B, Llama 2, Zephyr, Falcon
-  - Image: Stable Diffusion XL, SD 2.1
-  - Audio: Whisper Large v3, Bark TTS
-- **Rate Limits**: 1000 requests/hour
-- **Cost**: $0 (FREE)
-
-#### 2. **Together AI** 🚀
-- **Status**: FREE tier available
-- **What it provides**: Fast text/image/code generation
-- **How to get**:
-  1. Go to https://api.together.xyz/signup
-  2. Sign up (free $5 credit)
-  3. Dashboard → API Keys → Create new key
-- **Where to add**: API Keys page → Add as "Together AI"
-- **Models included**:
-  - Text: Llama 3.1 70B/8B, Mixtral 8x7B, Qwen 2
-  - Image: FLUX Schnell, SDXL Turbo
-  - Code: DeepSeek Coder 33B, CodeLlama 70B
-- **Rate Limits**: 600 requests/minute
-- **Cost**: $5 free credit, then pay-as-you-go (very cheap)
-
-#### 3. **Groq** ⚡
-- **Status**: FREE (fastest inference)
-- **What it provides**: Lightning-fast text generation
-- **How to get**:
-  1. Go to https://console.groq.com
-  2. Sign up with GitHub/Google
-  3. API Keys → Create API Key
-- **Where to add**: API Keys page → Add as "Groq"
-- **Models included**:
-  - Llama 3.1 70B (versatile)
-  - Llama 3.1 8B (instant)
-  - Mixtral 8x7B
-  - Gemma 7B
-- **Rate Limits**: 30 requests/minute (free), 14,400/day
-- **Cost**: $0 (FREE)
-- **Note**: FASTEST free AI available
-
-#### 4. **DeepSeek** 🧠
-- **Status**: FREE tier
-- **What it provides**: Code generation and chat
-- **How to get**:
-  1. Go to https://platform.deepseek.com
-  2. Sign up
-  3. API Keys → Create
-- **Where to add**: API Keys page → Add as "DeepSeek"
-- **Models included**:
-  - DeepSeek Coder (best for code)
-  - DeepSeek Chat
-- **Rate Limits**: 1000 requests/minute
-- **Cost**: FREE tier with generous limits
-
-#### 5. **Google Gemini** 🔮
-- **Status**: FREE
-- **What it provides**: Multimodal AI (text, images, video)
-- **How to get**:
-  1. Go to https://makersuite.google.com/app/apikey
-  2. Sign in with Google
-  3. Create API key
-- **Where to add**: API Keys page → Add as "Gemini"
-- **Models included**:
-  - Gemini Pro (free)
-  - Gemini 1.5 Flash (free, fast)
-- **Rate Limits**: 60 requests/minute
-- **Cost**: $0 (FREE)
-
-#### 6. **Replicate** 🔄
-- **Status**: FREE tier ($0.01 initial credit)
-- **What it provides**: Run any open-source model
-- **How to get**:
-  1. Go to https://replicate.com/signin
-  2. Sign up
-  3. Account → API tokens
-- **Where to add**: API Keys page → Add as "Replicate"
-- **Models**: Access to 1000+ models
-- **Cost**: Free tier, then pay per second
-
-### PAID AI MODELS (Use for Premium Tasks Only)
-
-#### 7. **OpenAI** (GPT-4, DALL-E 3)
-- **Status**: PAID
-- **When to use**: Complex reasoning, best text quality, professional images
-- **How to get**:
-  1. Go to https://platform.openai.com/signup
-  2. Add payment method
-  3. API keys → Create
-- **Where to add**: API Keys page → Add as "OpenAI"
-- **Models**:
-  - GPT-4 Turbo: $0.01/1K tokens input, $0.03/1K tokens output
-  - GPT-3.5 Turbo: $0.0005/1K tokens (cheap fallback)
-  - DALL-E 3: $0.04-$0.12 per image
-- **JARVIS will use**: Only for critical code generation and complex analysis
-
-#### 8. **Anthropic** (Claude)
-- **Status**: PAID
-- **When to use**: Long context analysis, research, writing
-- **How to get**:
-  1. Go to https://console.anthropic.com
-  2. Sign up
-  3. Settings → API Keys
-- **Where to add**: API Keys page → Add as "Anthropic"
-- **Models**:
-  - Claude 3 Opus: $0.015/1K tokens input, $0.075/1K output
-  - Claude 3 Sonnet: $0.003/1K input, $0.015/1K output
-- **JARVIS will use**: For long document analysis
-
-#### 9. **ElevenLabs** (Voice Cloning)
-- **Status**: PAID (Free tier: 10K characters/month)
-- **When to use**: Professional voice overs
-- **How to get**:
-  1. Go to https://elevenlabs.io
-  2. Sign up
-  3. Profile → API Key
-- **Where to add**: API Keys page → Add as "ElevenLabs"
-- **Cost**: Free 10K chars, then $5/month for 30K
-
-### SOCIAL MEDIA & PLATFORMS (All Required)
-
-#### 11. **Instagram / Facebook (Meta)**
-- **How to get**:
-  1. Go to https://developers.facebook.com
-  2. Create App → Select "Business"
-  3. Add Instagram Basic Display
-  4. Get Access Token
-- **Where to add**: Social Connect page
-- **Required for**: Posting, analytics
-
-#### 12. **TikTok**
-- **How to get**:
-  1. Go to https://developers.tiktok.com
-  2. Apply for API access
-  3. Create app
-- **Where to add**: Social Connect page
-- **Note**: Requires approval
-
-#### 13. **YouTube**
-- **How to get**:
-  1. Go to https://console.cloud.google.com
-  2. Enable YouTube Data API v3
-  3. Create OAuth 2.0 credentials
-- **Where to add**: Social Connect page
-
-#### 14. **Twitter/X**
-- **How to get**:
-  1. Go to https://developer.twitter.com
-  2. Apply for developer account
-  3. Create app → Get API keys
-- **Where to add**: Social Connect page
-- **Cost**: $100/month for API access (Expensive!)
-
-#### 15. **LinkedIn**
-- **How to get**:
-  1. Go to https://www.linkedin.com/developers
-  2. Create app
-  3. Request API access
-- **Where to add**: Social Connect page
-
-### PAYMENT & MONETIZATION
-
-#### 16. **Stripe**
-- **How to get**:
-  1. Go to https://dashboard.stripe.com/register
-  2. Complete business verification
-  3. Developers → API keys
-- **Where to add**: API Keys page
-- **Required for**: Payment processing
-
-#### 17. **PayPal**
-- **How to get**:
-  1. Go to https://developer.paypal.com
-  2. Create app
-  3. Get Client ID and Secret
-- **Where to add**: API Keys page
-
-### ANALYTICS & TRACKING
-
-#### 18. **Google Analytics**
-- **How to get**:
-  1. Go to https://analytics.google.com
-  2. Create property
-  3. Get Measurement ID
-- **Where to add**: API Keys page
-
-### STORAGE & CLOUD
-
-#### 19. **Google Drive**
-- **How to get**:
-  1. Go to https://console.cloud.google.com
-  2. Enable Google Drive API
-  3. Create OAuth credentials
-- **Where to add**: Cloud Storage page
-
-#### 20. **AWS S3** (Optional)
-- **How to get**:
-  1. Go to https://aws.amazon.com
-  2. IAM → Create user
-  3. Get Access Key ID and Secret
-- **Where to add**: API Keys page
-
-### JARVIS PRIORITY SYSTEM
-
-#### For AI Tasks:
-1. **Data Analysis/Simple tasks** → Use FREE models (Groq, Gemini Flash)
-2. **Code Generation** → Use DeepSeek Coder (free) or GPT-4 (paid, if complex)
-3. **Image Generation** → Use FLUX Schnell (free) or DALL-E (paid, if quality matters)
-4. **Voice/Audio** → Use Whisper (free) or ElevenLabs (paid)
-
-#### Cost Optimization:
-- JARVIS will ALWAYS try free models first
-- Only escalate to paid models if:
-  - Free model fails
-  - Task requires premium quality
-  - User explicitly requests premium model
-- Track costs in real-time
-- Show savings vs. using only paid models
-
-### NEXT STEPS
-
-1. **Start with FREE keys** (Groq, Hugging Face, Gemini, Together AI, DeepSeek)
-2. **Add these keys in JARVIS** → API Keys page
-3. **Test each integration** → Use test button
-4. **Add paid keys** only when you need premium features
-5. **Monitor costs** → Analytics Dashboard
-
-### QUICK START (Minimum to Get Running)
-
-**Just get these 5 free keys to start:**
-1. ✅ Hugging Face
-2. ✅ Groq
-3. ✅ Google Gemini  
-4. ✅ Together AI
-5. ✅ DeepSeek
-
-**JARVIS will be 90% functional with just these!**
-
-### Direct Links Summary
-
-| Service | Get Key Here | Cost |
-|---------|--------------|------|
-| Hugging Face | https://huggingface.co/settings/tokens | FREE |
-| Groq | https://console.groq.com | FREE |
-| Together AI | https://api.together.xyz/signup | FREE ($5 credit) |
-| DeepSeek | https://platform.deepseek.com | FREE |
-| Google Gemini | https://makersuite.google.com/app/apikey | FREE |
-| Replicate | https://replicate.com/signin | FREE (small credit) |
-| OpenAI | https://platform.openai.com | PAID |
-| Anthropic | https://console.anthropic.com | PAID |
-| ElevenLabs | https://elevenlabs.io | PAID |
-
----
-
-## How to Update This File
-
-### Rules for Future Updates
-
-**⚠️ CRITICAL: This is the ONLY authoritative documentation file.**
-
-1. **Always Update This File**
-   - Do NOT create new documentation files (README.md, TODO.md, etc.)
-   - All changes, updates, and new information go into this file
-   - Keep this file as the single source of truth
-
-2. **Update Structure**
-   - When adding new features, update the appropriate section
-   - Add completion dates to DONE section
-   - Move completed items from TODO to DONE
-   - Update table of contents if adding new major sections
-
-3. **Markdown Best Practices**
-   - Use proper heading hierarchy (##, ###, ####)
-   - Include anchor links for navigation
-   - Use code blocks with language syntax highlighting
-   - Use tables for structured data
-   - Use checkboxes [x] for completed items, [ ] for pending
-
-4. **Commit Message Format**
-   ```
-   docs: Update MASTER_CHECKLIST.md - [brief description]
-   
-   - Detail 1
-   - Detail 2
-   ```
-
-5. **PR Updates**
-   - Every PR must update this file
-   - Add entry to "Latest PR Updates" section
-   - Update relevant sections (Quick Status, TODO, DONE, etc.)
-   - Keep last 10 PRs, archive older ones
-
-6. **Version Updates**
-   - Increment version number when significant changes occur
-   - Update "Consolidation Date" field
-   - Note major changes in changelog
-
-### Example Update Workflow
-
+**VERIFY:**
 ```bash
-# 1. Make your code changes
-git add <your-files>
-
-# 2. Update MASTER_CHECKLIST.md
-#    - Add to DONE section
-#    - Remove from TODO section
-#    - Update any relevant documentation
-
-# 3. Commit everything together
-git commit -m "feat: Add new feature X
-
-Updates MASTER_CHECKLIST.md:
-- Moved task X from TODO to DONE
-- Updated Quick Start section
-- Added troubleshooting entry"
-
-# 4. Push and create PR
-git push
+# Trigger errors and check:
+# - Error boundary catches and displays
+# - Sentry receives error
+# - User sees friendly message
+# - Retry works
 ```
 
-### Sections to Update Based on Change Type
+**ACCEPTANCE:**
+- [ ] Error boundaries working
+- [ ] Sentry integrated
+- [ ] User-friendly messages
+- [ ] Tests passing
 
-| Change Type | Sections to Update |
-|-------------|-------------------|
-| Bug Fix | DONE (completed), Metro Troubleshooting (if Metro-related) |
-| New Feature | DONE (completed), README (if user-facing), TODO (remaining work) |
-| Documentation | How to Update This File, relevant content section |
-| Build/Config | Metro Troubleshooting, Quick Start Guide, Backend Documentation |
-| Testing | TESTING section, DONE section |
-| Security Fix | Security & Vulnerability Scanning section |
-
-### What NOT to Do
-
-❌ Don't create separate README.md files  
-❌ Don't create separate TODO.md files  
-❌ Don't create changelog files (use git history + this file)  
-❌ Don't duplicate information across sections  
-❌ Don't remove completed tasks from DONE section  
-❌ Don't commit without updating this file for code changes
-
-### What TO Do
-
-✅ Update this file with every PR  
-✅ Keep information consolidated and organized  
-✅ Use clear section headings and anchors  
-✅ Include examples and code snippets  
-✅ Date-stamp major updates  
-✅ Cross-reference related sections  
-✅ Verify links and references work
-
----
-
-## Project Status Dashboard
-
-| Category | Status | Notes |
-|----------|--------|-------|
-| Core Infrastructure | ✅ Complete | React Native + Expo 54, TypeScript |
-| Metro Bundler | ✅ Complete | All startup issues resolved, Node 20.x recommended |
-| Authentication | ✅ Complete | Google OAuth + Guest mode |
-| AI Integration | ✅ Complete | Multi-provider support (6 free, 3 paid) |
-| Voice Features | ✅ Complete | TTS + STT with fallback |
-| Documentation | ✅ Consolidated | Single source of truth (this file) |
-| Security | ✅ Complete | CodeQL scans passing |
-| Testing | ✅ Complete | 155/155 tests passing (100%) |
-| Module Resolution | ✅ Complete | Babel + Metro path alias |
-| Real Implementations | ✅ Verified | No mock data in production |
-| Backend Server | ✅ Complete | TypeScript Express.js with REST API |
-| Node Version | ✅ Compatible | Node 20.x LTS (v20.19.5 tested) |
-
----
-
-## Quick Reference - Available Commands
-
-### Verification Commands
+**COMMIT:**
 ```bash
-npm test                 # Run all tests (155/155 expected)
-npm run verify:metro     # Verify Metro bundler (critical!)
-npm run verify           # Quick verification (NEW in this PR)
-npm run lint             # ESLint check
-npx tsc --noEmit         # TypeScript check (backend errors OK)
-```
-
-### Development Commands
-```bash
-npm start                # Start Metro bundler
-npm run start:all        # Start frontend + backend
-npm run dev:backend      # Backend with hot reload
-npm run start-web        # Web preview
-```
-
-### Testing Commands
-```bash
-npm test                 # All tests
-npm run test:watch       # Watch mode
-npm run test:coverage    # Coverage report
-npm run test:auth        # Auth tests only
-npm run test:all         # Complete pipeline
-```
-
-### Build Commands
-```bash
-npm run build:backend    # Build backend TypeScript
-npm run build:apk        # Build Android APK
-npm run android          # Run on Android emulator
-```
-
-### Troubleshooting Commands
-```bash
-npm run verify:metro     # Check Metro bundler
-npm start -- --clear     # Clear Metro cache
-rm -rf node_modules/.cache && npm start  # Nuclear option
-node --version           # Check Node version (should be 20.x)
+git commit -m "feat(errors): add error recovery UI and monitoring [R3-R5]"
 ```
 
 ---
+
+### ⚡ Steps 5-12: Remaining Phase 1 Tasks
+
+**Follow similar pattern for:**
+- **S1-S6:** Performance Optimization (bundle size, lazy loading, images, memory, cache, code splitting)
+- **T3-T7:** Testing Expansion (E2E, visual regression, performance, device farm, load tests)
+- **X1-X10:** Production Readiness (signed APK, device testing, optimization, QA, deployment, monitoring)
+- **P4:** Node 22 testing
+- **U7:** GraphQL endpoint
+- **TS3:** TypeScript cleanup
+- **V:** Feature enhancements
+- **W:** Developer experience
+
+**Each step follows:**
+1. **DO:** Implement with real logic
+2. **VERIFY:** Run tests, lint, manual check
+3. **ACCEPTANCE:** Define clear criteria
+4. **COMMIT:** Commit working code
+
+---
+
+### 🎯 Runbook Summary
+
+**Key Principles:**
+1. ✅ **One task at a time** - Complete before moving to next
+2. ✅ **Verify immediately** - Don't accumulate unverified changes
+3. ✅ **Commit frequently** - Working code committed after each task
+4. ✅ **Real data only** - No mocks, no placeholders, no TODOs
+5. ✅ **Test everything** - Unit, integration, manual verification
+
+**Standard Flow:**
+```
+Plan → Implement → Unit Test → Integration Test → Manual Verify → Commit → Repeat
+```
+
+**Success Criteria for Each Step:**
+- [ ] Implementation complete with real logic
+- [ ] Unit tests passing
+- [ ] Integration tests passing
+- [ ] Manual verification successful
+- [ ] All existing tests still passing (155+)
+- [ ] Committed with clear message
+
+---
+
 
 ## Implementation Status - Sections A-O
 
