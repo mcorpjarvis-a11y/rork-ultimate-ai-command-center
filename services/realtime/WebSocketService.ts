@@ -1,3 +1,4 @@
+import RuntimeConfig from '@/services/config/RuntimeConfig';
 import { WEBSOCKET_CONFIG } from '@/config/api.config';
 import { WebSocketMessage } from '@/types/api.types';
 
@@ -7,7 +8,7 @@ type EventHandler = (data?: any) => void;
 
 class WebSocketService {
   private ws: WebSocket | null = null;
-  private url: string;
+  private url: string = '';
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number;
   private reconnectInterval: number;
@@ -17,16 +18,27 @@ class WebSocketService {
   private messageQueue: WebSocketMessage[] = [];
   private isConnecting: boolean = false;
   private heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+  private initialConnectionWarned: boolean = false;
 
   constructor() {
-    this.url = WEBSOCKET_CONFIG.url;
     this.maxReconnectAttempts = WEBSOCKET_CONFIG.maxReconnectAttempts;
     this.reconnectInterval = WEBSOCKET_CONFIG.reconnectInterval;
     this.messageHandlers = new Map();
     this.eventHandlers = new Map();
   }
 
-  connect(token?: string): Promise<void> {
+  async connect(token?: string): Promise<void> {
+    // Get URL from RuntimeConfig with fallback to config
+    try {
+      this.url = await RuntimeConfig.getWsUrl();
+    } catch (error) {
+      this.url = WEBSOCKET_CONFIG.url;
+      if (!this.initialConnectionWarned) {
+        console.warn('[WebSocketService] Failed to get URL from RuntimeConfig, using default');
+        this.initialConnectionWarned = true;
+      }
+    }
+
     if (this.ws?.readyState === WebSocket.OPEN) {
       console.log('[WebSocketService] Already connected');
       return Promise.resolve();
@@ -40,14 +52,25 @@ class WebSocketService {
     this.isConnecting = true;
     const wsUrl = token ? `${this.url}?token=${token}` : this.url;
 
-    console.log('[WebSocketService] Connecting to WebSocket...');
+    console.log('[WebSocketService] Connecting to:', wsUrl);
 
     return new Promise((resolve, reject) => {
       try {
         this.ws = new WebSocket(wsUrl);
 
+        // Set timeout for connection attempt
+        const connectionTimeout = setTimeout(() => {
+          if (this.isConnecting) {
+            console.warn('[WebSocketService] Connection timeout after 10 seconds');
+            this.isConnecting = false;
+            this.ws?.close();
+            reject(new Error('WebSocket connection timeout'));
+          }
+        }, 10000);
+
         this.ws.onopen = () => {
-          console.log('[WebSocketService] Connected');
+          clearTimeout(connectionTimeout);
+          console.log('[WebSocketService] ✅ Connected successfully');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
           this.emit('connected');
@@ -57,18 +80,25 @@ class WebSocketService {
         };
 
         this.ws.onclose = (event) => {
-          console.log('[WebSocketService] Disconnected:', event.code, event.reason);
+          clearTimeout(connectionTimeout);
+          const wasClean = event.wasClean ? 'clean' : 'unclean';
+          console.log(`[WebSocketService] Disconnected (${wasClean}):`, event.code, event.reason || 'No reason');
           this.isConnecting = false;
           this.stopHeartbeat();
           this.emit('disconnected', { code: event.code, reason: event.reason });
 
-          if (!event.wasClean) {
+          if (!event.wasClean && this.reconnectAttempts < this.maxReconnectAttempts) {
             this.attemptReconnect();
           }
         };
 
         this.ws.onerror = (error) => {
-          console.error('[WebSocketService] Error:', error);
+          clearTimeout(connectionTimeout);
+          // Only log once per connection attempt to reduce noise
+          if (!this.initialConnectionWarned) {
+            console.warn('[WebSocketService] Connection failed - will retry with exponential backoff');
+            this.initialConnectionWarned = true;
+          }
           this.isConnecting = false;
           this.emit('error', error);
           reject(error);
