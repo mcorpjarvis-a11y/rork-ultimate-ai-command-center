@@ -3,7 +3,7 @@
     // Target modern Node.js
     "target": "ES2020",
     "module": "CommonJS",
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2020"],
     
     // Output configuration
     "outDir": "./dist",
@@ -49,6 +49,11 @@
     "node_modules",
     "dist",
     "**/*.spec.ts",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "../app/**/*",
+    "../components/**/*",
+    "../screens/**/*",
+    "../contexts/**/*",
+    "../hooks/**/*"
   ]
 }

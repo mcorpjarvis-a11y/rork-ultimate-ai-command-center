@@ -55,6 +55,7 @@
 # Verification (run before every PR)
 npm test                 # Run all tests (should show 142/142)
 npm run verify:metro     # Verify Metro bundler works
+npm run verify:backend   # Verify backend isolation and startup
 npm run verify           # Quick pre-start verification
 npm run lint             # Check code quality
 
@@ -1240,6 +1241,28 @@ backend/
 └── tsconfig.json         # Backend TypeScript configuration
 ```
 
+### Backend Isolation & Architecture
+
+**Critical**: The backend is a pure Node.js server and must remain isolated from mobile/frontend dependencies.
+
+#### Isolation Rules
+1. **No Browser APIs**: `backend/tsconfig.json` uses `lib: ["ES2020"]` only (no DOM)
+2. **No React/React Native**: Backend code cannot import react, react-native, or expo modules
+3. **Compiled Output**: Production runs precompiled JavaScript to avoid runtime transformation errors
+4. **Separate Type Environment**: Backend types are Node-only (`types: ["node"]`)
+
+#### Why Isolation Matters
+- Prevents `TransformError` when tsx tries to transform `react-native` at runtime
+- Avoids browser global pollution (window, document, etc.) in server code
+- Catches accidental coupling between server and mobile code at build time
+- Enables safe deployment without unexpected dependencies
+
+#### Enforcement Mechanisms
+1. **TypeScript Config**: Explicit exclusion of frontend dirs (app/, components/, screens/, etc.)
+2. **ESLint Rules**: `backend/.eslintrc.json` forbids React Native/Expo imports
+3. **Verification Script**: `scripts/verify-backend-isolated.js` scans for violations
+4. **CI Pipeline**: `.github/workflows/backend-verify.yml` runs isolation checks on every push
+
 ### Getting Started
 
 #### Prerequisites
@@ -1284,19 +1307,32 @@ GOOGLE_CLIENT_ID=your_google_client_id
 ```bash
 # Run with tsx watch (auto-reloads on file changes)
 npm run dev:backend
-
-# Or run without watch
-npm run start:backend
 ```
 
-#### Production Build
+**Note**: Development mode uses `tsx` for hot-reloading convenience. This is safe for development only.
+
+#### Production Build & Start
 ```bash
-# Compile TypeScript to JavaScript
-npm run build:backend
+# Build and start in one command (recommended for production)
+npm run start:backend
 
-# Run compiled production build
-npm run start:backend:prod
+# Or run steps separately:
+npm run build:backend           # Compile TypeScript to JavaScript
+npm run start:backend:prod      # Run compiled production build
 ```
+
+**Important**: Production mode always runs precompiled JavaScript from `backend/dist/` to avoid runtime transformation errors.
+
+#### Backend Isolation & Verification
+```bash
+# Verify backend isolation (runs build + startup test + import scan)
+npm run verify:backend
+```
+
+This verification script ensures:
+- Backend compiles successfully without React Native dependencies
+- Server can start without TransformError
+- No forbidden imports (react-native, expo, react, etc.) in backend code
 
 #### Run All Services
 ```bash

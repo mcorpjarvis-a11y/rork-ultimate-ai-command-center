@@ -1,0 +1,46 @@
+{
+  "extends": "../eslint.config.js",
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-native",
+            "message": "react-native is not allowed in backend code. Backend must remain isolated from mobile dependencies."
+          },
+          {
+            "name": "react-native-web",
+            "message": "react-native-web is not allowed in backend code. Backend must remain isolated from mobile dependencies."
+          },
+          {
+            "name": "expo",
+            "message": "expo is not allowed in backend code. Backend must remain isolated from mobile dependencies."
+          },
+          {
+            "name": "expo-router",
+            "message": "expo-router is not allowed in backend code. Backend must remain isolated from mobile dependencies."
+          },
+          {
+            "name": "react",
+            "message": "react is not allowed in backend code. Backend is a Node.js server, not a React application."
+          },
+          {
+            "name": "react-dom",
+            "message": "react-dom is not allowed in backend code. Backend is a Node.js server, not a React application."
+          }
+        ],
+        "patterns": [
+          {
+            "group": ["expo-*"],
+            "message": "Expo modules are not allowed in backend code. Backend must remain isolated from mobile dependencies."
+          },
+          {
+            "group": ["@expo/*"],
+            "message": "Expo modules are not allowed in backend code. Backend must remain isolated from mobile dependencies."
+          }
+        ]
+      }
+    ]
+  }
+}
