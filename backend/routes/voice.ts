@@ -1,4 +1,6 @@
 import express, { Request, Response, Router } from 'express';
+import WhisperService from '../../services/voice/WhisperService';
+import UserProfileService from '../../services/user/UserProfileService';
 
 const router: Router = express.Router();
 
@@ -58,17 +60,54 @@ router.post('/stt', async (req: Request<{}, {}, STTRequest>, res: Response) => {
       return res.status(400).json({ error: 'Audio data is required' });
     }
 
-    // Return configuration needed message
-    res.json({
-      success: false,
-      message: 'Speech-to-text not configured. Use text input or add STT endpoint.',
-      guidance: {
-        steps: [
-          'Get API key from Google Cloud Console',
-          'Add GOOGLE_STT_API_KEY to .env file',
-          'Restart backend server'
-        ]
+    // Check for OpenAI API key from user profile or environment
+    let apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
+    
+    // Try to get from UserProfileService if available
+    try {
+      await UserProfileService.initialize();
+      const profile = UserProfileService.getCurrentProfile();
+      if (profile?.apiKeys?.openai) {
+        apiKey = profile.apiKeys.openai;
       }
+    } catch (error) {
+      console.log('[Voice/STT] Could not load user profile, using environment key');
+    }
+
+    // Check if Whisper service is available
+    if (!WhisperService.isAvailable(apiKey)) {
+      return res.json({
+        success: false,
+        message: 'Speech-to-text not configured. Please add an OpenAI API key.',
+        guidance: {
+          steps: [
+            'Get API key from https://platform.openai.com/api-keys',
+            'Add EXPO_PUBLIC_OPENAI_API_KEY to .env file or configure in app settings',
+            'Restart backend server or refresh the app'
+          ]
+        }
+      });
+    }
+
+    // Transcribe using Whisper
+    const result = await WhisperService.transcribe(audio, apiKey!, {
+      language: language || 'en',
+      response_format: 'json',
+    });
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        error: result.error,
+        message: 'Speech-to-text transcription failed'
+      });
+    }
+
+    res.json({
+      success: true,
+      text: result.text,
+      language: result.language,
+      duration: result.duration,
     });
   } catch (error) {
     console.error('[Voice/STT] Error:', error);
@@ -81,14 +120,31 @@ router.post('/stt', async (req: Request<{}, {}, STTRequest>, res: Response) => {
 });
 
 // Get voice configuration
-router.get('/config', (req: Request, res: Response) => {
+router.get('/config', async (req: Request, res: Response) => {
+  // Check for OpenAI API key
+  let apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
+  
+  try {
+    await UserProfileService.initialize();
+    const profile = UserProfileService.getCurrentProfile();
+    if (profile?.apiKeys?.openai) {
+      apiKey = profile.apiKeys.openai;
+    }
+  } catch (error) {
+    // Ignore profile loading errors
+  }
+
+  const sttAvailable = WhisperService.isAvailable(apiKey);
+
   res.json({
     ttsAvailable: true,
-    sttAvailable: false,
+    sttAvailable,
+    sttProvider: sttAvailable ? 'openai-whisper' : null,
     defaultVoice: 'en-GB-Wavenet-D',
     defaultLanguage: 'en-GB',
     defaultRate: 1.1,
-    defaultPitch: 0.9
+    defaultPitch: 0.9,
+    supportedAudioFormats: sttAvailable ? WhisperService.getSupportedFormats() : [],
   });
 });
 
