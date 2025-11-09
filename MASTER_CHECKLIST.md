@@ -18,6 +18,7 @@
 - [Quick Navigation](#quick-navigation)
 - [README - Project Overview](#readme---project-overview)
 - [Quick Start Guide](#quick-start-guide)
+- [Development & Build Flow](#development--build-flow)
 - [TESTING - Testing Strategy](#testing---testing-strategy)
 - [DONE - Completed Tasks](#done---completed-tasks)
 - [TODO - Remaining Tasks](#todo---remaining-tasks)
@@ -71,6 +72,7 @@ npm run build:apk        # Build Android APK
 
 ### Quick Links to Sections
 - [How to Get Started](#quick-start-guide)
+- [Development & Build Flow](#development--build-flow)
 - [Environment Setup](#environment-setup)
 - [Running Tests](#running-tests)
 - [Common Issues](#metro-troubleshooting)
@@ -266,6 +268,215 @@ TWITTER_API_KEY=your_twitter_key
 ### Testing in Browser
 
 Run `npm run start-web` to test in a web browser. Note: The browser preview is great for quick testing, but some native features may not be available.
+
+---
+
+## Development & Build Flow
+
+> **⚠️ IMPORTANT: ACTIVE DEVELOPMENT WORKFLOW**
+>
+> This section documents the **current development workflow** for testing on the Samsung Galaxy S25 Ultra.
+> **Production builds are NOT configured** until building and testing are complete.
+
+### Workflow Overview
+
+This is the standard development cycle for working on JARVIS:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   Development Cycle                          │
+│                                                              │
+│  1. BUILD HERE     →  2. PUSH TO TERMUX                     │
+│     (Development        (S25 Ultra Device)                   │
+│      Machine)                ↓                               │
+│                                                              │
+│  4. ITERATE        ←  3. TEST IN EXPO GO 54                 │
+│     (Fix Issues)       (On S25 Ultra)                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step 1: Build & Verify Locally
+
+**On your development machine:**
+
+```bash
+# Make your code changes
+# Then verify everything works locally
+
+# Run tests
+npm test
+
+# Verify Metro bundler
+npm run verify:metro
+
+# Build backend (if backend changes made)
+npm run build:backend
+
+# Lint your code
+npm run lint
+
+# Commit your changes
+git add .
+git commit -m "Your commit message"
+git push origin your-branch
+```
+
+### Step 2: Deploy to Termux (S25 Ultra)
+
+**On your Samsung Galaxy S25 Ultra in Termux:**
+
+```bash
+# Navigate to project directory
+cd ~/rork-ultimate-ai-command-center
+
+# Pull latest changes
+git pull origin your-branch
+
+# Install any new dependencies (if package.json changed)
+npm install
+
+# You're now ready to test!
+```
+
+### Step 3: Test in Expo Go 54
+
+**Still on S25 Ultra:**
+
+```bash
+# Start BOTH backend and frontend together
+npm run start:all
+
+# This command does:
+# 1. Starts the backend server (Express API)
+# 2. Starts Metro bundler (React Native)
+# 3. Displays QR code for Expo Go
+
+# Alternative: Start individually
+npm run dev:backend     # Backend only (with hot reload)
+npm start               # Frontend only (Metro bundler)
+```
+
+**In Expo Go app on S25 Ultra:**
+
+1. Open **Expo Go 54** app
+2. Scan the QR code displayed in Termux
+3. App will load and connect to your local backend
+4. Test all features thoroughly
+
+### Step 4: Iterate
+
+**If you find issues:**
+
+1. **Note the issue** on your development machine
+2. **Make fixes** to the code
+3. **Commit and push** changes
+4. **Repeat Step 2** (pull in Termux)
+5. **Expo Go will auto-reload** with your changes
+
+> **💡 Hot Reload**: For backend changes, use `npm run dev:backend` which automatically reloads when you save files.
+
+### Key Points
+
+✅ **DO:**
+- Always use `npm run start:all` for full-stack testing
+- Test on physical S25 Ultra device with Expo Go 54
+- Use `npm run dev:backend` for backend development (hot reload)
+- Run tests before pushing (`npm test`)
+- Commit and push frequently
+
+❌ **DON'T:**
+- Don't build production APK yet (not configured)
+- Don't use `npm run build:apk` during development
+- Don't test on iOS (not supported)
+- Don't skip tests before committing
+
+### Device & Environment Specifics
+
+**Hardware:**
+- Device: Samsung Galaxy S25 Ultra
+- OS: Android with Termux
+- Testing App: Expo Go 54
+
+**Software Stack:**
+- Node.js: 20.x LTS (in Termux)
+- npm: Latest version
+- Metro Bundler: Expo 54
+- Backend: Express.js (Node.js)
+
+### Troubleshooting Development Flow
+
+#### Issue: Can't connect to backend from Expo Go
+
+**Solution:**
+```bash
+# Check backend is running
+# You should see "Server is ONLINE" message
+
+# Verify PORT (default: 3000)
+# Make sure firewall allows connections
+
+# Try restarting both services
+npm run start:all
+```
+
+#### Issue: Metro bundler won't start
+
+**Solution:**
+```bash
+# Clear Metro cache
+npm run verify:metro
+
+# Or manually
+rm -rf .expo
+rm -rf node_modules/.cache
+npm start -- --clear
+```
+
+#### Issue: Changes not reflecting in Expo Go
+
+**Solution:**
+```bash
+# Force reload in Expo Go (shake device)
+# Or restart Metro bundler
+npm start -- --clear
+```
+
+#### Issue: Backend changes not loading
+
+**Solution:**
+```bash
+# Make sure using dev mode (hot reload)
+npm run dev:backend
+
+# Or restart backend
+# Ctrl+C to stop, then:
+npm run start:backend
+```
+
+### Backend-Specific Development
+
+For backend-only development (no frontend testing needed):
+
+```bash
+# Development mode (recommended)
+npm run dev:backend
+
+# This uses tsx with hot reload
+# Best for active development
+# Changes auto-reload on save
+```
+
+For more backend details, see [Backend Documentation](#backend-documentation) section.
+
+### When to Build Production
+
+**Production builds will be configured when:**
+- All features are implemented
+- All tests pass consistently
+- Performance is optimized
+- Ready for deployment
+
+**Until then**: Use the development flow above for all testing.
 
 ---
 
