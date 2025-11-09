@@ -56,15 +56,16 @@
 npm test                 # Run all tests (should show 142/142)
 npm run verify:metro     # Verify Metro bundler works
 npm run verify           # Quick pre-start verification
+npm run verify:backend   # Verify backend isolation and build
 npm run lint             # Check code quality
 
 # Development
 npm start                # Start Metro bundler
 npm run start:all        # Start backend + frontend
-npm run dev:backend      # Start backend with hot reload
+npm run dev:backend      # Start backend with hot reload (recommended for dev)
 
 # Build
-npm run build:backend    # Build backend TypeScript
+npm run build:backend    # Build backend with esbuild (isolated from RN)
 npm run build:apk        # Build Android APK
 ```
 
@@ -693,6 +694,22 @@ This section lists remaining tasks. Most major features (A-O) are complete. Focu
 - [x] U6: API metrics and monitoring ✅ (Completed: 2025-11-09)
 - [ ] U7: GraphQL endpoint (optional alternative to REST)
 
+#### U-Backend. Backend Isolation & Hardening (Completed: 2025-11-09)
+- [x] UB1: Remove DOM lib from backend/tsconfig.json ✅
+- [x] UB2: Add typeRoots restriction (only @types) ✅
+- [x] UB3: Exclude frontend directories from backend compilation ✅
+- [x] UB4: Switch from tsc to esbuild for backend builds ✅
+- [x] UB5: Mark React Native/Expo packages as external ✅
+- [x] UB6: Add ESLint no-restricted-imports for RN/Expo ✅
+- [x] UB7: Create verify-backend-isolated.js script ✅
+- [x] UB8: Add backend-verify.yml CI workflow ✅
+- [x] UB9: Add esbuild to devDependencies ✅
+- [x] UB10: Create BACKEND_DEV.md documentation ✅
+- [x] UB11: Fix esbuild TransformError on react-native ✅
+- [x] UB12: Update MASTER_CHECKLIST.md with backend hardening info ✅
+
+**Summary**: Backend now builds successfully with esbuild, isolated from React Native dependencies. No more TransformError when transforming react-native/index.js. Build system marks RN packages as external, lint catches forbidden imports, and CI verifies isolation. See BACKEND_DEV.md for complete details.
+
 #### V. Feature Enhancements
 - [ ] V1: Additional voice options (ElevenLabs, Azure TTS)
 - [ ] V2: Theme customization (dark/light mode, custom colors)
@@ -1208,9 +1225,42 @@ The JARVIS backend is a fully TypeScript-enabled Express.js server that provides
 - **Runtime**: Node.js 20+
 - **Language**: TypeScript 5.9.x
 - **Framework**: Express.js with full TypeScript types
-- **Build Tool**: TypeScript Compiler (tsc)
+- **Build Tool**: esbuild (with React Native packages as external)
 - **Dev Runtime**: tsx (for hot reloading)
 - **Module System**: CommonJS
+- **Isolation**: Backend isolated from React Native/Expo dependencies
+
+### Backend Isolation & Hardening
+
+**Status**: ✅ Complete (as of 2025-11-09)
+
+The backend has been hardened to prevent React Native/Expo coupling and DOM type leakage:
+
+#### Key Improvements
+
+1. **No DOM Types**: Removed `"DOM"` from `backend/tsconfig.json` lib array
+   - Only `["ES2020"]` lib is used
+   - No browser globals (window, document, etc.) available
+   - Prevents accidental browser API usage
+
+2. **esbuild Build System**: Switched from tsc to esbuild
+   - Marks React Native/Expo packages as external (not bundled)
+   - Prevents esbuild TransformError on `react-native/index.js`
+   - Faster builds with proper module handling
+
+3. **ESLint Safeguards**: Added `no-restricted-imports` rules
+   - Blocks: `react-native`, `expo`, `react`, `react-dom`
+   - Automatic detection of forbidden imports during linting
+   - Prevents accidental React Native coupling
+
+4. **CI Verification**: Added `backend-verify.yml` workflow
+   - Automatically builds backend on changes
+   - Runs verification checks
+   - Ensures continued isolation
+
+**Documentation**: See [BACKEND_DEV.md](../BACKEND_DEV.md) for complete details
+
+**Known Limitation**: Services folder imports React Native modules (AsyncStorage, Platform, etc.), causing runtime issues. Use `npm run dev:backend` for development. Future work: refactor services layer.
 
 ### Directory Structure
 
@@ -1280,23 +1330,37 @@ GOOGLE_CLIENT_ID=your_google_client_id
 
 ### Development Workflow
 
-#### Development Mode (Hot Reload)
+#### Development Mode (Hot Reload - Recommended)
 ```bash
 # Run with tsx watch (auto-reloads on file changes)
 npm run dev:backend
 
-# Or run without watch
-npm run start:backend
+# This uses tsx directly on TypeScript sources
+# Best for active development with hot reload
 ```
 
-#### Production Build
+#### Production Build & Run
 ```bash
-# Compile TypeScript to JavaScript
+# Build backend (compiles with esbuild)
 npm run build:backend
 
 # Run compiled production build
 npm run start:backend:prod
+
+# Or do both in one command
+npm run start:backend
 ```
+
+#### Backend Verification
+```bash
+# Build and verify backend isolation
+npm run verify:backend
+
+# This builds the backend and spawns a test server
+# to verify it starts without errors
+```
+
+**Note**: The `start:backend` script now builds first, then runs the compiled output. For development with hot reload, use `dev:backend` instead.
 
 #### Run All Services
 ```bash
