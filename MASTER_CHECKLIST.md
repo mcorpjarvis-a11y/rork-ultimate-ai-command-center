@@ -40,6 +40,7 @@
   - [Section O: Delivery Notes](#section-o-delivery-notes)
 - [CI/CD Pipeline Configuration](#cicd-pipeline-configuration)
 - [Deployment Guide](#deployment-guide)
+- [⚠️ Node.js Version Requirement](#️-nodejs-version-requirement)
 - [Metro Troubleshooting](#metro-troubleshooting)
 - [Security & Vulnerability Scanning](#security--vulnerability-scanning)
 - [Backend Documentation](#backend-documentation)
@@ -996,6 +997,110 @@ This section lists remaining tasks. Most major features (A-O) are complete. Focu
 2. Implement L4 (migration system)
 3. Remove obsolete docs
 4. Build and test production APK
+
+---
+
+## ⚠️ Node.js Version Requirement
+
+### Overview
+
+This project **requires Node.js 20.x LTS**. Node.js 21 or higher will cause the application to fail during startup.
+
+### Why This Matters
+
+React Native 0.81.x tooling (Metro bundler and esbuild) is **not compatible** with Node.js 21 or 22. Running the project on an unsupported Node version will result in:
+
+- **TransformError** during Metro bundling
+- Build failures with cryptic error messages
+- esbuild compilation errors
+
+### Automatic Version Checking
+
+The project includes a preflight check that validates your Node.js version before starting any services:
+
+```bash
+# Check your Node version manually
+npm run check:node
+
+# When you run start:all, version is checked automatically
+npm run start:all
+```
+
+**What happens on Node 21+:**
+- The preflight check stops startup immediately
+- A clear error message is displayed
+- Metro bundler never initializes (prevents confusing crashes)
+- Exit code 1 is returned
+
+**What happens on Node 18-20:**
+- ✅ Version check passes
+- Services start normally
+- No interruption to your workflow
+
+### Supported Versions
+
+| Node Version | Status | Notes |
+|--------------|--------|-------|
+| Node 20.x LTS | ✅ **Recommended** | Fully tested and optimal |
+| Node 18.x LTS | ✅ Supported | Works but 20.x preferred |
+| Node 17 or below | ❌ Too old | Missing required features |
+| Node 21 or above | ❌ Not compatible | Metro/esbuild will crash |
+
+### How to Fix Version Issues
+
+#### Using nvm (Recommended for Desktop/Linux)
+
+```bash
+# Install Node 20 LTS
+nvm install 20
+
+# Switch to Node 20
+nvm use 20
+
+# Set Node 20 as default
+nvm alias default 20
+
+# Verify the version
+node --version  # Should show v20.x.x
+```
+
+#### Using Termux (Android Devices)
+
+If you're developing on a Samsung Galaxy S25 Ultra or other Android device using Termux:
+
+```bash
+# Uninstall current Node.js
+pkg uninstall nodejs
+
+# Install Node.js LTS (will install compatible version)
+pkg install nodejs-lts
+
+# Verify the version
+node --version  # Should show v20.x.x
+```
+
+#### Direct Download
+
+Download Node.js 20 LTS from the official website:
+- [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+- Select "LTS (Long Term Support)" version
+
+### Troubleshooting
+
+**Problem:** I already have Node 20 but still get errors
+- Clear npm cache: `npm cache clean --force`
+- Remove node_modules: `rm -rf node_modules package-lock.json`
+- Reinstall: `npm install`
+
+**Problem:** nvm not found
+- Install nvm: [https://github.com/nvm-sh/nvm#installing-and-updating](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+**Problem:** Need different Node versions for different projects
+- Use nvm to switch between versions per project
+- Or use Docker containers for isolated environments
+
+---
+
 ## Metro Troubleshooting
 
 This section documents Metro bundler issues, solutions, and best practices for the Rork Ultimate AI Command Center project.

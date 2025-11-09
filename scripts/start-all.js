@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// Check Node.js version before starting any services
+require('./check-node-version');
+
 /**
  * JARVIS Unified Launcher
  * Starts both frontend and backend in a single command
@@ -14,18 +17,6 @@ console.log('\n🚀 ════════════════════
 console.log('🚀   JARVIS UNIFIED LAUNCHER');
 console.log('🚀   Starting Complete AI Command Center');
 console.log('🚀 ════════════════════════════════════════════════════════════\n');
-
-// Check Node version
-const nodeVersion = process.version;
-const majorVersion = parseInt(nodeVersion.slice(1).split('.')[0]);
-console.log(`📌 Node version: ${nodeVersion}`);
-
-if (majorVersion > 20) {
-  console.log('⚠️  WARNING: Node.js > 20 detected. Node 20.x LTS is recommended for Metro bundler.');
-  console.log('   You may experience TransformError issues. Consider downgrading to Node 20.\n');
-} else if (majorVersion === 20) {
-  console.log('✅ Node 20.x LTS detected (optimal for Metro bundler)\n');
-}
 
 // Check if --skip-update flag is provided
 const skipUpdate = process.argv.includes('--skip-update');
