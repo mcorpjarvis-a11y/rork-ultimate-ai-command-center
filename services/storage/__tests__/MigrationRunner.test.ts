@@ -6,12 +6,16 @@ import MigrationRunner from '../MigrationRunner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 describe('MigrationRunner', () => {
+  // Note: Tests may have interdependencies due to static migrations array
+  // In production, migrations are registered once at app startup
+  
   beforeEach(async () => {
-    // Clear all storage before each test
-    const allKeys = await AsyncStorage.getAllKeys();
-    if (allKeys.length > 0) {
-      await AsyncStorage.multiRemove(allKeys);
-    }
+    // Clear migrations to ensure clean state for each test
+    // Access private property for testing purposes
+    (MigrationRunner as any).migrations = [];
+    
+    // Clear AsyncStorage
+    await AsyncStorage.clear();
   });
 
   describe('Version Management', () => {

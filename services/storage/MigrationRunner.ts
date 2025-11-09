@@ -215,6 +215,8 @@ class MigrationRunner {
     console.warn('[MigrationRunner] Resetting migration system');
     await AsyncStorage.removeItem(this.VERSION_KEY);
     await AsyncStorage.removeItem(this.MIGRATION_HISTORY_KEY);
+    // Clear registered migrations
+    this.migrations = [];
   }
 }
 
