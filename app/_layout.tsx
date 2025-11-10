@@ -219,11 +219,13 @@ export default function RootLayout() {
 
   useEffect(() => {
     const handleAuthSuccess = () => {
-      console.log('[App] 🔄 Authenticated event received - navigating to app');
+      console.log('[App] 🔄 Authenticated event received - will re-initialize');
       setShowSignIn(false);
-      setIsAuthenticating(false);
-      // Navigate to home - let the app initialization happen naturally on next mount
-      router.replace('/');
+      // Reset flags to allow re-initialization after successful auth
+      setHasInitialized(false);
+      setIsAuthenticating(true);
+      setAppReady(false);
+      // Let the initialization effect run naturally with the new auth state
     };
 
     AuthManager.on('authenticated', handleAuthSuccess);
