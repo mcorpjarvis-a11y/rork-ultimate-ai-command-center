@@ -2,18 +2,18 @@
  * Dependency Compatibility Tests
  * 
  * These tests verify that critical dependencies are properly installed
- * and compatible with Expo SDK 54.
+ * and compatible with Expo SDK 54 and React Native 0.82.1.
  */
 
 describe('Dependency Compatibility', () => {
-  test('React version matches Expo SDK 54 requirements', () => {
+  test('React version matches React Native 0.82.1 requirements', () => {
     const React = require('react');
-    expect(React.version).toBe('18.2.0');
+    expect(React.version).toBe('19.1.1');
   });
 
   test('React DOM version matches React version', () => {
     const ReactDOM = require('react-dom');
-    expect(ReactDOM.version).toBe('18.2.0');
+    expect(ReactDOM.version).toBe('19.1.1');
   });
 
   test('React Native is properly installed', () => {
