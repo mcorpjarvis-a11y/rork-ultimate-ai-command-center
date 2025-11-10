@@ -11,11 +11,16 @@ require('./check-node-version');
 const { spawn, execSync } = require('child_process');
 const os = require('os');
 
-const isWindows = os.platform() === 'win32';
+const platform = os.platform();
+const isWindows = platform === 'win32';
+const isMac = platform === 'darwin';
+const isLinux = platform === 'linux';
 
 console.log('\n🚀 ════════════════════════════════════════════════════════════');
 console.log('🚀   JARVIS UNIFIED LAUNCHER');
 console.log('🚀   Starting Complete AI Command Center');
+console.log('🚀 ════════════════════════════════════════════════════════════');
+console.log(`🖥️   Platform: ${platform} (${isMac ? 'macOS' : isWindows ? 'Windows' : 'Linux'})`);
 console.log('🚀 ════════════════════════════════════════════════════════════\n');
 
 // Check if --skip-update flag is provided

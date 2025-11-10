@@ -72,10 +72,13 @@ npm run dev:backend      # Development mode with hot reload
 
 ## Important Notes
 
-- **Platform**: Android only (iOS not supported)
+- **Target Platform**: Android only (iOS target not supported)
+- **Development Platform**: Works on Windows, macOS, and Linux
 - **Node Version**: Node 20.x LTS recommended (current: 20.19.5)
 - **Framework**: React Native + Expo 54
 - **Documentation**: All in [MASTER_CHECKLIST.md](./MASTER_CHECKLIST.md)
+
+> **Note**: While the mobile app targets Android only, you can develop on any platform (Windows, macOS, Linux). The iOS target platform is not supported, but macOS is fully supported for development.
 
 ## Project Structure
 
