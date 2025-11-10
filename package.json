@@ -25,6 +25,9 @@
     "test:api-keys": "node scripts/test-api-keys.js",
     "test:metro-config": "node scripts/test-metro-config.js",
     "test:provider-registry": "node scripts/test-provider-registry.js",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
     "verify": "npm run verify:metro && npm test && npm run lint",
     "verify:backend": "npm run build:backend && node scripts/scan-backend-imports.js && node scripts/verify-backend-isolated.js",
     "verify:startup": "node scripts/test-startup.js",
@@ -107,6 +110,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@expo/ngrok": "^4.1.0",
+    "@playwright/test": "1.56.1",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.3.3",
     "@types/cors": "^2.8.19",
