@@ -41,6 +41,7 @@ class AuthManager {
     this.eventListeners.set('connected', new Set());
     this.eventListeners.set('disconnected', new Set());
     this.eventListeners.set('token_refreshed', new Set());
+    this.eventListeners.set('authenticated', new Set());
   }
 
   /**
@@ -83,6 +84,12 @@ class AuthManager {
 
       // Emit connected event
       this.emit('connected', provider, { tokenData, profile: authResponse.profile });
+
+      // Emit authenticated event for post-login flows
+      this.emit('authenticated', provider, {
+        tokenData,
+        profile: authResponse.profile,
+      });
 
       console.log(`[AuthManager] Successfully authenticated ${provider}`);
       return true;
@@ -293,6 +300,13 @@ class AuthManager {
     if (listeners) {
       listeners.add(listener);
     }
+  }
+
+  /**
+   * Emit authentication success manually (for non-OAuth flows)
+   */
+  notifyAuthenticated(provider: string, data?: any): void {
+    this.emit('authenticated', provider, data);
   }
 
   /**

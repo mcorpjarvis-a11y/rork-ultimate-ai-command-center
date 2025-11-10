@@ -9,6 +9,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import SignInScreen from "@/screens/Onboarding/SignInScreen";
 import JarvisInitializationService from "@/services/JarvisInitializationService";
 import MasterProfile from "@/services/auth/MasterProfile";
+import AuthManager from "@/services/auth/AuthManager";
 import SecureKeyStorage from "@/services/security/SecureKeyStorage";
 import ConfigValidator from "@/services/config/ConfigValidator";
 import OnboardingStatus from "@/services/onboarding/OnboardingStatus";
@@ -43,6 +44,7 @@ export default function RootLayout() {
   const [appReady, setAppReady] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const [initSequence, setInitSequence] = useState(0);
 
   useEffect(() => {
     async function initializeApp() {
@@ -135,7 +137,7 @@ export default function RootLayout() {
     }
 
     initializeApp();
-    
+
     // Cleanup on unmount
     return () => {
       JarvisAlwaysListeningService.stop();
@@ -143,7 +145,23 @@ export default function RootLayout() {
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
     };
-  }, [router]);
+  }, [router, initSequence]);
+
+  useEffect(() => {
+    const handleAuthSuccess = () => {
+      console.log('[App] 🔄 Authenticated event received - restarting initialization');
+      setShowSignIn(false);
+      setAppReady(false);
+      setIsAuthenticating(true);
+      setInitSequence((value) => value + 1);
+    };
+
+    AuthManager.on('authenticated', handleAuthSuccess);
+
+    return () => {
+      AuthManager.off('authenticated', handleAuthSuccess);
+    };
+  }, []);
 
   async function checkAuthentication(): Promise<boolean> {
     try {
