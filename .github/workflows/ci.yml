@@ -117,16 +117,29 @@ jobs:
           npm install -g wscat
           timeout 5s wscat -c ws://localhost:3000/ws --execute "ping" || echo "WebSocket test completed"
       
-      - name: Verify Metro bundler
-        run: npm run verify:metro
-      
-      - name: Stop backend server
-        if: always()
+      - name: Stop backend server before Metro verification
         run: |
           if [ -f backend.pid ]; then
             kill $(cat backend.pid) || true
             rm backend.pid
+            sleep 2
           fi
+      
+      - name: Verify Metro bundler
+        run: npm run verify:metro
+        env:
+          CI: true
+          NODE_ENV: test
+      
+      - name: Final cleanup
+        if: always()
+        run: |
+          # Ensure all backend processes are stopped
+          pkill -f "node backend/dist/server.express.js" 2>/dev/null || true
+          if [ -f backend.pid ]; then
+            rm backend.pid
+          fi
+          sleep 1
 
   # Job 4: E2E Tests with Playwright
   e2e-tests:
@@ -182,10 +195,14 @@ jobs:
       - name: Stop backend server
         if: always()
         run: |
+          # Try to kill using PID file first
           if [ -f backend.pid ]; then
-            kill $(cat backend.pid) || true
+            kill $(cat backend.pid) 2>/dev/null || true
             rm backend.pid
           fi
+          # Also try to kill any remaining backend processes
+          pkill -f "node backend/dist/server.express.js" 2>/dev/null || true
+          sleep 1
 
   # Job 5: Build Verification
   build:
