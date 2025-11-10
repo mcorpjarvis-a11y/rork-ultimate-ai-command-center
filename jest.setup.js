@@ -153,46 +153,103 @@ jest.mock('expo-speech', () => ({
 }));
 
 // Mock expo-audio
-jest.mock('expo-audio', () => ({
-  setIsAudioActiveAsync: jest.fn(() => Promise.resolve()),
-  setAudioModeAsync: jest.fn(() => Promise.resolve()),
-  RecordingPresets: {
-    HIGH_QUALITY: {
-      isMeteringEnabled: true,
-      android: {
-        extension: '.m4a',
-        outputFormat: 2,
-        audioEncoder: 3,
-        sampleRate: 44100,
-        numberOfChannels: 2,
-        bitRate: 128000,
-      },
-      ios: {
-        extension: '.m4a',
-        outputFormat: 'MPEG4AAC',
-        audioQuality: 127,
-        sampleRate: 44100,
-        numberOfChannels: 2,
-        bitRate: 128000,
-        linearPCMBitDepth: 16,
-        linearPCMIsBigEndian: false,
-        linearPCMIsFloat: false,
+jest.mock('expo-audio', () => {
+  const permissionResponse = {
+    status: 'granted',
+    granted: true,
+    canAskAgain: true,
+    expires: 'never',
+  };
+
+  return {
+    setIsAudioActiveAsync: jest.fn(async () => {}),
+    setAudioModeAsync: jest.fn(async () => {}),
+    requestRecordingPermissionsAsync: jest.fn(async () => permissionResponse),
+    getRecordingPermissionsAsync: jest.fn(async () => permissionResponse),
+    RecordingPresets: {
+      HIGH_QUALITY: {
+        isMeteringEnabled: true,
+        android: {
+          extension: '.m4a',
+          outputFormat: 2,
+          audioEncoder: 3,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+        },
+        ios: {
+          extension: '.m4a',
+          outputFormat: 'MPEG4AAC',
+          audioQuality: 127,
+          sampleRate: 44100,
+          numberOfChannels: 2,
+          bitRate: 128000,
+          linearPCMBitDepth: 16,
+          linearPCMIsBigEndian: false,
+          linearPCMIsFloat: false,
+        },
       },
     },
-  },
-}));
+  };
+});
 
 // Mock expo-audio AudioModule
-jest.mock('expo-audio/build/AudioModule', () => ({
-  __esModule: true,
-  default: {
-    createRecorder: jest.fn(() => Promise.resolve({ id: 'mock-recorder' })),
-    prepareRecorder: jest.fn(() => Promise.resolve()),
-    startRecording: jest.fn(() => Promise.resolve()),
-    stopRecording: jest.fn(() => Promise.resolve({ uri: 'mock://audio.m4a' })),
-    getStatus: jest.fn(() => Promise.resolve({ isRecording: false })),
-  },
-}));
+jest.mock('expo-audio/build/AudioModule', () => {
+  const permissionResponse = {
+    status: 'granted',
+    granted: true,
+    canAskAgain: true,
+    expires: 'never',
+  };
+
+  class MockAudioRecorder {
+    constructor() {
+      this.uri = 'mock://audio.m4a';
+      this._isRecording = false;
+    }
+
+    prepareToRecordAsync = jest.fn(async () => {});
+
+    record = jest.fn(() => {
+      this._isRecording = true;
+    });
+
+    stop = jest.fn(async () => {
+      this._isRecording = false;
+      return { uri: this.uri };
+    });
+
+    getStatus = jest.fn(() => ({
+      canRecord: true,
+      isRecording: this._isRecording,
+      durationMillis: this._isRecording ? 1000 : 0,
+      metering: this._isRecording ? 0.5 : 0,
+      uri: this.uri,
+    }));
+  }
+
+  class MockAudioPlayer {
+    constructor() {
+      this.play = jest.fn();
+      this.pause = jest.fn();
+      this.stop = jest.fn();
+      this.replace = jest.fn();
+      this.remove = jest.fn();
+    }
+  }
+
+  return {
+    __esModule: true,
+    default: {
+      setIsAudioActiveAsync: jest.fn(async () => {}),
+      setAudioModeAsync: jest.fn(async () => {}),
+      requestRecordingPermissionsAsync: jest.fn(async () => permissionResponse),
+      getRecordingPermissionsAsync: jest.fn(async () => permissionResponse),
+      AudioRecorder: MockAudioRecorder,
+      AudioPlayer: MockAudioPlayer,
+    },
+  };
+});
 
 // Mock expo-speech-recognition
 jest.mock('expo-speech-recognition', () => ({
