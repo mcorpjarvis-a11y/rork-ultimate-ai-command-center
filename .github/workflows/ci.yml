@@ -63,6 +63,7 @@ jobs:
       
       - name: Run unit tests
         run: npm test -- --coverage --maxWorkers=2 --forceExit --detectOpenHandles
+        continue-on-error: false
         env:
           CI: true
           USE_SOCIAL_FIXTURES: true
@@ -334,30 +335,31 @@ jobs:
           echo "Build: ${{ needs.build.result }}"
           echo "Security: ${{ needs.security.result }}"
           
-          # Check for failures
+          # Check for failures or cancellations
           failed=0
           
-          if [ "${{ needs.lint.result }}" == "failure" ]; then
-            echo "❌ Lint job failed"
+          if [[ "${{ needs.lint.result }}" != "success" ]] && [[ "${{ needs.lint.result }}" != "skipped" ]]; then
+            echo "❌ Lint job failed or was cancelled"
             failed=1
           fi
           
-          if [ "${{ needs.unit-tests.result }}" == "failure" ]; then
-            echo "❌ Unit tests job failed"
+          if [[ "${{ needs.unit-tests.result }}" != "success" ]] && [[ "${{ needs.unit-tests.result }}" != "skipped" ]]; then
+            echo "❌ Unit tests job failed or was cancelled"
             failed=1
           fi
           
-          if [ "${{ needs.integration-tests.result }}" == "failure" ]; then
-            echo "❌ Integration tests job failed"
+          if [[ "${{ needs.integration-tests.result }}" != "success" ]] && [[ "${{ needs.integration-tests.result }}" != "skipped" ]]; then
+            echo "❌ Integration tests job failed or was cancelled"
             failed=1
           fi
           
-          if [ "${{ needs.build.result }}" == "failure" ]; then
-            echo "❌ Build job failed"
+          if [[ "${{ needs.build.result }}" != "success" ]] && [[ "${{ needs.build.result }}" != "skipped" ]]; then
+            echo "❌ Build job failed or was cancelled"
             failed=1
           fi
           
-          if [ "${{ needs.security.result }}" == "failure" ]; then
+          # Security is non-blocking
+          if [[ "${{ needs.security.result }}" == "failure" ]]; then
             echo "⚠️  Security scan had issues (non-blocking)"
           fi
           

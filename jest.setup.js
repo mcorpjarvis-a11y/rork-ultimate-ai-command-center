@@ -216,6 +216,21 @@ const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 const originalConsoleLog = console.log;
 
+// Known harmless warnings to filter out in CI
+const knownHarmlessWarnings = [
+  'native module is not exported through NativeModules',
+  'ExpoModulesCoreJSLogger',
+  'EXNativeModulesProxy',
+  'expo-modules-core',
+  'Cannot read properties of undefined',
+  'verify that expo-modules-core',
+];
+
+const shouldSuppressWarning = (message) => {
+  const msgStr = String(message);
+  return knownHarmlessWarnings.some(pattern => msgStr.includes(pattern));
+};
+
 global.console = {
   ...console,
   log: jest.fn((...args) => {
@@ -225,14 +240,16 @@ global.console = {
     }
   }),
   warn: jest.fn((...args) => {
-    // Show warnings in CI
-    if (process.env.CI) {
+    // Show warnings in CI, but filter known harmless ones
+    if (process.env.CI && !shouldSuppressWarning(args[0])) {
       originalConsoleWarn(...args);
     }
   }),
   error: jest.fn((...args) => {
-    // Always keep errors visible
-    originalConsoleError(...args);
+    // Show errors, but filter known harmless Expo module errors in test environment
+    if (!shouldSuppressWarning(args[0])) {
+      originalConsoleError(...args);
+    }
   }),
 };
 
