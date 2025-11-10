@@ -408,7 +408,7 @@ class JarvisAlwaysListeningService {
       console.log('[AlwaysListening] Command timeout reached');
       this.isProcessingCommand = false;
       this.commandTimeoutHandle = null;
-    }, this.config.commandTimeout * 1000);
+    }, this.config.commandTimeout * 1000) as unknown as NodeJS.Timeout;
 
     // Remove wake word from transcript and check if there's a command already
     const commandText = transcript.replace(new RegExp(this.config.wakeWord, 'gi'), '').trim();
