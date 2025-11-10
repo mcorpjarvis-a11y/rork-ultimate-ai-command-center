@@ -59,21 +59,31 @@ export default function RootLayout() {
     setMounted(true);
     console.log('[App] Component mounted');
     
-    // Start a safety timer to hide splash after 3 seconds no matter what
+    // Start a safety timer to hide splash and show sign-in after 8 seconds no matter what
+    // This prevents users from being stuck on a loading screen indefinitely
     const safetyTimer = setTimeout(async () => {
-      console.log('[Splash] 3s safety timer - hiding splash');
+      console.log('[Splash] 8s safety timer - hiding splash and forcing sign-in if still loading');
       try {
         await SplashScreen.hideAsync();
         console.log('[Splash] ✅ Hidden by safety timer');
       } catch (e) {
         console.log('[Splash] Safety timer hide failed (may already be hidden):', e);
       }
-    }, 3000);
+      
+      // If still authenticating after 8s, force sign-in screen
+      setIsAuthenticating(false);
+      if (!appReady) {
+        console.log('[Splash] Safety timer: forcing sign-in screen due to timeout');
+        setShowSignIn(true);
+      }
+    }, 8000);
 
     return () => clearTimeout(safetyTimer);
-  }, []);
+  }, [appReady]);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function initializeApp() {
       try {
         console.log('[App] 🚀 Starting app initialization...');
@@ -94,6 +104,8 @@ export default function RootLayout() {
         // Step 1: Test SecureStorage on app startup
         console.log('[App] Step 1: Testing secure storage...');
         const storageWorks = await SecureKeyStorage.testSecureStorage();
+        if (!isMounted) return; // Check if component is still mounted
+        
         if (!storageWorks) {
           console.warn('[App] ⚠️  SecureStorage not fully functional, some features may be limited');
         } else {
@@ -104,17 +116,30 @@ export default function RootLayout() {
         console.log('[App] Steps 2-4: Checking authentication, OAuth, and onboarding in parallel...');
         
         const [isAuthenticated, oauthValid, onboardingComplete] = await Promise.all([
-          checkAuthentication(),
-          OAuthRequirementService.hasValidOAuthProfile(),
-          OnboardingStatus.isOnboardingComplete()
+          checkAuthentication().catch(err => {
+            console.error('[App] Authentication check failed:', err);
+            return false;
+          }),
+          OAuthRequirementService.hasValidOAuthProfile().catch(err => {
+            console.error('[App] OAuth validation failed:', err);
+            return false;
+          }),
+          OnboardingStatus.isOnboardingComplete().catch(err => {
+            console.error('[App] Onboarding check failed:', err);
+            return false;
+          })
         ]);
+        
+        if (!isMounted) return; // Check if component is still mounted
         
         // Check authentication result
         if (!isAuthenticated) {
           console.log('[App] ❌ No valid master profile found, showing sign-in');
           console.log('[App] 🔐 OAuth login REQUIRED to proceed');
-          setShowSignIn(true);
-          setIsAuthenticating(false);
+          if (isMounted) {
+            setShowSignIn(true);
+            setIsAuthenticating(false);
+          }
           return;
         }
         console.log('[App] ✅ Authentication check passed');
@@ -122,8 +147,10 @@ export default function RootLayout() {
         // Check OAuth validation result
         if (!oauthValid) {
           console.log('[App] ❌ OAuth providers not connected, showing sign-in');
-          setShowSignIn(true);
-          setIsAuthenticating(false);
+          if (isMounted) {
+            setShowSignIn(true);
+            setIsAuthenticating(false);
+          }
           return;
         }
         console.log('[App] ✅ OAuth validation passed');
@@ -132,12 +159,13 @@ export default function RootLayout() {
         OAuthRequirementService.logOAuthStatus();
 
         // Check onboarding status result
-        
         if (!onboardingComplete) {
           console.log('[App] ⚠️  Profile exists but onboarding not complete, redirecting to wizard');
-          setIsAuthenticating(false);
-          // Let the router navigate to permissions screen
-          router.replace('/onboarding/permissions');
+          if (isMounted) {
+            setIsAuthenticating(false);
+            // Let the router navigate to permissions screen
+            router.replace('/onboarding/permissions');
+          }
           return;
         }
         
@@ -149,15 +177,21 @@ export default function RootLayout() {
         console.log('[App] Step 6: Initializing JARVIS with live data...');
         await initializeJarvis();
         
+        if (!isMounted) return; // Check if component is still mounted
+        
         setAppReady(true);
         console.log('[App] ✅ JARVIS initialized and ready');
         console.log('[App] 🎯 App initialization complete - All systems operational');
       } catch (error) {
         console.error('[App] ❌ App initialization error:', error);
         // Show sign-in on error
-        setShowSignIn(true);
+        if (isMounted) {
+          setShowSignIn(true);
+        }
       } finally {
-        setIsAuthenticating(false);
+        if (isMounted) {
+          setIsAuthenticating(false);
+        }
       }
     }
 
@@ -165,6 +199,7 @@ export default function RootLayout() {
 
     // Cleanup on unmount
     return () => {
+      isMounted = false;
       JarvisAlwaysListeningService.stop();
       SchedulerService.stop();
       WebSocketService.disconnect();
@@ -217,29 +252,45 @@ export default function RootLayout() {
     // 1. Not authenticating anymore (completed or failed)
     // 2. App is ready
     // 3. Showing sign-in screen
+    // This ensures we ALWAYS show the UI, even if there are errors
     if (!isAuthenticating || appReady || showSignIn) {
       console.log('[Splash] Condition met to hide splash - hiding now');
-      hideSplash();
+      // Small delay to ensure state has been updated
+      setTimeout(() => {
+        hideSplash();
+      }, 100);
       return; // Exit early, don't set up timeout
     }
     
-    console.log('[Splash] Still initializing, setting up 10s fallback timeout...');
+    console.log('[Splash] Still initializing, setting up 5s fallback timeout...');
 
-    // Fallback: force hide after 10s if initialization stalls
+    // Fallback: force hide after 5s if initialization stalls
+    // Reduced from 10s to 5s for better UX
     const timeout = setTimeout(async () => {
       if (!splashHidden) {
-        console.warn("⏱️  Splash timeout reached (10s) - forcing hide");
+        console.warn("⏱️  Splash timeout reached (5s) - forcing hide and showing sign-in");
         try {
           await SplashScreen.hideAsync();
           setSplashHidden(true);
+          // If still authenticating after 5s, something is wrong - show sign-in
+          if (isAuthenticating) {
+            console.log('[Splash] Timeout occurred, forcing transition to sign-in screen');
+            setIsAuthenticating(false);
+            setShowSignIn(true);
+          }
           console.log("✅ Splash hidden via timeout fallback");
           console.log("🎉 App mounted and visible (via timeout)");
         } catch (e) {
           console.log("❌ Splash hide failed on timeout (may already be hidden):", e);
           setSplashHidden(true); // Mark as hidden anyway
+          // Still force sign-in on timeout
+          if (isAuthenticating) {
+            setIsAuthenticating(false);
+            setShowSignIn(true);
+          }
         }
       }
-    }, 10000);
+    }, 5000);
 
     return () => {
       console.log('[Splash] Cleaning up timeout');

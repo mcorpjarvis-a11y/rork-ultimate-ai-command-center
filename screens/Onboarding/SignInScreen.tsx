@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Image,
   Alert,
   TextInput,
   KeyboardAvoidingView,
@@ -46,9 +45,16 @@ export default function SignInScreen() {
       const profile = await MasterProfile.getMasterProfile();
       
       if (profile) {
-        // Profile exists - let _layout.tsx handle routing based on onboarding status
-        console.log('[SignInScreen] Existing profile found, redirecting to app');
-        router.replace('/');
+        // Only redirect if profile has OAuth providers connected
+        // Otherwise, user needs to connect OAuth through this sign-in screen
+        const hasOAuth = profile.connectedProviders && profile.connectedProviders.length > 0;
+        
+        if (hasOAuth) {
+          console.log('[SignInScreen] Existing profile with OAuth found, redirecting to app');
+          router.replace('/');
+        } else {
+          console.log('[SignInScreen] Profile exists but no OAuth connected, staying on sign-in');
+        }
       }
     } catch (error) {
       console.error('[SignInScreen] Error checking profile:', error);
@@ -58,17 +64,11 @@ export default function SignInScreen() {
   }, [router]);
 
   useEffect(() => {
-    let mounted = true;
-    
     const init = async () => {
       await checkExistingProfile();
     };
     
     init();
-    
-    return () => {
-      mounted = false;
-    };
   }, [checkExistingProfile]);
 
   const handleEmailAuth = useCallback(async () => {
@@ -97,13 +97,13 @@ export default function SignInScreen() {
           name: name.trim(),
         });
 
-        // Create master profile
+        // Create master profile with email as a connected provider
         const masterProfile: MasterProfileType = {
           id: `user_${Date.now()}`,
           email: email.trim(),
           name: name.trim(),
           createdAt: new Date().toISOString(),
-          connectedProviders: [],
+          connectedProviders: ['email'], // Email is a valid authentication provider
         };
 
         await MasterProfile.saveMasterProfile(masterProfile);
@@ -128,14 +128,18 @@ export default function SignInScreen() {
         let masterProfile = await MasterProfile.getMasterProfile();
         
         if (!masterProfile) {
-          // Create profile if it doesn't exist
+          // Create profile if it doesn't exist with email as connected provider
           masterProfile = {
             id: `user_${Date.now()}`,
             email: email.trim(),
             name: name.trim() || 'User',
             createdAt: new Date().toISOString(),
-            connectedProviders: [],
+            connectedProviders: ['email'], // Email is a valid authentication provider
           };
+          await MasterProfile.saveMasterProfile(masterProfile);
+        } else if (!masterProfile.connectedProviders || masterProfile.connectedProviders.length === 0) {
+          // Update profile to include email as connected provider if it's missing
+          masterProfile.connectedProviders = ['email'];
           await MasterProfile.saveMasterProfile(masterProfile);
         }
 
@@ -253,11 +257,11 @@ export default function SignInScreen() {
         {
           text: 'Skip',
           onPress: async () => {
-            // Create a minimal anonymous profile
+            // Create a minimal anonymous profile with 'anonymous' as provider
             const anonymousProfile: MasterProfileType = {
               id: `anon_${Date.now()}`,
               createdAt: new Date().toISOString(),
-              connectedProviders: [],
+              connectedProviders: ['anonymous'], // Anonymous is treated as a valid provider
             };
             
             await MasterProfile.saveMasterProfile(anonymousProfile);
