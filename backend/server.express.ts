@@ -134,23 +134,14 @@ app.get('/healthz', (_req: Request, res: Response) => {
 
 // Readiness probe - checks if server is ready to accept traffic
 app.get('/readyz', (_req: Request, res: Response) => {
-  // Check if server is ready (all services initialized)
-  const isReady = true; // Can add more sophisticated checks here
-  
-  if (isReady) {
-    res.status(200).json({
-      status: 'ready',
-      timestamp: new Date().toISOString(),
-      websocket: {
-        clients: wsManager.getClientCount()
-      }
-    });
-  } else {
-    res.status(503).json({
-      status: 'not ready',
-      timestamp: new Date().toISOString()
-    });
-  }
+  // TODO: Implement more sophisticated readiness checks (e.g., database, external services, etc.)
+  res.status(200).json({
+    status: 'ready',
+    timestamp: new Date().toISOString(),
+    websocket: {
+      clients: wsManager.getClientCount()
+    }
+  });
 });
 
 // API Routes
