@@ -30,7 +30,7 @@ test.describe('WebSocket Connection', () => {
     await page.goto('http://localhost:3000/healthz');
     
     // Wait for any delayed errors
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState('networkidle');
     
     // Should have no unhandled promise rejections or errors
     expect(errors).toHaveLength(0);
