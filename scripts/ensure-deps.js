@@ -21,7 +21,7 @@ if (isCI || skipRequested || offlineMode) {
   if (skipRequested) reasons.push('SKIP_ENSURE_DEPS flag');
   if (offlineMode) reasons.push('offline mode');
 
-  console.log(`[ensure-deps] Skipping dependency alignment (${reasons.join(', ') || 'no internet detected'})`);
+  console.log(`[ensure-deps] Skipping dependency alignment (${reasons.join(', ')})`);
   console.log('[ensure-deps] Install will rely on package-lock.json versions.');
   process.exit(0);
 }
