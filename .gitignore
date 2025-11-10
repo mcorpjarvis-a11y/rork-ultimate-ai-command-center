@@ -64,3 +64,4 @@ docs-archive-consolidated/
 
 # Temporary files
 /tmp/
+coverage/
