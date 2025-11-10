@@ -140,7 +140,9 @@ class JarvisAlwaysListeningService {
       console.log('[AlwaysListening] ✅ Always-listening service started successfully');
       return true;
     } catch (error) {
-      console.error('[AlwaysListening] Failed to start:', error);
+      console.warn('[AlwaysListening] ⚠️ Failed to start (gracefully degrading):', error);
+      console.info('[AlwaysListening] Speech recognition unavailable - text input mode available');
+      // Don't throw - allow app to continue with text-based input
       return false;
     }
   }

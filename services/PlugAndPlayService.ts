@@ -753,15 +753,18 @@ class PlugAndPlayService {
 
   async initialize(): Promise<void> {
     try {
+      console.log('[PlugAndPlay] Initializing backend connectivity...');
       const connected = await this.checkBackendConnection();
       if (connected) {
-        console.log('[PlugAndPlay] Backend connected ✓ - Full features available');
+        console.log('[PlugAndPlay] ✅ Backend connected - Full features available');
       } else {
-        console.warn('[PlugAndPlay] Backend offline - Operating in fallback mode');
-        console.warn('[PlugAndPlay] Some features may use mock data until backend is available');
+        console.warn('[PlugAndPlay] ⚠️ Backend offline - Operating in fallback mode');
+        console.info('[PlugAndPlay] Local features remain available');
       }
     } catch (error) {
-      console.error('[PlugAndPlay] Initialization error:', error);
+      console.warn('[PlugAndPlay] ⚠️ Initialization error (gracefully degrading):', error);
+      console.info('[PlugAndPlay] Continuing with local-only features');
+      // Don't throw - allow app to continue without backend
     }
   }
 }

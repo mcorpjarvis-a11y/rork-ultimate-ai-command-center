@@ -155,8 +155,10 @@ class JarvisListenerService {
 
     // For native platforms, check if STT is configured
     if (!this.isSTTConfigured()) {
-      console.warn('[JarvisListener] Continuous listening requires STT endpoint configuration');
-      await JarvisVoiceService.speak('My apologies, sir. Continuous listening requires Speech-to-Text configuration. Please configure EXPO_PUBLIC_STT_URL in your environment.');
+      console.warn('[JarvisListener] ⚠️ Continuous listening requires STT endpoint configuration');
+      console.info('[JarvisListener] Gracefully degrading - text input mode available');
+      await JarvisVoiceService.speak('My apologies, sir. Continuous listening requires Speech-to-Text configuration. Text input mode is available.');
+      // Don't throw - allow app to continue with text input
       return;
     }
 

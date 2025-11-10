@@ -59,6 +59,8 @@ import contentRoutes from './routes/content';
 import monetizationRoutes from './routes/monetization';
 // eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import iotRoutes from './routes/iot';
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
+import servicesRoutes from './routes/services';
 
 // Import WebSocket manager
 // eslint-disable-next-line import/first -- Environment must be validated before importing routes
@@ -157,6 +159,7 @@ app.use('/api/trends', trendsRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/monetization', monetizationRoutes);
 app.use('/api/iot', iotRoutes);
+app.use('/api/services', servicesRoutes);
 
 // tRPC support (backwards compatibility)
 app.use('/trpc', (req: Request, res: Response) => {
