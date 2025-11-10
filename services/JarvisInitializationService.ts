@@ -395,7 +395,6 @@ class JarvisInitializationService {
     // Test the provider
     try {
       // Reload keys in FreeAIService
-      const FreeAIService = (await import('./ai/FreeAIService')).default;
       await FreeAIService.loadAPIKeys();
       await FreeAIService.testProvider(providerId);
       
