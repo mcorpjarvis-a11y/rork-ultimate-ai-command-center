@@ -19,7 +19,14 @@ console.log('🚀   Starting Complete AI Command Center');
 console.log('🚀 ════════════════════════════════════════════════════════════\n');
 
 // Check if --skip-update flag is provided
-const skipUpdate = process.argv.includes('--skip-update');
+const normalize = (value) => String(value || '').toLowerCase();
+const isTruthy = (value) => ['1', 'true', 'yes', 'on'].includes(normalize(value));
+
+const skipUpdate =
+  process.argv.includes('--skip-update') ||
+  isTruthy(process.env.SKIP_ENSURE_DEPS) ||
+  isTruthy(process.env.CI) ||
+  isTruthy(process.env.GITHUB_ACTIONS);
 
 if (!skipUpdate) {
   console.log('🔍 Checking dependencies...\n');
@@ -65,7 +72,7 @@ if (!skipUpdate) {
     console.log('Continuing with current dependencies...\n');
   }
 } else {
-  console.log('⏭️  Skipping dependency update (--skip-update flag provided)\n');
+  console.log('⏭️  Skipping dependency update (skip flag or CI/offline environment detected)\n');
 }
 
 let backendRunning = false;
@@ -215,7 +222,11 @@ function checkAllReady() {
     console.log('✅ ════════════════════════════════════════════════════════════');
     console.log('\n🎯 Backend: http://localhost:3000');
     console.log('📱 Frontend: Check Expo output for QR code\n');
-    
+    console.log('🛠️  Onboarding sequence once the Expo client opens:');
+    console.log('   1. Sign in with Google on the initial login screen to create your master profile.');
+    console.log('   2. Grant all permissions in the Permission Manager when it appears.');
+    console.log('   3. Complete the Startup Wizard to connect Jarvis and finish onboarding.\n');
+
     // Perform health checks
     performHealthChecks();
   }

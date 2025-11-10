@@ -8,6 +8,24 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
+const normalize = (value) => String(value || '').toLowerCase();
+const isTruthy = (value) => ['1', 'true', 'yes', 'on'].includes(normalize(value));
+
+const isCI = isTruthy(process.env.CI) || isTruthy(process.env.GITHUB_ACTIONS);
+const skipRequested = isTruthy(process.env.SKIP_ENSURE_DEPS);
+const offlineMode = isTruthy(process.env.NPM_CONFIG_OFFLINE) || isTruthy(process.env.OFFLINE_MODE);
+
+if (isCI || skipRequested || offlineMode) {
+  const reasons = [];
+  if (isCI) reasons.push('CI environment');
+  if (skipRequested) reasons.push('SKIP_ENSURE_DEPS flag');
+  if (offlineMode) reasons.push('offline mode');
+
+  console.log(`[ensure-deps] Skipping dependency alignment (${reasons.join(', ') || 'no internet detected'})`);
+  console.log('[ensure-deps] Install will rely on package-lock.json versions.');
+  process.exit(0);
+}
+
 console.log('[ensure-deps] Running dependency alignment...');
 
 try {

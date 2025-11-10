@@ -7,7 +7,7 @@
 > Do NOT create separate documentation files - update this master file instead.
 
 **Consolidation Date:** 2025-11-09  
-**Version:** 3.3 (OAuth-First Flow & Repository Cleanup)  
+**Version:** 3.3.1 (CI Dependency Safeguards)
 **Platform:** Android (Galaxy S25 Ultra optimized)  
 **Node Version:** 20.x LTS (Recommended), 22.x Testing Complete ✅  
 **Last Updated:** 2025-11-10
@@ -15,6 +15,25 @@
 ---
 
 ## 📋 Recent Updates (2025-11-10)
+
+### ✅ CI Dependency Alignment Safeguards (PR: fix-ci-postinstall-loop)
+
+**Status: COMPLETE - Postinstall scripts now respect CI/offline environments**
+
+#### Changes Made (1 Commit):
+- Added environment-aware skipping to `scripts/ensure-deps.js` (`CI`, `GITHUB_ACTIONS`, `SKIP_ENSURE_DEPS`, and offline flags)
+- Extended `scripts/start-all.js` to honour the same skip logic for automated launches
+- Documented the `SKIP_ENSURE_DEPS` flag for local/offline installs
+
+#### Impact:
+- Prevents `npm ci` and other automated installs from running `npm update`/`expo install` in CI
+- Enables deterministic installs that rely solely on `package-lock.json`
+- Provides a clean opt-out (`SKIP_ENSURE_DEPS=1`) for offline or air-gapped environments
+
+#### Tests / Verification:
+- Manual verification of `npm install` flow (registry 403 in sandbox environment; see Troubleshooting entry for workaround)
+
+---
 
 ### ✅ OAuth-First Startup Flow & Repository Cleanup (PR: remove-temp-files-and-fix-oauth)
 
@@ -3275,6 +3294,19 @@ npm start -- --clear
 rm -rf node_modules/.cache
 npm test -- --clearCache
 npm test
+```
+
+#### Issue: `npm ci` hangs or runs expo commands in CI/offline environments
+**Symptom:** GitHub Actions or offline installs stall during `postinstall`
+**Solution:**
+```bash
+# Skip dependency alignment when automation/offline
+export SKIP_ENSURE_DEPS=1
+npm ci
+
+# Or set in the workflow/job environment
+env:
+  SKIP_ENSURE_DEPS: '1'
 ```
 
 #### Issue: Backend not starting
