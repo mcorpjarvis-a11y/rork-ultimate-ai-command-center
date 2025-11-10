@@ -73,10 +73,16 @@ export default function RootLayout() {
           console.log('[App] ✅ SecureStorage test passed');
         }
         
-        // Step 2: Check if master profile exists with OAuth
-        console.log('[App] Step 2: Checking authentication...');
-        const isAuthenticated = await checkAuthentication();
+        // Steps 2-4: Parallel authentication and validation checks (OPTIMIZED)
+        console.log('[App] Steps 2-4: Checking authentication, OAuth, and onboarding in parallel...');
         
+        const [isAuthenticated, oauthValid, onboardingComplete] = await Promise.all([
+          checkAuthentication(),
+          OAuthRequirementService.hasValidOAuthProfile(),
+          OnboardingStatus.isOnboardingComplete()
+        ]);
+        
+        // Check authentication result
         if (!isAuthenticated) {
           console.log('[App] ❌ No valid master profile found, showing sign-in');
           console.log('[App] 🔐 OAuth login REQUIRED to proceed');
@@ -85,11 +91,9 @@ export default function RootLayout() {
           SplashScreen.hideAsync();
           return;
         }
+        console.log('[App] ✅ Authentication check passed');
 
-        // Step 3: Validate OAuth requirement
-        console.log('[App] Step 3: Validating OAuth providers...');
-        const oauthValid = await OAuthRequirementService.hasValidOAuthProfile();
-        
+        // Check OAuth validation result
         if (!oauthValid) {
           console.log('[App] ❌ OAuth providers not connected, showing sign-in');
           setShowSignIn(true);
@@ -97,12 +101,12 @@ export default function RootLayout() {
           SplashScreen.hideAsync();
           return;
         }
+        console.log('[App] ✅ OAuth validation passed');
         
-        await OAuthRequirementService.logOAuthStatus();
+        // Log OAuth status asynchronously (non-blocking)
+        OAuthRequirementService.logOAuthStatus();
 
-        // Step 4: Check onboarding status
-        console.log('[App] Step 4: Checking onboarding status...');
-        const onboardingComplete = await OnboardingStatus.isOnboardingComplete();
+        // Check onboarding status result
         
         if (!onboardingComplete) {
           console.log('[App] ⚠️  Profile exists but onboarding not complete, redirecting to wizard');
@@ -113,11 +117,9 @@ export default function RootLayout() {
           return;
         }
         
-        console.log('[App] ✅ Onboarding complete');
-
-        // Step 5: Validate master profile integrity
+        // Step 5: Validate master profile integrity (non-blocking log)
         console.log('[App] Step 5: Validating master profile...');
-        await MasterProfileValidator.logValidationStatus();
+        MasterProfileValidator.logValidationStatus(); // Non-blocking - logs asynchronously
 
         // Step 6: Initialize JARVIS with real data
         console.log('[App] Step 6: Initializing JARVIS with live data...');
