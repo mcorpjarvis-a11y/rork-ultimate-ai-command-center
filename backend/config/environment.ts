@@ -46,8 +46,9 @@ export function validateEnvironment(): EnvironmentConfig {
   const hasGroq = !!process.env.EXPO_PUBLIC_GROQ_API_KEY;
   
   if (!hasGemini && !hasOpenAI && !hasHuggingFace && !hasGroq) {
-    warnings.push('No AI API keys configured. AI features will not work.');
-    warnings.push('  Set at least one of:');
+    warnings.push('No AI API keys configured. AI features will not work until keys are added via Settings.');
+    warnings.push('  The app will start in "clean slate" mode with local features only.');
+    warnings.push('  Users can add keys later in Settings. Supported providers:');
     warnings.push('    - EXPO_PUBLIC_GROQ_API_KEY (recommended - free & fast)');
     warnings.push('    - EXPO_PUBLIC_GEMINI_API_KEY (Google Gemini)');
     warnings.push('    - EXPO_PUBLIC_HF_API_TOKEN (HuggingFace)');

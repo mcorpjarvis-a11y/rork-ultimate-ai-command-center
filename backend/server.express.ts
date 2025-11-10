@@ -40,6 +40,10 @@ import monetizationRoutes from './routes/monetization';
 // eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import iotRoutes from './routes/iot';
 
+// Import WebSocket manager
+// eslint-disable-next-line import/first -- Environment must be validated before importing routes
+import { wsManager } from './websocket/WebSocketManager';
+
 const app: Express = express();
 const PORT = envConfig.PORT;
 const HOST = envConfig.HOST;
@@ -90,7 +94,7 @@ app.use((_req: Request, _res: Response, next: NextFunction) => {
   next();
 });
 
-// Health check
+// Health check endpoints
 app.get('/', (_req: Request, res: Response) => {
   res.json({
     status: 'online',
@@ -98,6 +102,35 @@ app.get('/', (_req: Request, res: Response) => {
     version: '1.0.0',
     timestamp: new Date().toISOString()
   });
+});
+
+// Liveness probe - checks if server is alive
+app.get('/healthz', (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Readiness probe - checks if server is ready to accept traffic
+app.get('/readyz', (_req: Request, res: Response) => {
+  // Check if server is ready (all services initialized)
+  const isReady = true; // Can add more sophisticated checks here
+  
+  if (isReady) {
+    res.status(200).json({
+      status: 'ready',
+      timestamp: new Date().toISOString(),
+      websocket: {
+        clients: wsManager.getClientCount()
+      }
+    });
+  } else {
+    res.status(503).json({
+      status: 'not ready',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // API Routes
@@ -152,7 +185,9 @@ const server = app.listen(PORT, HOST, () => {
   console.log('✅ Server is ONLINE');
   console.log(`🌐 Server URL: http://${HOST}:${PORT}`);
   console.log(`📡 API Base: http://${HOST}:${PORT}/api`);
-  console.log(`🩺 Health: http://${HOST}:${PORT}/`);
+  console.log(`🩺 Health: http://${HOST}:${PORT}/healthz`);
+  console.log(`🚦 Ready: http://${HOST}:${PORT}/readyz`);
+  console.log(`🔌 WebSocket: ws://${HOST}:${PORT}/ws`);
   console.log('\n📋 Available Backend Services:');
   console.log('   🎤 Voice API           - Text-to-speech and speech-to-text');
   console.log('   🤖 AI Reasoning        - Gemini, Hugging Face, OpenAI integration');
@@ -176,11 +211,19 @@ const server = app.listen(PORT, HOST, () => {
   console.log('   • /api/iot          - IoT device control');
   console.log('   • /api/monetization - Monetization features');
   console.log('\n📝 Logs will appear below...\n');
+  
+  // Initialize WebSocket server
+  wsManager.initialize(server);
+  console.log('🔌 WebSocket server initialized on /ws');
 });
 
 // Graceful shutdown
 process.on('SIGINT', () => {
   console.log('\n\n⚠️  Shutting down JARVIS Backend Server...');
+  
+  // Shutdown WebSocket server first
+  wsManager.shutdown();
+  
   server.close(() => {
     console.log('✅ Server stopped gracefully');
     process.exit(0);
@@ -189,6 +232,10 @@ process.on('SIGINT', () => {
 
 process.on('SIGTERM', () => {
   console.log('\n\n⚠️  Received SIGTERM, shutting down...');
+  
+  // Shutdown WebSocket server first
+  wsManager.shutdown();
+  
   server.close(() => {
     console.log('✅ Server stopped gracefully');
     process.exit(0);

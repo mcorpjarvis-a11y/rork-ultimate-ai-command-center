@@ -83,11 +83,13 @@ class JarvisInitializationService {
     console.log('[JarvisInit] 🚀 Starting Jarvis initialization...');
 
     try {
-      // Step 1: Load and save API keys from config to AsyncStorage
-      await this.loadAPIKeysFromConfig();
+      // Step 1: Skip loading API keys from config (lazy-load later)
+      // API keys will be loaded only when user adds them in Settings
+      console.log('[JarvisInit] Skipping API key loading - clean slate mode');
 
-      // Step 2: Initialize Free AI Service with the loaded keys
-      await this.initializeFreeAIService();
+      // Step 2: Skip initializing Free AI Service (lazy-load later)
+      // AI service will be initialized only when user provides keys
+      console.log('[JarvisInit] Skipping AI service initialization - will initialize when keys provided');
 
       // Step 3: Initialize Jarvis Personality
       await this.initializePersonality();
@@ -107,7 +109,7 @@ class JarvisInitializationService {
       // Mark as initialized
       await AsyncStorage.setItem(INITIALIZATION_KEY, 'true');
 
-      console.log('[JarvisInit] ✅ All systems operational');
+      console.log('[JarvisInit] ✅ All systems operational (local mode)');
     } catch (error) {
       console.error('[JarvisInit] Initialization error:', error);
       throw error;
@@ -357,6 +359,55 @@ class JarvisInitializationService {
   invalidateStatusCache(): void {
     this.cachedStatus = null;
     this.statusCacheExpiry = 0;
+  }
+
+  /**
+   * Lazy-load and initialize API keys from config (called from Settings)
+   * This allows API keys to be configured after app startup
+   */
+  async initializeAPIKeys(): Promise<void> {
+    console.log('[JarvisInit] Lazy-loading API keys from configuration...');
+    try {
+      await this.loadAPIKeysFromConfig();
+      await this.initializeFreeAIService();
+      this.invalidateStatusCache();
+      console.log('[JarvisInit] ✅ API keys initialized');
+    } catch (error) {
+      console.error('[JarvisInit] Failed to initialize API keys:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Test and save a specific API key (called from Settings)
+   */
+  async testAndSaveAPIKey(providerId: string, apiKey: string): Promise<boolean> {
+    console.log(`[JarvisInit] Testing API key for ${providerId}...`);
+    
+    // Validate format first
+    if (!this.validateAPIKey(providerId, apiKey)) {
+      throw new Error(`Invalid API key format for ${providerId}`);
+    }
+
+    // Save to AsyncStorage
+    await AsyncStorage.setItem(`@free_ai_keys:${providerId}`, apiKey);
+
+    // Test the provider
+    try {
+      // Reload keys in FreeAIService
+      const FreeAIService = (await import('./ai/FreeAIService')).default;
+      await FreeAIService.loadAPIKeys();
+      await FreeAIService.testProvider(providerId);
+      
+      this.invalidateStatusCache();
+      console.log(`[JarvisInit] ✅ API key for ${providerId} validated and saved`);
+      return true;
+    } catch (error) {
+      // Remove the invalid key
+      await AsyncStorage.removeItem(`@free_ai_keys:${providerId}`);
+      console.error(`[JarvisInit] API key test failed for ${providerId}:`, error);
+      throw error;
+    }
   }
 }
 
