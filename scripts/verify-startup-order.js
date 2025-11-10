@@ -256,22 +256,26 @@ console.log('\n🔄 Startup Order Validation\n');
 check('_layout.tsx: Implements correct initialization sequence', () => {
   const content = fs.readFileSync('app/_layout.tsx', 'utf8');
   
-  // Check for all required steps in order
+  // Check for all required steps (now with parallel optimization)
   const hasStep0 = content.includes('Step 0: Validating configuration');
   const hasStep1 = content.includes('Step 1: Testing secure storage');
-  const hasStep2 = content.includes('Step 2: Checking authentication');
-  const hasStep3 = content.includes('Step 3: Validating OAuth providers');
-  const hasStep4 = content.includes('Step 4: Checking onboarding status');
+  const hasParallelSteps = content.includes('Steps 2-4: Checking authentication, OAuth, and onboarding in parallel');
   const hasStep5 = content.includes('Step 5: Validating master profile');
   const hasStep6 = content.includes('Step 6: Initializing JARVIS');
   
-  const allStepsPresent = hasStep0 && hasStep1 && hasStep2 && hasStep3 && 
-                          hasStep4 && hasStep5 && hasStep6;
+  // Also check for the optimization - Promise.all for parallel execution
+  const hasParallelOptimization = content.includes('await Promise.all([') && 
+                                  content.includes('checkAuthentication()') &&
+                                  content.includes('OAuthRequirementService.hasValidOAuthProfile()') &&
+                                  content.includes('OnboardingStatus.isOnboardingComplete()');
+  
+  const allStepsPresent = hasStep0 && hasStep1 && hasParallelSteps && 
+                          hasStep5 && hasStep6 && hasParallelOptimization;
   
   return {
     pass: allStepsPresent,
     message: allStepsPresent 
-      ? 'All 7 initialization steps present in correct order' 
+      ? 'All initialization steps present with parallel optimization (Steps 2-4 run concurrently)' 
       : 'Missing or incorrect initialization steps'
   };
 });
