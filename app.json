@@ -24,7 +24,6 @@
       },
       "package": "com.mcorpjarvis.aicommandcenter",
       "versionCode": 1,
-      "useNextNotificationsApi": true,
       "permissions": [
         "INTERNET",
         "CAMERA",
