@@ -27,7 +27,14 @@ import {
 } from "@/services";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+// Wrap in try-catch to handle cases where it's already been called
+try {
+  SplashScreen.preventAutoHideAsync().catch(() => {
+    console.log('[Splash] preventAutoHideAsync already called or failed');
+  });
+} catch (e) {
+  console.log('[Splash] preventAutoHideAsync error:', e);
+}
 
 const queryClient = new QueryClient();
 
@@ -46,6 +53,26 @@ export default function RootLayout() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [initSequence, setInitSequence] = useState(0);
   const [splashHidden, setSplashHidden] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Mark component as mounted and ensure splash hides
+  useEffect(() => {
+    setMounted(true);
+    console.log('[App] Component mounted');
+    
+    // Start a safety timer to hide splash after 3 seconds no matter what
+    const safetyTimer = setTimeout(async () => {
+      console.log('[Splash] 3s safety timer - hiding splash');
+      try {
+        await SplashScreen.hideAsync();
+        console.log('[Splash] ✅ Hidden by safety timer');
+      } catch (e) {
+        console.log('[Splash] Safety timer hide failed (may already be hidden):', e);
+      }
+    }, 3000);
+
+    return () => clearTimeout(safetyTimer);
+  }, []);
 
   useEffect(() => {
     async function initializeApp() {
@@ -164,12 +191,14 @@ export default function RootLayout() {
 
   // Balanced splash screen lifecycle with fallback timeout
   useEffect(() => {
+    if (!mounted) return; // Wait for component to mount
+    
     console.log('[Splash] Effect triggered - isAuthenticating:', isAuthenticating, 'appReady:', appReady, 'showSignIn:', showSignIn, 'splashHidden:', splashHidden);
     
     const hideSplash = async () => {
       if (splashHidden) {
         console.log('[Splash] Already hidden, skipping');
-        return; // Already hidden, skip
+        return;
       }
       
       console.log('[Splash] Attempting to hide splash screen...');
@@ -179,17 +208,23 @@ export default function RootLayout() {
         console.log("✅ Splash hidden — UI ready");
         console.log("🎉 App mounted and visible");
       } catch (e) {
-        console.warn("⚠️  Splash hide failed:", e);
+        // This might fail if already hidden, which is fine
+        console.log("⚠️  Splash hide call failed (may already be hidden):", e);
+        setSplashHidden(true); // Mark as hidden anyway
       }
     };
 
-    // Hide splash when authentication completes or app is ready
+    // Hide splash when ANY of these conditions are met:
+    // 1. Not authenticating anymore (completed or failed)
+    // 2. App is ready
+    // 3. Showing sign-in screen
     if (!isAuthenticating || appReady || showSignIn) {
-      console.log('[Splash] Condition met to hide splash');
+      console.log('[Splash] Condition met to hide splash - hiding now');
       hideSplash();
-    } else {
-      console.log('[Splash] Waiting for initialization to complete...');
+      return; // Exit early, don't set up timeout
     }
+    
+    console.log('[Splash] Still initializing, setting up 10s fallback timeout...');
 
     // Fallback: force hide after 10s if initialization stalls
     const timeout = setTimeout(async () => {
@@ -201,7 +236,8 @@ export default function RootLayout() {
           console.log("✅ Splash hidden via timeout fallback");
           console.log("🎉 App mounted and visible (via timeout)");
         } catch (e) {
-          console.error("❌ Splash hide failed on timeout:", e);
+          console.log("❌ Splash hide failed on timeout (may already be hidden):", e);
+          setSplashHidden(true); // Mark as hidden anyway
         }
       }
     }, 10000);
@@ -210,7 +246,7 @@ export default function RootLayout() {
       console.log('[Splash] Cleaning up timeout');
       clearTimeout(timeout);
     };
-  }, [isAuthenticating, appReady, showSignIn, splashHidden]);
+  }, [mounted, isAuthenticating, appReady, showSignIn, splashHidden]);
 
   const checkAuthentication = useCallback(async (): Promise<boolean> => {
     try {
