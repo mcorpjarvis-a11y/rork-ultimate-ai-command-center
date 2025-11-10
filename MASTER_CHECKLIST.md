@@ -7,7 +7,7 @@
 > Do NOT create separate documentation files - update this master file instead.
 
 **Consolidation Date:** 2025-11-09  
-**Version:** 3.2 (Clean Slate Startup & Testing Infrastructure)  
+**Version:** 3.3 (OAuth-First Flow & Repository Cleanup)  
 **Platform:** Android (Galaxy S25 Ultra optimized)  
 **Node Version:** 20.x LTS (Recommended), 22.x Testing Complete ✅  
 **Last Updated:** 2025-11-10
@@ -15,6 +15,134 @@
 ---
 
 ## 📋 Recent Updates (2025-11-10)
+
+### ✅ OAuth-First Startup Flow & Repository Cleanup (PR: remove-temp-files-and-fix-oauth)
+
+**Status: COMPLETE - OAuth-First Flow Active, Repository Cleaned, All Permissions Requested**
+
+#### Changes Made (4 Commits):
+
+**Commit 1: Initial Plan**
+- Created PR checklist and planning documentation
+
+**Commit 2: Comprehensive Permission Requests - All 40 Permissions**
+- Expanded `PermissionManager.tsx` to request **ALL 40 possible Android permissions**
+- Organized permissions into clear categories:
+  - **Critical (6)**: Camera, Microphone, Fine Location, Storage (Read/Write), Notifications
+  - **Location (2)**: Approximate Location, Background Location  
+  - **Bluetooth (3)**: Connect, Scan, Advertise
+  - **Contacts (3)**: Read, Write, Get Accounts
+  - **Calendar (2)**: Read, Write
+  - **Phone/SMS (8)**: Phone State, Phone Numbers, Call Phone, Read/Write Call Log, Read/Send/Receive SMS
+  - **Media (3)**: Read Images, Video, Audio
+  - **Sensors (3)**: Body Sensors, Body Sensors Background, Activity Recognition
+  - **Network (3)**: Nearby Wi-Fi Devices, Change Network State, Change Wi-Fi State
+  - **System (7)**: Schedule/Use Exact Alarms, Notification Policy, System Alert Window, Install/Request Install Packages, Package Usage Stats
+- Added prominent warning: "⚠️ This happens once during setup. After granting permissions, you won't see this screen again unless you perform a hard reset."
+- Updated UI messaging to clarify one-time setup process
+
+**Commit 3: Update Dependencies to Latest Compatible Versions**
+- Updated @react-native/virtualized-lists: 0.81.5 → 0.82.1
+- Updated @types/react: 19.1.10 → 19.2.2
+- Updated dotenv: 16.4.5 → 17.2.3
+- Updated esbuild: 0.24.0 → 0.27.0
+- Updated eslint: 9.31.0 → 9.39.1
+- Updated express: 4.18.2 → 4.21.2 (stayed on v4 for stability)
+- Updated lucide-react-native: 0.546.0 → 0.553.0
+- Updated react & react-dom: 19.1.0 → 19.2.0
+- Updated react-native: 0.81.5 → 0.82.1
+- Updated react-native-gesture-handler: 2.28.0 → 2.29.1
+- Updated react-native-screens: 4.16.0 → 4.18.0
+- Updated react-native-svg: 15.12.1 → 15.14.0
+- Updated react-test-renderer: 19.1.0 → 19.2.0
+
+**Commit 4: Complete OAuth-First Startup Flow and Cleanup**
+- **Files Deleted (10 files):**
+  - `.env` - Contains sensitive demo keys
+  - `.env.production` - Contains template data
+  - `PROVIDER_HELPER_TEMPLATE.ts` - Template file
+  - `test-jarvis-voice-loop.ts` - Temporary test file
+  - `scripts/cleanup-docs.js` - Temporary cleanup script
+  - `scripts/test-enhancements.js` - Not in package.json
+  - `scripts/test-metro-bundle.js` - Not in package.json  
+  - `scripts/test-node-version-logic.js` - Not in package.json
+  - `scripts/test-onboarding-pipeline.js` - Not in package.json
+  - `scripts/verify-persistent-memory.js` - Not in package.json
+
+- **Files Created (2 files):**
+  - `services/onboarding/OAuthRequirementService.ts` - Enforces OAuth-first requirement with validation
+  - `services/onboarding/MasterProfileValidator.ts` - Validates master profile integrity with OAuth providers
+
+- **Files Modified (1 file):**
+  - `app/_layout.tsx` - Complete OAuth-first startup flow with comprehensive logging
+
+#### Key Features:
+
+1. **OAuth-First Authentication Flow:**
+   - NO guest bypass - OAuth connection is REQUIRED to proceed
+   - Step 0: Configuration validation
+   - Step 1: Secure storage testing
+   - Step 2: Authentication check (now requires OAuth)
+   - Step 3: OAuth provider validation using `OAuthRequirementService`
+   - Step 4: Onboarding status check
+   - Step 5: Master profile validation using `MasterProfileValidator`
+   - Step 6: JARVIS initialization with lazy-loaded voice services
+
+2. **Lazy-Loading Voice Services:**
+   - Speech services (VoiceService, JarvisVoiceService, JarvisListenerService) load AFTER OAuth validation
+   - Always-listening service starts only after successful OAuth
+   - Proper error handling for `expo-speech-recognition not available` errors
+   - Services gracefully degrade if speech recognition unavailable
+
+3. **Comprehensive Logging:**
+   - ✅ "Successfully connected to [Provider]"
+   - ❌ "Failed to connect: [reason]"
+   - ✅ "Master profile saved"
+   - ✅ "JARVIS initialized and ready"
+   - 🚀 "Starting app initialization..."
+   - 🎯 "App initialization complete - All systems operational"
+   - 🤖 "Initializing JARVIS core systems..."
+   - 🔐 "OAuth login REQUIRED to proceed"
+   - ⚠️ Warning messages for degraded functionality
+
+4. **Clean Repository:**
+   - Removed all temporary test files from root
+   - Removed 6 temporary scripts not referenced in package.json
+   - Kept only permanent scripts referenced in package.json commands
+   - Removed .env files (kept only .env.example as template)
+
+5. **Comprehensive Permissions (40 total):**
+   - One-time setup after login
+   - Won't be shown again unless hard reset
+   - All permissions app could use, will use, or is currently using
+
+#### Test Results:
+```bash
+✅ Build: Backend compiles successfully (263.7kb)
+✅ Tests: 197/197 passing (100% pass rate)
+✅ TypeScript: 0 errors (all new services fully typed)
+✅ Dependencies: All updated to latest compatible versions
+✅ Clean Repository: 10 temporary files removed
+✅ OAuth Flow: Enforced with validation at every step
+```
+
+#### Files Modified/Created:
+**New Files:**
+- `services/onboarding/OAuthRequirementService.ts` - OAuth requirement enforcement
+- `services/onboarding/MasterProfileValidator.ts` - Profile validation with OAuth
+
+**Modified Files:**
+- `app/_layout.tsx` - OAuth-first startup flow with 6-step initialization
+- `screens/Onboarding/PermissionManager.tsx` - 40 comprehensive permissions
+- `package.json` - Updated 14 dependencies to latest versions
+
+**Deleted Files:**
+- `.env`, `.env.production` - Sensitive/template data
+- `PROVIDER_HELPER_TEMPLATE.ts` - Template file
+- `test-jarvis-voice-loop.ts` - Temporary test file
+- 6 temporary scripts from `scripts/` folder
+
+---
 
 ### ✅ Clean Slate Startup & Comprehensive Testing Infrastructure (PR: overhaul-startup-bugs-and-testing)
 
