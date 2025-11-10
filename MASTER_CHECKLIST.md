@@ -16,6 +16,32 @@
 
 ## 📋 Recent Updates (2025-11-10)
 
+### ✅ Splash Screen Hang Fix (PR: fix-splash-screen-hang)
+
+**Status: COMPLETE - Splash Screen Lifecycle Fixed**
+
+#### Summary
+Fixed the Iron Man splash screen hang issue where the splash never disappeared. Implemented a balanced splash lifecycle with automatic hide mechanism and 10-second fallback timeout.
+
+#### Key Changes
+- **✅ Balanced Splash Lifecycle**: Added dedicated useEffect hook to manage splash screen hide/show
+- **✅ 10-Second Fallback Timeout**: Ensures splash always hides even if initialization stalls
+- **✅ Centralized Management**: Removed scattered `SplashScreen.hideAsync()` calls throughout initialization
+- **✅ Enhanced Logging**: Added detailed console logs to track splash hide timing and state transitions
+- **✅ Guaranteed UI Visibility**: All code paths now ensure visible UI after splash (SignInScreen, loading state, or main app)
+
+#### Technical Implementation
+- Modified `app/_layout.tsx` only (minimal surgical change)
+- Added `splashHidden` state to track splash screen status
+- Splash hides automatically when: `!isAuthenticating || appReady || showSignIn`
+- Fallback timeout forces hide after 10 seconds if initialization stalls
+- No backend or Jarvis system modifications
+
+#### Startup Flow / UI Rendering
+> **Splash Screen Lifecycle**: Splash hides automatically after initialization or 10s fallback. Confirmed stable on npm build. App transitions smoothly from Iron Man splash to login screen or main UI. All initialization paths guarantee visible UI with loading indicators.
+
+---
+
 ### ✅ Startup Flow Optimization & Plug-and-Play Verification (PR: fix-react-frontend-errors)
 
 **Status: COMPLETE - System Production-Ready with Optimized Startup Flow**

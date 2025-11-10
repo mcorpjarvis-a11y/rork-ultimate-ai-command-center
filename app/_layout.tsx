@@ -45,6 +45,7 @@ export default function RootLayout() {
   const [showSignIn, setShowSignIn] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [initSequence, setInitSequence] = useState(0);
+  const [splashHidden, setSplashHidden] = useState(false);
 
   useEffect(() => {
     async function initializeApp() {
@@ -88,7 +89,6 @@ export default function RootLayout() {
           console.log('[App] 🔐 OAuth login REQUIRED to proceed');
           setShowSignIn(true);
           setIsAuthenticating(false);
-          SplashScreen.hideAsync();
           return;
         }
         console.log('[App] ✅ Authentication check passed');
@@ -98,7 +98,6 @@ export default function RootLayout() {
           console.log('[App] ❌ OAuth providers not connected, showing sign-in');
           setShowSignIn(true);
           setIsAuthenticating(false);
-          SplashScreen.hideAsync();
           return;
         }
         console.log('[App] ✅ OAuth validation passed');
@@ -111,7 +110,6 @@ export default function RootLayout() {
         if (!onboardingComplete) {
           console.log('[App] ⚠️  Profile exists but onboarding not complete, redirecting to wizard');
           setIsAuthenticating(false);
-          SplashScreen.hideAsync();
           // Let the router navigate to permissions screen
           router.replace('/onboarding/permissions');
           return;
@@ -134,7 +132,6 @@ export default function RootLayout() {
         setShowSignIn(true);
       } finally {
         setIsAuthenticating(false);
-        SplashScreen.hideAsync();
       }
     }
 
@@ -147,7 +144,7 @@ export default function RootLayout() {
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
     };
-  }, [router, initSequence, checkAuthentication, initializeJarvis]);
+  }, [router, initSequence]);
 
   useEffect(() => {
     const handleAuthSuccess = () => {
@@ -164,6 +161,56 @@ export default function RootLayout() {
       AuthManager.off('authenticated', handleAuthSuccess);
     };
   }, []);
+
+  // Balanced splash screen lifecycle with fallback timeout
+  useEffect(() => {
+    console.log('[Splash] Effect triggered - isAuthenticating:', isAuthenticating, 'appReady:', appReady, 'showSignIn:', showSignIn, 'splashHidden:', splashHidden);
+    
+    const hideSplash = async () => {
+      if (splashHidden) {
+        console.log('[Splash] Already hidden, skipping');
+        return; // Already hidden, skip
+      }
+      
+      console.log('[Splash] Attempting to hide splash screen...');
+      try {
+        await SplashScreen.hideAsync();
+        setSplashHidden(true);
+        console.log("✅ Splash hidden — UI ready");
+        console.log("🎉 App mounted and visible");
+      } catch (e) {
+        console.warn("⚠️  Splash hide failed:", e);
+      }
+    };
+
+    // Hide splash when authentication completes or app is ready
+    if (!isAuthenticating || appReady || showSignIn) {
+      console.log('[Splash] Condition met to hide splash');
+      hideSplash();
+    } else {
+      console.log('[Splash] Waiting for initialization to complete...');
+    }
+
+    // Fallback: force hide after 10s if initialization stalls
+    const timeout = setTimeout(async () => {
+      if (!splashHidden) {
+        console.warn("⏱️  Splash timeout reached (10s) - forcing hide");
+        try {
+          await SplashScreen.hideAsync();
+          setSplashHidden(true);
+          console.log("✅ Splash hidden via timeout fallback");
+          console.log("🎉 App mounted and visible (via timeout)");
+        } catch (e) {
+          console.error("❌ Splash hide failed on timeout:", e);
+        }
+      }
+    }, 10000);
+
+    return () => {
+      console.log('[Splash] Cleaning up timeout');
+      clearTimeout(timeout);
+    };
+  }, [isAuthenticating, appReady, showSignIn, splashHidden]);
 
   const checkAuthentication = useCallback(async (): Promise<boolean> => {
     try {
