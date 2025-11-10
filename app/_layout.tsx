@@ -53,6 +53,7 @@ export default function RootLayout() {
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [splashHidden, setSplashHidden] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Mark component as mounted and ensure splash hides
   useEffect(() => {
@@ -82,11 +83,20 @@ export default function RootLayout() {
   }, [appReady]);
 
   useEffect(() => {
+    // Guard to prevent repeated initialization
+    if (hasInitialized) {
+      console.log('[App] Already initialized, skipping re-initialization');
+      return;
+    }
+
     let isMounted = true;
 
     async function initializeApp() {
       try {
         console.log('[App] 🚀 Starting app initialization...');
+        
+        // Mark as initialized immediately to prevent re-entry
+        setHasInitialized(true);
         
         // Step 0: Validate configuration
         console.log('[App] Step 0: Validating configuration...');
@@ -205,7 +215,7 @@ export default function RootLayout() {
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
     };
-  }, [checkAuthentication, initializeJarvis, router]); // Dependencies are stable - won't cause re-renders
+  }, [hasInitialized, checkAuthentication, initializeJarvis, router]);
 
   useEffect(() => {
     const handleAuthSuccess = () => {
