@@ -98,7 +98,7 @@ class WebSocketManager {
         (ws as any).isAlive = false;
         ws.ping();
       });
-    }, 30000); // 30 seconds
+    }, 30000) as unknown as NodeJS.Timeout; // 30 seconds
   }
 
   private sendToClient(ws: WebSocket, message: WSMessage): void {
