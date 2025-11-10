@@ -25,7 +25,11 @@ export interface MasterProfile {
   connectedProviders: string[];
 }
 
-export type AuthEvent = 'connected' | 'disconnected' | 'token_refreshed';
+export type AuthEvent =
+  | 'connected'
+  | 'disconnected'
+  | 'token_refreshed'
+  | 'authenticated';
 
 export type AuthEventListener = (provider: string, data?: any) => void;
 

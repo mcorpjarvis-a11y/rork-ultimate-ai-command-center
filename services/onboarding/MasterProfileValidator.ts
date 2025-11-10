@@ -112,7 +112,6 @@ class MasterProfileValidatorManager {
     for (const providerId of profile.connectedProviders) {
       try {
         console.log(`[ProfileValidator] Verifying OAuth token for ${providerId}...`);
-        cursor/fix-code-issues-ecda
         // Check if token exists in AuthManager
         const isConnected = await AuthManager.isConnected(providerId);
         results.push({

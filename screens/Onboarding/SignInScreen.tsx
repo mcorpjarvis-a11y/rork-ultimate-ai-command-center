@@ -89,6 +89,7 @@ export default function SignInScreen() {
         await MasterProfile.saveMasterProfile(masterProfile);
 
         console.log('[SignInScreen] Master profile created successfully');
+        AuthManager.notifyAuthenticated('email', { profile: masterProfile });
         router.replace('/onboarding/permissions');
         
         Alert.alert(
@@ -120,6 +121,7 @@ export default function SignInScreen() {
         }
 
         console.log('[SignInScreen] Sign-in successful, redirecting to app');
+        AuthManager.notifyAuthenticated('email', { profile: masterProfile });
         // Let _layout.tsx handle routing based on onboarding status
         router.replace('/');
         
@@ -202,6 +204,7 @@ export default function SignInScreen() {
       await MasterProfile.saveMasterProfile(masterProfile);
 
       console.log('[SignInScreen] Master profile created successfully');
+      AuthManager.notifyAuthenticated('google', { profile: masterProfile });
 
       // Navigate to permission manager
       router.replace('/onboarding/permissions');

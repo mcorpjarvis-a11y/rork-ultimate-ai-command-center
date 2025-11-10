@@ -10,6 +10,21 @@ const path = require('path');
 // Get default Expo Metro configuration
 const config = getDefaultConfig(__dirname);
 
+config.maxWorkers = 2;
+
+config.transformer = {
+  ...config.transformer,
+  getTransformOptions: async () => ({
+    transform: {
+      experimentalImportSupport: false,
+      inlineRequires: true,
+    },
+  }),
+};
+
+const defaultSourceExts = config.resolver?.sourceExts || [];
+const defaultAssetExts = config.resolver?.assetExts || [];
+
 // Configure resolver to support @/ path alias
 config.resolver = {
   ...config.resolver,
@@ -17,8 +32,8 @@ config.resolver = {
     '@': path.resolve(__dirname, './'),
   },
   // Ensure TypeScript files and other extensions are resolved
-  sourceExts: [...(config.resolver?.sourceExts || []), 'ts', 'tsx', 'mjs', 'cjs'],
-  assetExts: [...(config.resolver?.assetExts || []), 'db', 'mp3', 'ttf', 'obj', 'png', 'jpg'],
+  sourceExts: Array.from(new Set([...defaultSourceExts, 'ts', 'tsx', 'mjs', 'cjs'])),
+  assetExts: Array.from(new Set([...defaultAssetExts, 'db', 'mp3', 'ttf', 'obj', 'png', 'jpg'])),
   // Block only build artifacts and cache directories from being watched
   // Don't block nested node_modules as some packages need them
   blockList: [

@@ -466,6 +466,17 @@ export default function PermissionManager() {
     }
   };
 
+  const promptForPermission = async (permission: Permission) => {
+    const result = await PermissionsAndroid.request(permission.androidPermission as any, {
+      title: `${permission.name} Permission`,
+      message: permission.description,
+      buttonPositive: 'Allow',
+      buttonNegative: 'Deny',
+    });
+
+    return result === PermissionsAndroid.RESULTS.GRANTED ? 'granted' : 'denied';
+  };
+
   const requestPermission = async (permission: Permission) => {
     if (Platform.OS !== 'android') {
       Alert.alert('Not Supported', 'Permissions are only available on Android');
@@ -473,14 +484,7 @@ export default function PermissionManager() {
     }
 
     try {
-      const result = await PermissionsAndroid.request(permission.androidPermission as any, {
-        title: `${permission.name} Permission`,
-        message: permission.description,
-        buttonPositive: 'Allow',
-        buttonNegative: 'Deny',
-      });
-
-      const newStatus = result === PermissionsAndroid.RESULTS.GRANTED ? 'granted' : 'denied';
+      const newStatus = await promptForPermission(permission);
 
       setPermissions((prev) =>
         prev.map((p) =>
@@ -509,20 +513,32 @@ export default function PermissionManager() {
     setLoading(true);
 
     try {
-      // Request all permissions in batch
-      const permissionsToRequest = permissions
-        .filter((p) => p.status === 'pending')
-        .map((p) => p.androidPermission as any);
+      const pendingPermissions = permissions.filter((p) => p.status === 'pending');
 
-      const results = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+      if (pendingPermissions.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      const results = await Promise.all(
+        pendingPermissions.map(async (permission) => {
+          try {
+            const status = await promptForPermission(permission);
+            return { id: permission.id, status } as const;
+          } catch (error) {
+            console.error(`Error requesting permission ${permission.id}:`, error);
+            return { id: permission.id, status: 'denied' as const };
+          }
+        })
+      );
 
       setPermissions((prev) =>
         prev.map((p) => {
-          const result = (results as any)[p.androidPermission];
-          if (result) {
+          const updated = results.find((result) => result.id === p.id);
+          if (updated) {
             return {
               ...p,
-              status: result === PermissionsAndroid.RESULTS.GRANTED ? 'granted' : 'denied',
+              status: updated.status,
             };
           }
           return p;

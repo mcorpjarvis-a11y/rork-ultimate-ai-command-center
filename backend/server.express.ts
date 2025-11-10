@@ -16,8 +16,10 @@
  */
 
 import express, { Express, Request, Response, NextFunction } from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -69,6 +71,8 @@ const PORT = envConfig.PORT;
 const HOST = envConfig.HOST;
 
 // Middleware
+app.use(compression());
+app.use(helmet());
 app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
