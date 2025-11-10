@@ -1,16 +1,36 @@
+/**
+ * JARVIS Backend Server (Express)
+ * 
+ * This server provides:
+ * - REST API endpoints for voice, AI, integrations, etc.
+ * - WebSocket support for real-time updates
+ * - Health check endpoints for monitoring
+ * - CORS configuration for frontend access
+ * 
+ * Key Features:
+ * - Clean slate startup: No external API calls or keys required on startup
+ * - WebSocket server on /ws path
+ * - Health checks: /healthz (liveness) and /readyz (readiness)
+ * - Graceful shutdown handling
+ * - Rate limiting on API routes
+ */
+
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-// Load environment variables
+// Load environment variables from .env file
 dotenv.config();
 
 // Validate environment before importing routes
+// This ensures required config is present and logs warnings for missing optional config
 // eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import { validateEnvironment, logEnvironmentInfo } from './config/environment';
 // eslint-disable-next-line import/first -- Environment must be validated before importing routes
 import { apiLimiter } from './middleware/rateLimiting';
 
+// Validate environment and log configuration
+// Note: Validation now accepts missing API keys (clean slate mode)
 const envConfig = validateEnvironment();
 logEnvironmentInfo(envConfig);
 
@@ -212,7 +232,8 @@ const server = app.listen(PORT, HOST, () => {
   console.log('   • /api/monetization - Monetization features');
   console.log('\n📝 Logs will appear below...\n');
   
-  // Initialize WebSocket server
+  // Initialize WebSocket server after HTTP server is listening
+  // WebSocket uses the HTTP server for upgrade requests
   wsManager.initialize(server);
   console.log('🔌 WebSocket server initialized on /ws');
 });
