@@ -8,13 +8,6 @@ const startTime = Date.now();
 // System status
 router.get('/status', (req: Request, res: Response) => {
   const uptime = Date.now() - startTime;
-  const platform = os.platform();
-  
-  // Provide human-readable platform name
-  const platformName = platform === 'darwin' ? 'macOS' 
-    : platform === 'win32' ? 'Windows'
-    : platform === 'linux' ? 'Linux'
-    : platform;
   
   res.json({
     online: true,
@@ -23,8 +16,7 @@ router.get('/status', (req: Request, res: Response) => {
     version: '1.0.0',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    platform: platform,
-    platformName: platformName,
+    platform: os.platform(),
     nodeVersion: process.version
   });
 });

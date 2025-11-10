@@ -8,8 +8,7 @@
 
 **Consolidation Date:** 2025-11-09  
 **Version:** 3.4 (Startup Flow Optimization & Plug-and-Play Verification)  
-**Target Platform:** Android (Galaxy S25 Ultra optimized)  
-**Development Platforms:** Windows, macOS, Linux  
+**Platform:** Android (Galaxy S25 Ultra optimized)  
 **Node Version:** 20.x LTS (Recommended), 22.x Testing Complete ✅  
 **Last Updated:** 2025-11-10
 
@@ -1080,12 +1079,11 @@ npm run build:apk        # Build Android APK
 
 This is a native Android mobile application - the Ultimate AI Command Center powered by JARVIS.
 
-**Target Platform**: Native Android app (iOS target not supported)  
-**Development Platforms**: Windows, macOS, Linux (full support)  
+**Platform**: Native Android app (iOS not supported)  
 **Framework**: Expo Router + React Native  
 **Distribution**: APK for sideloading on Android devices
 
-> **Note**: This project targets Android only for the mobile app. The iOS target platform is not supported. However, you can develop on Windows, macOS, or Linux - all development platforms are fully supported.
+> **Note**: This project is Android-only by design. All iOS/Apple platform support has been removed.
 
 ### Project Architecture
 
@@ -1258,7 +1256,7 @@ TWITTER_API_KEY=your_twitter_key
 1. **Android**: Download the [Expo Go app from Google Play](https://play.google.com/store/apps/details?id=host.exp.exponent)
 2. Run `npm start` and scan the QR code from your development server
 
-> **Note**: iOS target platform is not supported. This project targets Android mobile devices only. You can develop on macOS, but the app targets Android.
+> **Note**: iOS is not supported. This is an Android-only project.
 
 ### Testing in Browser
 
@@ -1382,28 +1380,21 @@ npm start               # Frontend only (Metro bundler)
 ❌ **DON'T:**
 - Don't build production APK yet (not configured)
 - Don't use `npm run build:apk` during development
-- Don't test on iOS devices (iOS target platform not supported - Android only)
+- Don't test on iOS (not supported)
 - Don't skip tests before committing
 
 ### Device & Environment Specifics
 
-**Target Device:**
+**Hardware:**
 - Device: Samsung Galaxy S25 Ultra
 - OS: Android with Termux
 - Testing App: Expo Go 54
 
-**Development Platforms:**
-- ✅ **Windows**: Fully supported
-- ✅ **macOS**: Fully supported (macOS 10.15+)
-- ✅ **Linux**: Fully supported
-
 **Software Stack:**
-- Node.js: 20.x LTS (recommended)
+- Node.js: 20.x LTS (in Termux)
 - npm: Latest version
 - Metro Bundler: Expo 54
 - Backend: Express.js (Node.js)
-
-> **Important**: While the app targets Android devices, you can develop on any platform (Windows, macOS, Linux). All development platforms are fully supported.
 
 ### Troubleshooting Development Flow
 
