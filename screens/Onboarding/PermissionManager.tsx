@@ -47,6 +47,7 @@ export default function PermissionManager() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [permissions, setPermissions] = useState<Permission[]>([
+    // CRITICAL PERMISSIONS - Required for core JARVIS functionality
     {
       id: 'camera',
       name: 'Camera',
@@ -75,45 +76,9 @@ export default function PermissionManager() {
       status: 'pending',
     },
     {
-      id: 'location_coarse',
-      name: 'Approximate Location',
-      description: 'General location for region-specific features',
-      icon: MapPin,
-      androidPermission: PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
-      isCritical: false,
-      status: 'pending',
-    },
-    {
-      id: 'bluetooth',
-      name: 'Bluetooth',
-      description: 'Connect to Bluetooth devices, speakers, and IoT gadgets',
-      icon: Bluetooth,
-      androidPermission: PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-      isCritical: false,
-      status: 'pending',
-    },
-    {
-      id: 'bluetooth_scan',
-      name: 'Bluetooth Scanning',
-      description: 'Discover nearby Bluetooth devices',
-      icon: Bluetooth,
-      androidPermission: PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-      isCritical: false,
-      status: 'pending',
-    },
-    {
-      id: 'wifi',
-      name: 'Wi-Fi State',
-      description: 'Monitor Wi-Fi connections for network-based automation',
-      icon: Wifi,
-      androidPermission: 'android.permission.ACCESS_WIFI_STATE' as any,
-      isCritical: false,
-      status: 'pending',
-    },
-    {
       id: 'storage',
-      name: 'Storage',
-      description: 'Read and write files, save media, and backup data',
+      name: 'Storage (Read)',
+      description: 'Read files, media, and backup data from storage',
       icon: HardDrive,
       androidPermission: PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       isCritical: true,
@@ -121,7 +86,7 @@ export default function PermissionManager() {
     },
     {
       id: 'storage_write',
-      name: 'Write Storage',
+      name: 'Storage (Write)',
       description: 'Save files and media to device storage',
       icon: HardDrive,
       androidPermission: PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -137,9 +102,60 @@ export default function PermissionManager() {
       isCritical: true,
       status: 'pending',
     },
+    
+    // LOCATION PERMISSIONS
     {
-      id: 'contacts',
-      name: 'Contacts',
+      id: 'location_coarse',
+      name: 'Approximate Location',
+      description: 'General location for region-specific features',
+      icon: MapPin,
+      androidPermission: PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'location_background',
+      name: 'Background Location',
+      description: 'Track location in background for automation and geofencing',
+      icon: MapPin,
+      androidPermission: PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+      isCritical: false,
+      status: 'pending',
+    },
+    
+    // BLUETOOTH PERMISSIONS
+    {
+      id: 'bluetooth_connect',
+      name: 'Bluetooth Connect',
+      description: 'Connect to Bluetooth devices, speakers, and IoT gadgets',
+      icon: Bluetooth,
+      androidPermission: PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'bluetooth_scan',
+      name: 'Bluetooth Scan',
+      description: 'Discover nearby Bluetooth devices',
+      icon: Bluetooth,
+      androidPermission: PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'bluetooth_advertise',
+      name: 'Bluetooth Advertise',
+      description: 'Advertise device to other Bluetooth devices',
+      icon: Bluetooth,
+      androidPermission: PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
+      isCritical: false,
+      status: 'pending',
+    },
+    
+    // CONTACTS & COMMUNICATION
+    {
+      id: 'contacts_read',
+      name: 'Read Contacts',
       description: 'Access contacts for smart dialing and messaging',
       icon: Users,
       androidPermission: PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
@@ -147,16 +163,47 @@ export default function PermissionManager() {
       status: 'pending',
     },
     {
-      id: 'calendar',
-      name: 'Calendar',
-      description: 'Manage events, set reminders, and schedule automation',
+      id: 'contacts_write',
+      name: 'Write Contacts',
+      description: 'Add and modify contacts',
+      icon: Users,
+      androidPermission: PermissionsAndroid.PERMISSIONS.WRITE_CONTACTS,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'contacts_accounts',
+      name: 'Access Accounts',
+      description: 'View and manage accounts for contact sync',
+      icon: Users,
+      androidPermission: PermissionsAndroid.PERMISSIONS.GET_ACCOUNTS,
+      isCritical: false,
+      status: 'pending',
+    },
+    
+    // CALENDAR PERMISSIONS
+    {
+      id: 'calendar_read',
+      name: 'Read Calendar',
+      description: 'View events and schedule automation',
       icon: Calendar,
       androidPermission: PermissionsAndroid.PERMISSIONS.READ_CALENDAR,
       isCritical: false,
       status: 'pending',
     },
     {
-      id: 'phone',
+      id: 'calendar_write',
+      name: 'Write Calendar',
+      description: 'Create and modify calendar events',
+      icon: Calendar,
+      androidPermission: PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
+      isCritical: false,
+      status: 'pending',
+    },
+    
+    // PHONE & SMS PERMISSIONS
+    {
+      id: 'phone_state',
       name: 'Phone State',
       description: 'Monitor calls for call-related automation',
       icon: Phone,
@@ -164,6 +211,100 @@ export default function PermissionManager() {
       isCritical: false,
       status: 'pending',
     },
+    {
+      id: 'phone_numbers',
+      name: 'Phone Numbers',
+      description: 'Access phone numbers for verification',
+      icon: Phone,
+      androidPermission: PermissionsAndroid.PERMISSIONS.READ_PHONE_NUMBERS,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'call_phone',
+      name: 'Make Calls',
+      description: 'Initiate phone calls',
+      icon: Phone,
+      androidPermission: PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'read_call_log',
+      name: 'Read Call Log',
+      description: 'Access call history',
+      icon: Phone,
+      androidPermission: PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'write_call_log',
+      name: 'Write Call Log',
+      description: 'Modify call history',
+      icon: Phone,
+      androidPermission: PermissionsAndroid.PERMISSIONS.WRITE_CALL_LOG,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'sms_read',
+      name: 'Read SMS',
+      description: 'Read text messages',
+      icon: Phone,
+      androidPermission: PermissionsAndroid.PERMISSIONS.READ_SMS,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'sms_send',
+      name: 'Send SMS',
+      description: 'Send text messages',
+      icon: Phone,
+      androidPermission: PermissionsAndroid.PERMISSIONS.SEND_SMS,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'sms_receive',
+      name: 'Receive SMS',
+      description: 'Receive incoming text messages',
+      icon: Phone,
+      androidPermission: PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+      isCritical: false,
+      status: 'pending',
+    },
+    
+    // MEDIA & STORAGE PERMISSIONS
+    {
+      id: 'media_images',
+      name: 'Media Images',
+      description: 'Access photos and images',
+      icon: HardDrive,
+      androidPermission: PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'media_video',
+      name: 'Media Video',
+      description: 'Access video files',
+      icon: HardDrive,
+      androidPermission: PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'media_audio',
+      name: 'Media Audio',
+      description: 'Access audio files and music',
+      icon: HardDrive,
+      androidPermission: PermissionsAndroid.PERMISSIONS.READ_MEDIA_AUDIO,
+      isCritical: false,
+      status: 'pending',
+    },
+    
+    // SENSORS & HEALTH
     {
       id: 'body_sensors',
       name: 'Body Sensors',
@@ -174,7 +315,16 @@ export default function PermissionManager() {
       status: 'pending',
     },
     {
-      id: 'activity',
+      id: 'body_sensors_background',
+      name: 'Body Sensors (Background)',
+      description: 'Access body sensors in background',
+      icon: Activity,
+      androidPermission: PermissionsAndroid.PERMISSIONS.BODY_SENSORS_BACKGROUND,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'activity_recognition',
       name: 'Physical Activity',
       description: 'Track steps, activity, and fitness metrics',
       icon: Activity,
@@ -182,12 +332,97 @@ export default function PermissionManager() {
       isCritical: false,
       status: 'pending',
     },
+    
+    // NETWORK & CONNECTIVITY
     {
-      id: 'nearby',
-      name: 'Nearby Devices',
-      description: 'Discover and connect to nearby devices',
+      id: 'nearby_devices',
+      name: 'Nearby Wi-Fi Devices',
+      description: 'Discover and connect to nearby Wi-Fi devices',
       icon: Radio,
       androidPermission: PermissionsAndroid.PERMISSIONS.NEARBY_WIFI_DEVICES,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'change_network_state',
+      name: 'Change Network State',
+      description: 'Modify network connectivity settings',
+      icon: Wifi,
+      androidPermission: 'android.permission.CHANGE_NETWORK_STATE' as any,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'change_wifi_state',
+      name: 'Change Wi-Fi State',
+      description: 'Turn Wi-Fi on/off and modify settings',
+      icon: Wifi,
+      androidPermission: 'android.permission.CHANGE_WIFI_STATE' as any,
+      isCritical: false,
+      status: 'pending',
+    },
+    
+    // SYSTEM & DEVICE PERMISSIONS
+    {
+      id: 'schedule_exact_alarm',
+      name: 'Schedule Exact Alarms',
+      description: 'Set precise alarms and reminders',
+      icon: Bell,
+      androidPermission: PermissionsAndroid.PERMISSIONS.SCHEDULE_EXACT_ALARM,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'use_exact_alarm',
+      name: 'Use Exact Alarms',
+      description: 'Use exact alarm clock functionality',
+      icon: Bell,
+      androidPermission: PermissionsAndroid.PERMISSIONS.USE_EXACT_ALARM,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'access_notification_policy',
+      name: 'Notification Policy',
+      description: 'Access Do Not Disturb settings',
+      icon: Bell,
+      androidPermission: PermissionsAndroid.PERMISSIONS.ACCESS_NOTIFICATION_POLICY,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'system_alert_window',
+      name: 'Display Over Apps',
+      description: 'Show overlays and floating windows',
+      icon: Smartphone,
+      androidPermission: 'android.permission.SYSTEM_ALERT_WINDOW' as any,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'install_packages',
+      name: 'Install Packages',
+      description: 'Install app updates and packages',
+      icon: Smartphone,
+      androidPermission: 'android.permission.INSTALL_PACKAGES' as any,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'request_install_packages',
+      name: 'Request Install Packages',
+      description: 'Request to install unknown apps',
+      icon: Smartphone,
+      androidPermission: 'android.permission.REQUEST_INSTALL_PACKAGES' as any,
+      isCritical: false,
+      status: 'pending',
+    },
+    {
+      id: 'package_usage_stats',
+      name: 'Usage Stats',
+      description: 'View app usage statistics',
+      icon: Activity,
+      androidPermission: 'android.permission.PACKAGE_USAGE_STATS' as any,
       isCritical: false,
       status: 'pending',
     },
@@ -339,7 +574,11 @@ export default function PermissionManager() {
         <View style={styles.header}>
           <Text style={styles.title}>System Permissions</Text>
           <Text style={styles.subtitle}>
-            Grant JARVIS access to device features for optimal functionality
+            Grant JARVIS access to all device features for optimal functionality.
+            {'\n\n'}
+            <Text style={styles.subtitleBold}>⚠️ This happens once during setup.</Text>
+            {'\n'}
+            After granting permissions, you won't see this screen again unless you perform a hard reset.
           </Text>
 
           <View style={styles.progressContainer}>
@@ -467,6 +706,11 @@ const styles = StyleSheet.create({
     color: '#888',
     lineHeight: 24,
     marginBottom: 24,
+  },
+  subtitleBold: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#00f2ff',
   },
   progressContainer: {
     marginTop: 16,
