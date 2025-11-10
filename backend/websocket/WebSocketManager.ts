@@ -21,7 +21,7 @@ export interface WSMessage {
 class WebSocketManager {
   private wss: WebSocketServer | null = null;
   private clients: Set<WebSocket> = new Set();
-  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private heartbeatInterval: any = null;
 
   initialize(server: any): void {
     this.wss = new WebSocketServer({ server, path: '/ws' });

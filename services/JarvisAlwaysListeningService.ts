@@ -48,7 +48,7 @@ class JarvisAlwaysListeningService {
   private isProcessingCommand: boolean = false;
   private recognition: any = null;
   private webRecognition: any = null;
-  private commandTimeoutHandle: NodeJS.Timeout | null = null;
+  private commandTimeoutHandle: any = null;
 
   private config: AlwaysListeningConfig = {
     enabled: true,
