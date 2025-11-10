@@ -8,6 +8,13 @@ module.exports = {
     '**/__tests__/**/*.test.(ts|tsx|js)',
     '**/?(*.)+(spec|test).(ts|tsx|js)'
   ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/e2e/',
+    '/.expo/',
+    '/dist/',
+    '/coverage/'
+  ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: [
     'services/**/*.{ts,tsx}',
@@ -18,7 +25,8 @@ module.exports = {
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/__tests__/**',
-    '!**/coverage/**'
+    '!**/coverage/**',
+    '!**/e2e/**'
   ],
   coverageThreshold: {
     global: {
