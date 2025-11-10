@@ -51,7 +51,6 @@ export default function RootLayout() {
   const [appReady, setAppReady] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
-  const [initSequence, setInitSequence] = useState(0);
   const [splashHidden, setSplashHidden] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -171,15 +170,15 @@ export default function RootLayout() {
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
     };
-  }, [router, initSequence]);
+  }, [checkAuthentication, initializeJarvis, router]); // Dependencies are stable - won't cause re-renders
 
   useEffect(() => {
     const handleAuthSuccess = () => {
-      console.log('[App] 🔄 Authenticated event received - restarting initialization');
+      console.log('[App] 🔄 Authenticated event received - navigating to app');
       setShowSignIn(false);
-      setAppReady(false);
-      setIsAuthenticating(true);
-      setInitSequence((value) => value + 1);
+      setIsAuthenticating(false);
+      // Navigate to home - let the app initialization happen naturally on next mount
+      router.replace('/');
     };
 
     AuthManager.on('authenticated', handleAuthSuccess);
@@ -187,7 +186,7 @@ export default function RootLayout() {
     return () => {
       AuthManager.off('authenticated', handleAuthSuccess);
     };
-  }, []);
+  }, [router]);
 
   // Balanced splash screen lifecycle with fallback timeout
   useEffect(() => {
