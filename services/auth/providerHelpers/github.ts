@@ -155,7 +155,6 @@ async function startWebFlow(additionalScopes: string[] = []): Promise<AuthRespon
 
     // Create redirect URI using proxy
     const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: USE_PROXY,
       scheme: 'myapp',
     });
 
@@ -170,7 +169,6 @@ async function startWebFlow(additionalScopes: string[] = []): Promise<AuthRespon
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-      useProxy: USE_PROXY,
     });
 
     console.log('[GitHubProvider] Auth result:', result.type);

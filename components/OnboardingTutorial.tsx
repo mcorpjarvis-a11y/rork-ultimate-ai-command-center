@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Dimensions
 import { useState, useEffect } from 'react';
 import { Bot, Zap, Target, TrendingUp, DollarSign, Settings, CheckCircle, ArrowRight, X } from 'lucide-react-native';
 import { IronManTheme } from '@/constants/colors';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');

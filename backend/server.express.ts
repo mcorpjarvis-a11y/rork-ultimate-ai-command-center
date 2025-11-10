@@ -51,19 +51,27 @@ app.use(cors({
     if (!origin) return callback(null, true);
     
     // Get allowed origins from env or use safe defaults
-    const allowedOrigins = process.env.FRONTEND_URL 
-      ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
-      : ['http://localhost:8081', 'http://localhost:19006', 'exp://'];
+    const frontendUrlEnv = process.env.FRONTEND_URL || 'http://localhost:3000,http://localhost:8081,http://localhost:19006,exp://';
+    const allowedOrigins = frontendUrlEnv
+      .split(',')
+      .map((o: string) => o.trim())
+      .filter((o: string) => o.length > 0);
+    
+    // Check if wildcard is present
+    if (allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
     
     // Check if origin is allowed or starts with exp:// (Expo)
-    const isAllowed = allowedOrigins.some(allowed => 
-      allowed === '*' || origin === allowed || origin.startsWith('exp://')
+    const isAllowed = allowedOrigins.some((allowed: string) => 
+      origin === allowed || origin.startsWith('exp://')
     );
     
     if (isAllowed) {
       callback(null, true);
     } else {
       console.warn(`[CORS] Blocked request from origin: ${origin}`);
+      console.warn(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -145,7 +153,16 @@ const server = app.listen(PORT, HOST, () => {
   console.log(`🌐 Server URL: http://${HOST}:${PORT}`);
   console.log(`📡 API Base: http://${HOST}:${PORT}/api`);
   console.log(`🩺 Health: http://${HOST}:${PORT}/`);
-  console.log('\n💡 Available Endpoints:');
+  console.log('\n📋 Available Backend Services:');
+  console.log('   🎤 Voice API           - Text-to-speech and speech-to-text');
+  console.log('   🤖 AI Reasoning        - Gemini, Hugging Face, OpenAI integration');
+  console.log('   🔗 Integration Manager - Social accounts and connected APIs');
+  console.log('   📄 Content Management  - Content creation and management');
+  console.log('   📊 Analytics           - Performance analytics and insights');
+  console.log('   🎮 IoT Control         - IoT device management and control');
+  console.log('   📤 Upload/Storage      - Media upload, storage, transcription');
+  console.log('   📈 Monitoring          - System status, logs, and health checks');
+  console.log('\n💡 API Endpoints:');
   console.log('   • /api/voice        - Text-to-speech and speech-to-text');
   console.log('   • /api/ask          - AI reasoning (Gemini, Hugging Face, OpenAI)');
   console.log('   • /api/integrations - Social accounts and connected APIs');
@@ -156,6 +173,8 @@ const server = app.listen(PORT, HOST, () => {
   console.log('   • /api/logs         - System and user logs');
   console.log('   • /api/settings     - App configuration');
   console.log('   • /api/system       - System status and info');
+  console.log('   • /api/iot          - IoT device control');
+  console.log('   • /api/monetization - Monetization features');
   console.log('\n📝 Logs will appear below...\n');
 });
 

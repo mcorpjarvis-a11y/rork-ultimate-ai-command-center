@@ -11,6 +11,20 @@ const path = require('path');
 console.log('[ensure-deps] Running dependency alignment...');
 
 try {
+  // Update dependencies to latest compatible versions
+  console.log('[ensure-deps] Running: npm update');
+  
+  try {
+    execSync('npm update', {
+      cwd: path.join(__dirname, '..'),
+      stdio: 'inherit',
+      env: { ...process.env, CI: 'true' } // Non-interactive mode
+    });
+    console.log('[ensure-deps] ✓ Dependencies updated');
+  } catch (error) {
+    console.warn('[ensure-deps] ⚠ npm update completed with warnings (non-blocking)');
+  }
+
   // Run expo install --fix non-interactively
   // This aligns React Native and Expo SDK versions
   console.log('[ensure-deps] Running: npx expo install --fix');

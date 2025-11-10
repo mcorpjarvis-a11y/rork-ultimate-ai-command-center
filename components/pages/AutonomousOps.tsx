@@ -127,7 +127,7 @@ export default function AutonomousOpsPage() {
         <View style={styles.metricCard}>
           <DollarSign color="#7CFC00" size={24} />
           <Text style={styles.metricValue}>${metrics.revenue.today.toFixed(0)}</Text>
-          <Text style={styles.metricLabel}>Today's Revenue</Text>
+          <Text style={styles.metricLabel}>Today&apos;s Revenue</Text>
           <Text style={[styles.metricChange, { color: metrics.revenue.change > 0 ? '#7CFC00' : '#FF3B30' }]}>
             {metrics.revenue.change > 0 ? '+' : ''}{metrics.revenue.change.toFixed(1)}%
           </Text>

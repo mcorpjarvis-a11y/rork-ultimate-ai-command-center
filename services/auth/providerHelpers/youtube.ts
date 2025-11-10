@@ -33,7 +33,6 @@ export async function startAuth(): Promise<AuthResponse> {
 
     // Create redirect URI using proxy
     const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: USE_PROXY,
       scheme: 'myapp',
     });
 
@@ -51,9 +50,9 @@ export async function startAuth(): Promise<AuthResponse> {
       usePKCE: USE_PROXY,
     });
 
-    const result = await request.promptAsync(discovery, {
-      useProxy: USE_PROXY,
-    });
+    const result = discovery
+      ? await request.promptAsync(discovery, {})
+      : await request.promptAsync({} as any, {});
 
     if (result.type === 'success') {
       const code = result.params.code;

@@ -2,6 +2,20 @@
 // This runs before all tests
 
 // Mock expo modules that aren't available in test environment
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: {
+    expoConfig: {
+      extra: {},
+    },
+    manifest: {},
+    platform: {
+      android: undefined,
+      ios: undefined,
+    },
+  },
+}));
+
 jest.mock('expo-auth-session', () => ({
   makeRedirectUri: jest.fn(() => 'myapp://redirect'),
   AuthRequest: jest.fn(),
@@ -197,15 +211,27 @@ jest.mock('expo-speech-recognition', () => ({
   useSpeechRecognitionEvent: jest.fn(),
 }));
 
-// Suppress console logs in tests (but keep errors)
+// Suppress console logs in tests (but keep errors visible in CI)
 const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+const originalConsoleLog = console.log;
 
 global.console = {
   ...console,
-  log: jest.fn(),
-  warn: jest.fn(),
+  log: jest.fn((...args) => {
+    // In CI or when DEBUG is set, show logs
+    if (process.env.CI || process.env.DEBUG) {
+      originalConsoleLog(...args);
+    }
+  }),
+  warn: jest.fn((...args) => {
+    // Show warnings in CI
+    if (process.env.CI) {
+      originalConsoleWarn(...args);
+    }
+  }),
   error: jest.fn((...args) => {
-    // Keep errors visible
+    // Always keep errors visible
     originalConsoleError(...args);
   }),
 };
