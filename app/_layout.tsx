@@ -13,6 +13,7 @@ import SecureKeyStorage from "@/services/security/SecureKeyStorage";
 import ConfigValidator from "@/services/config/ConfigValidator";
 import OnboardingStatus from "@/services/onboarding/OnboardingStatus";
 import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService";
+import ServiceHealthMonitor from "@/services/core/ServiceHealthMonitor";
 import { 
   SchedulerService, 
   WebSocketService, 
@@ -114,6 +115,7 @@ export default function RootLayout() {
       SchedulerService.stop();
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
+      ServiceHealthMonitor.stopMonitoring();
     };
   }, [router]);
 
@@ -138,49 +140,118 @@ export default function RootLayout() {
   async function initializeJarvis() {
     try {
       console.log('[App] Initializing Jarvis...');
+      
+      // Register core services with health monitor
+      ServiceHealthMonitor.registerService('jarvis-initialization');
+      ServiceHealthMonitor.registerService('backend-connectivity');
+      ServiceHealthMonitor.registerService('speech-services');
+      ServiceHealthMonitor.registerService('always-listening');
+      ServiceHealthMonitor.registerService('scheduler');
+      ServiceHealthMonitor.registerService('websocket');
+      ServiceHealthMonitor.registerService('monitoring');
+      
       await JarvisInitializationService.initialize();
+      ServiceHealthMonitor.updateServiceHealth('jarvis-initialization', {
+        status: 'healthy',
+        message: 'JARVIS core initialized',
+      });
       
       // Initialize backend connectivity with error handling
       try {
         await PlugAndPlayService.initialize();
+        ServiceHealthMonitor.updateServiceHealth('backend-connectivity', {
+          status: 'healthy',
+          message: 'Backend connected',
+        });
       } catch (error) {
         console.warn('[App] Backend connectivity initialization failed (will retry later):', error);
+        ServiceHealthMonitor.updateServiceHealth('backend-connectivity', {
+          status: 'degraded',
+          message: 'Backend offline - using fallback mode',
+        });
         // Continue - app can work without backend
       }
       
       // Initialize speech services
-      await VoiceService.initialize();
-      console.log('[App] VoiceService initialized');
-      
-      // JarvisVoiceService and JarvisListenerService auto-initialize in their constructors
-      // Access them to ensure they're loaded (they're singleton instances)
-      const speechServices = [JarvisVoiceService, JarvisListenerService];
-      console.log('[App] Speech services initialized:', speechServices.length);
+      try {
+        await VoiceService.initialize();
+        console.log('[App] VoiceService initialized');
+        
+        // JarvisVoiceService and JarvisListenerService auto-initialize in their constructors
+        // Access them to ensure they're loaded (they're singleton instances)
+        const speechServices = [JarvisVoiceService, JarvisListenerService];
+        console.log('[App] Speech services initialized:', speechServices.length);
+        
+        ServiceHealthMonitor.updateServiceHealth('speech-services', {
+          status: 'healthy',
+          message: 'Speech services available',
+        });
+      } catch (error) {
+        console.warn('[App] Speech services initialization warning:', error);
+        ServiceHealthMonitor.updateServiceHealth('speech-services', {
+          status: 'degraded',
+          message: 'Speech services unavailable - text input available',
+        });
+      }
       
       // Start always-listening service for wake word detection
       console.log('[App] Starting always-listening service...');
       const alwaysListeningStarted = await JarvisAlwaysListeningService.start();
       if (alwaysListeningStarted) {
         console.log('[App] ✅ Always-listening service started - JARVIS is now listening for wake word');
+        ServiceHealthMonitor.updateServiceHealth('always-listening', {
+          status: 'healthy',
+          message: 'Wake word detection active',
+        });
       } else {
         console.warn('[App] ⚠️ Always-listening service could not be started');
+        ServiceHealthMonitor.updateServiceHealth('always-listening', {
+          status: 'degraded',
+          message: 'Wake word detection unavailable',
+        });
       }
       
       // Start scheduler for automated tasks
       SchedulerService.start();
       console.log('[App] Scheduler service started');
+      ServiceHealthMonitor.updateServiceHealth('scheduler', {
+        status: 'healthy',
+        message: 'Scheduler running',
+      });
       
       // Connect WebSocket for real-time updates with error handling
       try {
         await WebSocketService.connect();
+        ServiceHealthMonitor.updateServiceHealth('websocket', {
+          status: 'healthy',
+          message: 'WebSocket connected',
+        });
       } catch (error) {
         console.warn('[App] WebSocket connection failed (will retry automatically):', error);
+        ServiceHealthMonitor.updateServiceHealth('websocket', {
+          status: 'degraded',
+          message: 'WebSocket disconnected - will retry',
+        });
         // Continue - app can work without WebSocket
       }
       
       // Start system monitoring
       MonitoringService.startMonitoring();
       console.log('[App] Monitoring service started');
+      ServiceHealthMonitor.updateServiceHealth('monitoring', {
+        status: 'healthy',
+        message: 'System monitoring active',
+      });
+      
+      // Start health monitoring with 30 second intervals
+      ServiceHealthMonitor.startMonitoring(30000);
+      
+      // Log health report
+      const healthReport = ServiceHealthMonitor.getHealthReport();
+      console.log('[App] Service Health Report:', healthReport.overallStatus);
+      console.log('[App] Services:', healthReport.services.map(s => 
+        `${s.name}: ${s.status}`
+      ).join(', '));
       
       console.log('[App] Jarvis initialization complete');
     } catch (error) {
