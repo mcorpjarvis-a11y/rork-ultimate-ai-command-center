@@ -62,8 +62,9 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
       },
     });
 
-    const result = await request.promptAsync(discovery, {
-    });
+    const result = discovery 
+      ? await request.promptAsync(discovery, {})
+      : await request.promptAsync({} as any, {});
 
     console.log('[GoogleProvider] Auth result:', result?.type);
 

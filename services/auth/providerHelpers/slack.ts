@@ -78,8 +78,10 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
         scope: tokens.scope,
         scopes: scopes,
         expires_at: Date.now() + (tokens.expires_in * 1000),
-        team_id: tokens.team?.id,
-        team_name: tokens.team?.name,
+        metadata: {
+          team_id: tokens.team?.id,
+          team_name: tokens.team?.name,
+        },
         profile,
       };
     } else if (result.type === 'error') {

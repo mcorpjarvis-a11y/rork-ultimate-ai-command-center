@@ -57,10 +57,12 @@ export async function startAuth(): Promise<AuthResponse> {
       return {
         access_token: tokens.access_token,
         token_type: tokens.token_type,
-        workspace_id: tokens.workspace_id,
-        workspace_name: tokens.workspace_name,
-        bot_id: tokens.bot_id,
-        owner: tokens.owner,
+        metadata: {
+          workspace_id: tokens.workspace_id,
+          workspace_name: tokens.workspace_name,
+          bot_id: tokens.bot_id,
+          owner: tokens.owner,
+        },
         profile,
       };
     } else if (result.type === 'error') {

@@ -117,7 +117,7 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
       case 'instagram':
         // Get Instagram token data for user ID and page access token
         const igTokenData = await TokenVault.getToken('instagram');
-        const igUserId = igTokenData?.userId || igTokenData?.user_id;
+        const igUserId = (igTokenData?.metadata?.userId || igTokenData?.metadata?.user_id) as string | undefined;
         
         if (!igUserId) {
           return res.status(400).json({
@@ -130,7 +130,7 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
           imageUrl: mediaUrls && mediaUrls[0],
           videoUrl: videoFile ? videoFile.toString() : undefined,
           caption: content,
-          accessToken: igTokenData?.pageAccessToken || accessToken,
+          accessToken: (igTokenData?.metadata?.pageAccessToken as string) || accessToken,
           igUserId,
         });
         
@@ -216,8 +216,8 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
       case 'instagram':
         // Get Instagram token data for analytics
         const igTokenData2 = await TokenVault.getToken('instagram');
-        const igUserId2 = igTokenData2?.userId || igTokenData2?.user_id;
-        const pageAccessToken = igTokenData2?.pageAccessToken || accessToken;
+        const igUserId2 = (igTokenData2?.metadata?.userId || igTokenData2?.metadata?.user_id) as string | undefined;
+        const pageAccessToken = (igTokenData2?.metadata?.pageAccessToken as string) || accessToken;
         
         if (!igUserId2) {
           return res.status(400).json({
@@ -238,7 +238,7 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
       case 'x':
         // Get Twitter token data for analytics
         const twitterTokenData = await TokenVault.getToken('twitter');
-        const twitterUserId = twitterTokenData?.userId || twitterTokenData?.user_id;
+        const twitterUserId = (twitterTokenData?.metadata?.userId || twitterTokenData?.metadata?.user_id) as string | undefined;
         
         if (!twitterUserId) {
           return res.status(400).json({

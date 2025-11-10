@@ -38,6 +38,7 @@ export interface AuthResponse {
   scope?: string;
   scopes?: string[]; // Array of scope strings (alternative to scope)
   profile?: any;
+  metadata?: Record<string, any>; // Additional metadata from provider
 }
 
 export type ProviderStatus = 'connected' | 'not_connected' | 'needs_reauth';

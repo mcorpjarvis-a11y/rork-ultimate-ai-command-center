@@ -50,8 +50,9 @@ export async function startAuth(): Promise<AuthResponse> {
       usePKCE: USE_PROXY,
     });
 
-    const result = await request.promptAsync(discovery, {
-    });
+    const result = discovery
+      ? await request.promptAsync(discovery, {})
+      : await request.promptAsync({} as any, {});
 
     if (result.type === 'success') {
       const code = result.params.code;
