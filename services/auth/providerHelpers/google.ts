@@ -38,7 +38,6 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     // Create redirect URI - using proxy means no manual setup!
     const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: USE_PROXY,
       scheme: 'myapp',
     });
 
@@ -64,7 +63,6 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
     });
 
     const result = await request.promptAsync(discovery, {
-      useProxy: USE_PROXY,
     });
 
     console.log('[GoogleProvider] Auth result:', result?.type);

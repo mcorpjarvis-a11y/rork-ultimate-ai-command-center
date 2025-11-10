@@ -54,8 +54,8 @@ app.use(cors({
     const frontendUrlEnv = process.env.FRONTEND_URL || 'http://localhost:3000,http://localhost:8081,http://localhost:19006,exp://';
     const allowedOrigins = frontendUrlEnv
       .split(',')
-      .map(o => o.trim())
-      .filter(o => o.length > 0);
+      .map((o: string) => o.trim())
+      .filter((o: string) => o.length > 0);
     
     // Check if wildcard is present
     if (allowedOrigins.includes('*')) {
@@ -63,7 +63,7 @@ app.use(cors({
     }
     
     // Check if origin is allowed or starts with exp:// (Expo)
-    const isAllowed = allowedOrigins.some(allowed => 
+    const isAllowed = allowedOrigins.some((allowed: string) => 
       origin === allowed || origin.startsWith('exp://')
     );
     

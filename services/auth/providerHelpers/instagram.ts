@@ -31,7 +31,6 @@ export async function startAuth(): Promise<AuthResponse> {
 
     // Create redirect URI using proxy
     const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: USE_PROXY,
       scheme: 'myapp',
     });
 
@@ -48,7 +47,6 @@ export async function startAuth(): Promise<AuthResponse> {
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://www.facebook.com/v18.0/dialog/oauth',
-      useProxy: USE_PROXY,
     });
 
     if (result.type === 'success') {

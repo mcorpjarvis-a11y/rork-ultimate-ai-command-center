@@ -34,7 +34,6 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     // Create redirect URI using proxy
     const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: USE_PROXY,
       scheme: 'myapp',
     });
 
@@ -54,7 +53,6 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://slack.com/oauth/v2/authorize',
-      useProxy: USE_PROXY,
     });
 
     console.log('[SlackProvider] Auth result:', result.type);

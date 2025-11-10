@@ -27,7 +27,6 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     // Create redirect URI using proxy
     const redirectUri = AuthSession.makeRedirectUri({
-      useProxy: USE_PROXY,
       scheme: 'myapp',
     });
 
@@ -47,7 +46,6 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     const result = await request.promptAsync({
       authorizationEndpoint: 'https://www.reddit.com/api/v1/authorize',
-      useProxy: USE_PROXY,
     });
 
     console.log('[RedditProvider] Auth result:', result.type);

@@ -36,14 +36,17 @@ router.get('/accounts', async (req: Request, res: Response) => {
 
     for (const provider of connectedProviders) {
       const status = await AuthManager.getProviderStatus(provider);
-      if (status.connected) {
+      if (status === 'connected') {
+        // Get token data for additional info
+        const tokenData = await (AuthManager as any).getToken?.(provider);
+        
         accounts.push({
           id: provider,
           platform: provider,
-          username: status.profile?.username || status.profile?.displayName || 'Unknown',
+          username: tokenData?.username || tokenData?.displayName || 'Unknown',
           connected: true,
-          connectedAt: status.connectedAt,
-          expiresAt: status.expiresAt,
+          connectedAt: tokenData?.created_at || Date.now(),
+          expiresAt: tokenData?.expires_in ? Date.now() + tokenData.expires_in * 1000 : undefined,
         });
       }
     }
@@ -68,7 +71,7 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
     }
 
     // Check if provider is connected
-    const isConnected = await AuthManager.isProviderConnected(platform);
+    const isConnected = await AuthManager.isConnected(platform);
     if (!isConnected) {
       return res.status(403).json({ 
         success: false, 
@@ -112,8 +115,9 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
         });
 
       case 'instagram':
-        const profile = await AuthManager.getProviderStatus('instagram');
-        const igUserId = profile.profile?.id;
+        // Get Instagram token data for user ID and page access token
+        const igTokenData = await TokenVault.getToken('instagram');
+        const igUserId = igTokenData?.userId || igTokenData?.user_id;
         
         if (!igUserId) {
           return res.status(400).json({
@@ -126,7 +130,7 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
           imageUrl: mediaUrls && mediaUrls[0],
           videoUrl: videoFile ? videoFile.toString() : undefined,
           caption: content,
-          accessToken: profile.profile?.pageAccessToken || accessToken,
+          accessToken: igTokenData?.pageAccessToken || accessToken,
           igUserId,
         });
         
@@ -139,7 +143,7 @@ router.post('/social/post', async (req: Request<{}, {}, PostRequestBody>, res: R
 
       case 'twitter':
       case 'x':
-        const twitterProfile = await AuthManager.getProviderStatus('twitter');
+        // Twitter status check removed - not needed for posting
         
         result = await TwitterAPIService.postTweet(accessToken, {
           text: content,
@@ -177,7 +181,7 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
       return res.status(400).json({ success: false, error: 'Platform is required' });
     }
 
-    const isConnected = await AuthManager.isProviderConnected(platform);
+    const isConnected = await AuthManager.isConnected(platform);
     if (!isConnected) {
       return res.status(403).json({ 
         success: false, 
@@ -210,11 +214,19 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
         });
 
       case 'instagram':
-        const igProfile = await AuthManager.getProviderStatus('instagram');
-        const igUserId = igProfile.profile?.id;
-        const pageAccessToken = igProfile.profile?.pageAccessToken || accessToken;
+        // Get Instagram token data for analytics
+        const igTokenData2 = await TokenVault.getToken('instagram');
+        const igUserId2 = igTokenData2?.userId || igTokenData2?.user_id;
+        const pageAccessToken = igTokenData2?.pageAccessToken || accessToken;
         
-        analytics = await InstagramAPIService.getInsights(igUserId, pageAccessToken, 'day');
+        if (!igUserId2) {
+          return res.status(400).json({
+            success: false,
+            error: 'Instagram user ID not found',
+          });
+        }
+        
+        analytics = await InstagramAPIService.getInsights(igUserId2, pageAccessToken, 'day');
         
         return res.json({
           success: true,
@@ -224,8 +236,16 @@ router.get('/social/analytics', async (req: Request<{}, {}, {}, AnalyticsRequest
 
       case 'twitter':
       case 'x':
-        const twitterProfile = await AuthManager.getProviderStatus('twitter');
-        const twitterUserId = twitterProfile.profile?.id;
+        // Get Twitter token data for analytics
+        const twitterTokenData = await TokenVault.getToken('twitter');
+        const twitterUserId = twitterTokenData?.userId || twitterTokenData?.user_id;
+        
+        if (!twitterUserId) {
+          return res.status(400).json({
+            success: false,
+            error: 'Twitter user ID not found',
+          });
+        }
         
         analytics = await TwitterAPIService.getUserAnalytics(accessToken, twitterUserId);
         
@@ -259,7 +279,7 @@ router.get('/social/content', async (req: Request<{}, {}, {}, { platform: string
       return res.status(400).json({ success: false, error: 'Platform is required' });
     }
 
-    const isConnected = await AuthManager.isProviderConnected(platform);
+    const isConnected = await AuthManager.isConnected(platform);
     if (!isConnected) {
       return res.status(403).json({ 
         success: false, 
@@ -314,9 +334,9 @@ router.get('/', async (req: Request, res: Response) => {
     for (const provider of connectedProviders) {
       const status = await AuthManager.getProviderStatus(provider);
       integrations[provider] = {
-        connected: status.connected,
-        profile: status.profile,
-        expiresAt: status.expiresAt,
+        connected: status === 'connected',
+        profile: null, // Profile info not available in current status structure
+        expiresAt: null, // Expiry info not available in current status structure
         services: getProviderServices(provider),
       };
     }
