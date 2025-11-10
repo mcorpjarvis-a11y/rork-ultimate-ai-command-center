@@ -67,8 +67,8 @@ test.describe('Backend Startup', () => {
     // Navigate to health endpoint
     await page.goto('http://localhost:3000/healthz');
     
-    // Wait a bit for any delayed requests
-    await page.waitForTimeout(2000);
+    // Wait for network to be idle after navigation
+    await page.waitForLoadState('networkidle');
     
     // Verify no external API calls were made
     expect(externalAPICalls).toHaveLength(0);
