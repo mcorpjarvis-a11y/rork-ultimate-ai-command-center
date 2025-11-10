@@ -31,6 +31,7 @@ export default function SignInScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [profileChecked, setProfileChecked] = useState(false);
 
   const toggleAuthMode = useCallback(() => {
     setAuthMode(mode => mode === 'email' ? 'google' : 'email');
@@ -41,7 +42,14 @@ export default function SignInScreen() {
   }, []);
 
   const checkExistingProfile = useCallback(async () => {
+    // Guard to prevent repeated checks
+    if (profileChecked) {
+      console.log('[SignInScreen] Profile already checked, skipping');
+      return;
+    }
+
     try {
+      setProfileChecked(true);
       const profile = await MasterProfile.getMasterProfile();
       
       if (profile) {
@@ -61,15 +69,19 @@ export default function SignInScreen() {
     } finally {
       setCheckingProfile(false);
     }
-  }, [router]);
+  }, [router, profileChecked]);
 
   useEffect(() => {
-    const init = async () => {
-      await checkExistingProfile();
-    };
-    
-    init();
-  }, [checkExistingProfile]);
+    // Only run profile check once
+    if (!profileChecked) {
+      const init = async () => {
+        console.log('[SignInScreen] Running initial profile check');
+        await checkExistingProfile();
+      };
+      
+      init();
+    }
+  }, [profileChecked, checkExistingProfile]);
 
   const handleEmailAuth = useCallback(async () => {
     try {
