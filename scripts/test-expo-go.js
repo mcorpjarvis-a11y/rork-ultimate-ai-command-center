@@ -32,11 +32,11 @@ tests.push({
   name: 'Backend routes files exist',
   test: () => {
     const fs = require('fs');
-    return fs.existsSync('backend/routes/analytics.js') &&
-           fs.existsSync('backend/routes/trends.js') &&
-           fs.existsSync('backend/routes/content.js') &&
-           fs.existsSync('backend/routes/integrations.js') &&
-           fs.existsSync('backend/routes/system.js');
+    return fs.existsSync('backend/routes/analytics.ts') &&
+           fs.existsSync('backend/routes/trends.ts') &&
+           fs.existsSync('backend/routes/content.ts') &&
+           fs.existsSync('backend/routes/integrations.ts') &&
+           fs.existsSync('backend/routes/system.ts');
   }
 });
 
@@ -45,7 +45,7 @@ tests.push({
   name: 'Backend server configured correctly',
   test: () => {
     const fs = require('fs');
-    const serverContent = fs.readFileSync('backend/server.js', 'utf8');
+    const serverContent = fs.readFileSync('backend/server.express.ts', 'utf8');
     return serverContent.includes('/api/analytics') &&
            serverContent.includes('/api/trends') &&
            serverContent.includes('/api/content') &&
