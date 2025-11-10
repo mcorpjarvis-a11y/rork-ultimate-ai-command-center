@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { AppProvider } from "@/contexts/AppContext";
 import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { trpc, trpcClient } from "@/lib/trpc";
@@ -147,7 +147,7 @@ export default function RootLayout() {
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
     };
-  }, [router, initSequence]);
+  }, [router, initSequence, checkAuthentication, initializeJarvis]);
 
   useEffect(() => {
     const handleAuthSuccess = () => {
@@ -165,7 +165,7 @@ export default function RootLayout() {
     };
   }, []);
 
-  async function checkAuthentication(): Promise<boolean> {
+  const checkAuthentication = useCallback(async (): Promise<boolean> => {
     try {
       // Check if master profile exists
       const profile = await MasterProfile.getMasterProfile();
@@ -191,9 +191,9 @@ export default function RootLayout() {
       console.error('[App] ❌ Authentication check error:', error);
       return false;
     }
-  }
+  }, []);
 
-  async function initializeJarvis() {
+  const initializeJarvis = useCallback(async () => {
     try {
       console.log('[Jarvis] 🤖 Initializing JARVIS core systems...');
       
@@ -266,7 +266,7 @@ export default function RootLayout() {
       // Don't throw - allow app to continue with reduced functionality
       console.warn('[Jarvis] ⚠️  Continuing with reduced functionality');
     }
-  }
+  }, []);
 
   if (showSignIn) {
     return (

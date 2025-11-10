@@ -4,7 +4,7 @@
  * Android/Expo/Termux only - NO iOS support
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -33,11 +33,15 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
 
-  useEffect(() => {
-    checkExistingProfile();
+  const toggleAuthMode = useCallback(() => {
+    setAuthMode(mode => mode === 'email' ? 'google' : 'email');
   }, []);
 
-  const checkExistingProfile = async () => {
+  const toggleSignUpMode = useCallback(() => {
+    setIsSignUp(prev => !prev);
+  }, []);
+
+  const checkExistingProfile = useCallback(async () => {
     try {
       const profile = await MasterProfile.getMasterProfile();
       
@@ -51,20 +55,36 @@ export default function SignInScreen() {
     } finally {
       setCheckingProfile(false);
     }
-  };
+  }, [router]);
 
-  const handleEmailAuth = async () => {
+  useEffect(() => {
+    let mounted = true;
+    
+    const init = async () => {
+      await checkExistingProfile();
+    };
+    
+    init();
+    
+    return () => {
+      mounted = false;
+    };
+  }, [checkExistingProfile]);
+
+  const handleEmailAuth = useCallback(async () => {
     try {
       setLoading(true);
 
       // Validate inputs
       if (!email.trim() || !password.trim()) {
         Alert.alert('Error', 'Please enter email and password');
+        setLoading(false);
         return;
       }
 
       if (isSignUp && !name.trim()) {
         Alert.alert('Error', 'Please enter your name');
+        setLoading(false);
         return;
       }
 
@@ -90,12 +110,11 @@ export default function SignInScreen() {
 
         console.log('[SignInScreen] Master profile created successfully');
         AuthManager.notifyAuthenticated('email', { profile: masterProfile });
-        router.replace('/onboarding/permissions');
         
         Alert.alert(
           'Welcome!',
           `Account created for ${email}. Let's set up your permissions.`,
-          [{ text: 'OK' }]
+          [{ text: 'OK', onPress: () => router.replace('/onboarding/permissions') }]
         );
       } else {
         // Sign in
@@ -122,13 +141,11 @@ export default function SignInScreen() {
 
         console.log('[SignInScreen] Sign-in successful, redirecting to app');
         AuthManager.notifyAuthenticated('email', { profile: masterProfile });
-        // Let _layout.tsx handle routing based on onboarding status
-        router.replace('/');
         
         Alert.alert(
           'Welcome Back!',
           `Signed in as ${email}.`,
-          [{ text: 'OK' }]
+          [{ text: 'OK', onPress: () => router.replace('/') }]
         );
       }
     } catch (error) {
@@ -141,9 +158,9 @@ export default function SignInScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [email, password, name, isSignUp, router]);
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = useCallback(async () => {
     try {
       setLoading(true);
       console.log('[SignInScreen] Starting Google Sign-In');
@@ -161,6 +178,7 @@ export default function SignInScreen() {
           'Please try again or use email sign-in instead.',
           [{ text: 'OK' }]
         );
+        setLoading(false);
         return;
       }
 
@@ -173,6 +191,7 @@ export default function SignInScreen() {
           'Could not retrieve authentication token. Please try again or use email sign-in instead.',
           [{ text: 'OK' }]
         );
+        setLoading(false);
         return;
       }
 
@@ -205,14 +224,11 @@ export default function SignInScreen() {
 
       console.log('[SignInScreen] Master profile created successfully');
       AuthManager.notifyAuthenticated('google', { profile: masterProfile });
-
-      // Navigate to permission manager
-      router.replace('/onboarding/permissions');
       
       Alert.alert(
         'Welcome!',
         `Signed in as ${googleProfile.name || googleProfile.email}. Let's set up your permissions.`,
-        [{ text: 'OK' }]
+        [{ text: 'OK', onPress: () => router.replace('/onboarding/permissions') }]
       );
     } catch (error) {
       console.error('[SignInScreen] Sign-in error:', error);
@@ -226,9 +242,9 @@ export default function SignInScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
-  const handleSkip = () => {
+  const handleSkip = useCallback(() => {
     Alert.alert(
       'Skip Sign In?',
       'You can sign in later from the settings, but some features may be limited.',
@@ -250,7 +266,7 @@ export default function SignInScreen() {
         },
       ]
     );
-  };
+  }, [router]);
 
   if (checkingProfile) {
     return (
@@ -340,7 +356,7 @@ export default function SignInScreen() {
 
             <TouchableOpacity
               style={styles.switchModeButton}
-              onPress={() => setIsSignUp(!isSignUp)}
+              onPress={toggleSignUpMode}
               disabled={loading}
             >
               <Text style={styles.switchModeText}>
@@ -356,7 +372,7 @@ export default function SignInScreen() {
 
             <TouchableOpacity
               style={[styles.button, styles.googleButton]}
-              onPress={() => setAuthMode('google')}
+              onPress={toggleAuthMode}
               disabled={loading}
             >
               <Text style={styles.googleIcon}>G</Text>
@@ -382,7 +398,7 @@ export default function SignInScreen() {
 
             <TouchableOpacity
               style={styles.backButton}
-              onPress={() => setAuthMode('email')}
+              onPress={toggleAuthMode}
               disabled={loading}
             >
               <Text style={styles.backButtonText}>← Back to Email Sign In</Text>
