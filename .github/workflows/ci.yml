@@ -369,8 +369,4 @@ jobs:
           fi
           
           echo "✅ All critical checks passed!"
-            echo "Security scan job failed"
-            exit 1
-          fi
-          echo "All critical checks passed!"
 
