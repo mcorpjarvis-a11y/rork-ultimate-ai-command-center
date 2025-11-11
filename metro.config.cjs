@@ -1,17 +1,22 @@
 /**
  * Metro configuration for React Native with Expo + Expo Router
- * Compatible with CommonJS environments (like Termux)
+ * Pure CommonJS for Node 22 compatibility in Termux
  */
 
 const { getDefaultConfig } = require('expo/metro-config');
-const { withExpoRouter } = require('expo-router/metro');
 const path = require('path');
 
-// Get base config
+// Detect Termux environment
+const isTermux = process.env.PREFIX && process.env.PREFIX.includes('/com.termux/');
+if (isTermux) {
+  console.log('🔧 Detected Termux environment – using safe Metro CJS mode.');
+}
+
+// Get base config from Expo
 const baseConfig = getDefaultConfig(__dirname);
 
-// Extend for router
-const config = withExpoRouter({
+// Build config with all necessary extensions
+const config = {
   ...baseConfig,
   transformer: {
     ...baseConfig.transformer,
@@ -21,6 +26,7 @@ const config = withExpoRouter({
         inlineRequires: true,
       },
     }),
+    // Critical for Node 22 + Termux compatibility
     unstable_disableModuleTypeStripping: true,
   },
   resolver: {
@@ -36,9 +42,9 @@ const config = withExpoRouter({
       ...(baseConfig.resolver?.assetExts || []),
       'db', 'mp3', 'ttf', 'png'
     ],
+    blockList: [/backend\/dist\/.*/, /\.git\/.*/],
   },
   watchFolders: [path.resolve(__dirname, 'node_modules')],
-  blockList: [/backend\/dist\/.*/, /\.git\/.*/],
-});
+};
 
 module.exports = config;
