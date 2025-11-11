@@ -7,10 +7,14 @@
 
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 import { AuthResponse } from '../types';
 
 WebBrowser.maybeCompleteAuthSession();
+
+// Get Google OAuth client ID from app configuration
+const googleClientId = Constants.expoConfig?.extra?.googleOAuthClientId;
 
 // For Expo Go and development, we use Expo's authentication proxy
 // This eliminates the need for manual OAuth client ID setup!
@@ -31,8 +35,9 @@ const GOOGLE_DISCOVERY = {
  */
 export async function startAuth(additionalScopes: string[] = []): Promise<AuthResponse> {
   try {
-    console.log('[GoogleProvider] Starting Google sign-in (no manual setup required)');
+    console.log('[GoogleProvider] Starting Google sign-in');
     console.log('[GoogleProvider] Platform:', Platform.OS);
+    console.log('[GoogleProvider] Client ID from config:', googleClientId ? 'configured' : 'missing');
     
     if (Platform.OS === 'ios') {
       throw new Error('iOS is not supported. Please use Android.');
@@ -40,26 +45,29 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
-    // Create redirect URI - using proxy means no manual setup!
-    const redirectUri = AuthSession.makeRedirectUri({
-      scheme: 'myapp',
+    // Create redirect URI using Expo proxy for better compatibility
+    const redirectUri = AuthSession.makeRedirectUri({ 
+      useProxy: true,
     });
 
     console.log('[GoogleProvider] Using Expo proxy:', USE_PROXY);
     console.log('[GoogleProvider] Redirect URI:', redirectUri);
 
-    // For proxy mode, we use a special client ID format
-    // Expo handles the real OAuth behind the scenes
-    const clientId = USE_PROXY 
-      ? 'EXPO_PROXY' // Special identifier for Expo proxy
-      : (process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '');
+    // Use the client ID from app configuration or fallback to environment variable
+    const clientId = googleClientId || process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '';
+    
+    if (!clientId) {
+      throw new Error('Google OAuth client ID not configured. Please set it in app.json extra.googleOAuthClientId');
+    }
+
+    console.log('[GoogleProvider] Using client ID:', clientId.substring(0, 20) + '...');
 
     const request = new AuthSession.AuthRequest({
       clientId,
       scopes,
       redirectUri,
-      usePKCE: USE_PROXY, // PKCE is used with proxy
-      responseType: AuthSession.ResponseType.Code,
+      usePKCE: true,
+      responseType: AuthSession.ResponseType.Token,
       extraParams: {
         access_type: 'offline',
         prompt: 'consent',
@@ -67,53 +75,38 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
     });
 
     // Use static discovery endpoints instead of useAutoDiscovery hook
-    const result = await request.promptAsync(GOOGLE_DISCOVERY, {});
+    const result = await request.promptAsync(GOOGLE_DISCOVERY, { useProxy: USE_PROXY });
 
     console.log('[GoogleProvider] Auth result:', result?.type);
 
     if (result.type === 'success') {
-      // With Expo proxy, we might get the token directly
-      if (result.authentication) {
-        const { authentication } = result;
-        console.log('[GoogleProvider] Got authentication directly from proxy');
-        
-        // Fetch user profile
-        const profile = await fetchUserProfile(authentication.accessToken);
-        
-        return {
-          access_token: authentication.accessToken,
-          refresh_token: authentication.refreshToken,
-          expires_in: authentication.expiresIn || 3600,
-          token_type: authentication.tokenType || 'Bearer',
-          scope: scopes.join(' '),
-          scopes: scopes,
-          expires_at: authentication.issuedAt 
-            ? authentication.issuedAt + (authentication.expiresIn || 3600) * 1000
-            : Date.now() + 3600000,
-          profile,
-        };
+      console.log('[GoogleProvider] Authentication successful');
+      
+      // With ResponseType.Token, we get the token directly in params
+      const accessToken = result.params?.access_token;
+      const tokenType = result.params?.token_type || 'Bearer';
+      const expiresIn = result.params?.expires_in ? parseInt(result.params.expires_in, 10) : 3600;
+      const scope = result.params?.scope;
+      
+      if (!accessToken) {
+        throw new Error('No access token received from OAuth flow');
       }
       
-      // If we have a code, exchange it (fallback for non-proxy mode)
-      const code = result.params?.code;
-      if (code) {
-        console.log('[GoogleProvider] Exchanging code for tokens');
-        const tokens = await exchangeCodeForTokens(code, request.codeVerifier!, redirectUri);
-        const profile = await fetchUserProfile(tokens.access_token);
-        
-        return {
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-          expires_in: tokens.expires_in,
-          token_type: tokens.token_type,
-          scope: tokens.scope,
-          scopes: scopes,
-          expires_at: Date.now() + (tokens.expires_in * 1000),
-          profile,
-        };
-      }
+      console.log('[GoogleProvider] Access token obtained');
       
-      throw new Error('No authentication data received');
+      // Fetch user profile
+      const profile = await fetchUserProfile(accessToken);
+      
+      return {
+        access_token: accessToken,
+        refresh_token: result.params?.refresh_token,
+        expires_in: expiresIn,
+        token_type: tokenType,
+        scope: scope || scopes.join(' '),
+        scopes: scopes,
+        expires_at: Date.now() + (expiresIn * 1000),
+        profile,
+      };
     } else if (result.type === 'error') {
       console.error('[GoogleProvider] Auth error:', result.error);
       throw new Error(result.error?.message || 'Authentication failed');
@@ -173,8 +166,12 @@ export async function refreshToken(refresh_token: string): Promise<AuthResponse>
   try {
     console.log('[GoogleProvider] Refreshing access token');
 
-    // Use EXPO_PROXY client ID for proxy mode
-    const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || 'EXPO_PROXY';
+    // Use the configured client ID
+    const clientId = googleClientId || process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '';
+    
+    if (!clientId) {
+      throw new Error('Google OAuth client ID not configured');
+    }
 
     const params = new URLSearchParams({
       client_id: clientId,
