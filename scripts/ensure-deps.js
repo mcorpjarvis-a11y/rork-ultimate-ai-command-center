@@ -7,20 +7,49 @@
 
 const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 console.log('[ensure-deps] Running dependency alignment...');
 
+// React-related packages that should be protected from auto-upgrade
+const PROTECTED_PACKAGES = [
+  'react',
+  'react-dom',
+  'react-native',
+  'react-native-renderer',
+  'react-test-renderer'
+];
+
 try {
-  // Update dependencies to latest compatible versions
-  console.log('[ensure-deps] Running: npm update');
+  // Update dependencies to latest compatible versions, excluding React packages
+  console.log('[ensure-deps] Running: npm update (excluding React packages)');
   
   try {
-    execSync('npm update', {
-      cwd: path.join(__dirname, '..'),
-      stdio: 'inherit',
-      env: { ...process.env, CI: 'true' } // Non-interactive mode
-    });
-    console.log('[ensure-deps] ✓ Dependencies updated');
+    // Read package.json to get all dependencies except protected ones
+    const packageJsonPath = path.join(__dirname, '..', 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    
+    const allDeps = {
+      ...packageJson.dependencies,
+      ...packageJson.devDependencies
+    };
+    
+    // Filter out protected packages
+    const packagesToUpdate = Object.keys(allDeps).filter(
+      pkg => !PROTECTED_PACKAGES.includes(pkg)
+    );
+    
+    if (packagesToUpdate.length > 0) {
+      // Update only non-protected packages
+      execSync(`npm update ${packagesToUpdate.join(' ')}`, {
+        cwd: path.join(__dirname, '..'),
+        stdio: 'inherit',
+        env: { ...process.env, CI: 'true' } // Non-interactive mode
+      });
+      console.log('[ensure-deps] ✓ Dependencies updated (React packages protected)');
+    } else {
+      console.log('[ensure-deps] ✓ No packages to update');
+    }
   } catch (error) {
     console.warn('[ensure-deps] ⚠ npm update completed with warnings (non-blocking)');
   }
