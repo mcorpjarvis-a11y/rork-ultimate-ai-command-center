@@ -15,6 +15,8 @@
     "start-web": "expo start --web --config metro.config.proxy.js",
     "start-web-dev": "DEBUG=expo* expo start --web --config metro.config.proxy.js",
     "check:node": "node scripts/check-node-version.js",
+    "check:native-mods": "node scripts/check-native-mods.js",
+    "reset:cache": "./scripts/reset-cache.sh",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
