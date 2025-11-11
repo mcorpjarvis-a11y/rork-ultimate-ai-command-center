@@ -215,7 +215,7 @@ export default function RootLayout() {
       WebSocketService.disconnect();
       MonitoringService.stopMonitoring();
     };
-  }, [hasInitialized, checkAuthentication, initializeJarvis, router]);
+  }, [hasInitialized, router]);
 
   useEffect(() => {
     const handleAuthSuccess = () => {
