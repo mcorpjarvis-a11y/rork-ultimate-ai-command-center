@@ -100,12 +100,13 @@ backend.on('exit', (code) => {
 
 setTimeout(() => {
   console.log('\n📱 Starting Frontend (Expo)...\n');
+  console.log('🧹 Clearing Metro cache for clean startup...\n');
   
   let frontend;
   try {
     frontend = spawn(
       isWindows ? 'npx.cmd' : 'npx',
-      ['expo', 'start'],
+      ['expo', 'start', '-c'],
       { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
     );
   } catch (error) {
