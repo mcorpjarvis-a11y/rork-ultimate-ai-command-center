@@ -7,6 +7,8 @@
 import TokenVault from './TokenVault';
 import MasterProfile from './MasterProfile';
 import { TokenData, AuthEvent, AuthEventListener, ProviderStatus } from './types';
+import JarvisListenerService from '../JarvisListenerService';
+import JarvisVoiceService from '../JarvisVoiceService';
 
 // Static imports for Metro bundler compatibility
 import * as googleProvider from './providerHelpers/google';
@@ -92,6 +94,10 @@ class AuthManager {
       });
 
       console.log(`[AuthManager] Successfully authenticated ${provider}`);
+      
+      // Reinitialize voice and listener services after successful login
+      await this.onLoginSuccess(provider);
+      
       return true;
     } catch (error) {
       console.error(`[AuthManager] Auth flow failed for ${provider}:`, error);
@@ -351,6 +357,30 @@ class AuthManager {
     }
     
     return helper;
+  }
+
+  /**
+   * Reinitialize voice and listener services after successful login
+   * Ensures Jarvis announces authentication and reactivates listening
+   */
+  private async onLoginSuccess(provider: string): Promise<void> {
+    try {
+      console.log(`[AuthManager] Reinitializing Jarvis systems after ${provider} login...`);
+      
+      // Announce successful authentication
+      await JarvisVoiceService.speak('System online. Authentication successful. Initializing full voice link.');
+      
+      // Start the listener service
+      await JarvisListenerService.startListening();
+      
+      // Confirm activation
+      await JarvisVoiceService.speak('Voice interface active and listening.');
+      
+      console.log('[Jarvis] Voice and listener services reinitialized post-login.');
+    } catch (error) {
+      console.error('[Jarvis] Failed to reinitialize voice/listener:', error);
+      // Don't throw - authentication was successful even if voice/listener fails
+    }
   }
 }
 
