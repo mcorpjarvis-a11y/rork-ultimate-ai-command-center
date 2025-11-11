@@ -16,6 +16,8 @@ import OnboardingStatus from "@/services/onboarding/OnboardingStatus";
 import OAuthRequirementService from "@/services/onboarding/OAuthRequirementService";
 import MasterProfileValidator from "@/services/onboarding/MasterProfileValidator";
 import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService";
+import JarvisLogger from "@/services/JarvisLoggerService";
+import { requestAllPermissions } from "@/services/JarvisPermissionsService";
 import { 
   SchedulerService, 
   WebSocketService, 
@@ -93,49 +95,49 @@ export default function RootLayout() {
 
     async function initializeApp() {
       try {
-        console.log('[App] 🚀 Starting app initialization...');
+        JarvisLogger.stage('App', 'Starting app initialization...');
         
         // Mark as initialized immediately to prevent re-entry
         setHasInitialized(true);
         
         // Step 0: Validate configuration
-        console.log('[App] Step 0: Validating configuration...');
+        JarvisLogger.stage('Step 0', 'Validating configuration...');
         const configValidation = ConfigValidator.validateConfig();
         
         if (!ConfigValidator.canRunApp(configValidation)) {
-          console.error('[App] ❌ Critical configuration errors:', configValidation.errors);
+          JarvisLogger.error('Critical configuration errors:', configValidation.errors);
           // Show error but continue - app can still work with local features
         }
         
         if (configValidation.warnings.length > 0) {
-          console.warn('[App] ⚠️  Configuration warnings:', configValidation.warnings);
+          JarvisLogger.warn('Configuration warnings:', configValidation.warnings);
         }
         
         // Step 1: Test SecureStorage on app startup
-        console.log('[App] Step 1: Testing secure storage...');
+        JarvisLogger.stage('Step 1', 'Testing secure storage...');
         const storageWorks = await SecureKeyStorage.testSecureStorage();
         if (!isMounted) return; // Check if component is still mounted
         
         if (!storageWorks) {
-          console.warn('[App] ⚠️  SecureStorage not fully functional, some features may be limited');
+          JarvisLogger.warn('SecureStorage not fully functional, some features may be limited');
         } else {
-          console.log('[App] ✅ SecureStorage test passed');
+          JarvisLogger.success('SecureStorage test passed');
         }
         
         // Steps 2-4: Parallel authentication and validation checks (OPTIMIZED)
-        console.log('[App] Steps 2-4: Checking authentication, OAuth, and onboarding in parallel...');
+        JarvisLogger.stage('Steps 2-4', 'Checking authentication, OAuth, and onboarding in parallel...');
         
         const [isAuthenticated, oauthValid, onboardingComplete] = await Promise.all([
           checkAuthentication().catch(err => {
-            console.error('[App] Authentication check failed:', err);
+            JarvisLogger.error('Authentication check failed:', err);
             return false;
           }),
           OAuthRequirementService.hasValidOAuthProfile().catch(err => {
-            console.error('[App] OAuth validation failed:', err);
+            JarvisLogger.error('OAuth validation failed:', err);
             return false;
           }),
           OnboardingStatus.isOnboardingComplete().catch(err => {
-            console.error('[App] Onboarding check failed:', err);
+            JarvisLogger.error('Onboarding check failed:', err);
             return false;
           })
         ]);
@@ -144,33 +146,33 @@ export default function RootLayout() {
         
         // Check authentication result
         if (!isAuthenticated) {
-          console.log('[App] ❌ No valid master profile found, showing sign-in');
-          console.log('[App] 🔐 OAuth login REQUIRED to proceed');
+          JarvisLogger.warn('No valid master profile found, showing sign-in');
+          JarvisLogger.info('OAuth login REQUIRED to proceed');
           if (isMounted) {
             setShowSignIn(true);
             setIsAuthenticating(false);
           }
           return;
         }
-        console.log('[App] ✅ Authentication check passed');
+        JarvisLogger.success('Authentication check passed');
 
         // Check OAuth validation result
         if (!oauthValid) {
-          console.log('[App] ❌ OAuth providers not connected, showing sign-in');
+          JarvisLogger.warn('OAuth providers not connected, showing sign-in');
           if (isMounted) {
             setShowSignIn(true);
             setIsAuthenticating(false);
           }
           return;
         }
-        console.log('[App] ✅ OAuth validation passed');
+        JarvisLogger.success('OAuth validation passed');
         
         // Log OAuth status asynchronously (non-blocking)
         OAuthRequirementService.logOAuthStatus();
 
         // Check onboarding status result
         if (!onboardingComplete) {
-          console.log('[App] ⚠️  Profile exists but onboarding not complete, redirecting to wizard');
+          JarvisLogger.warn('Profile exists but onboarding not complete, redirecting to wizard');
           if (isMounted) {
             setIsAuthenticating(false);
             // Let the router navigate to permissions screen
@@ -179,21 +181,27 @@ export default function RootLayout() {
           return;
         }
         
+        // Step 4.5: Request all permissions (after authentication, before JARVIS init)
+        JarvisLogger.stage('Step 4.5', 'Requesting permissions...');
+        const permissions = await requestAllPermissions();
+        if (!isMounted) return;
+        JarvisLogger.success('Permissions granted');
+        
         // Step 5: Validate master profile integrity (non-blocking log)
-        console.log('[App] Step 5: Validating master profile...');
+        JarvisLogger.stage('Step 5', 'Validating master profile...');
         MasterProfileValidator.logValidationStatus(); // Non-blocking - logs asynchronously
 
         // Step 6: Initialize JARVIS with real data
-        console.log('[App] Step 6: Initializing JARVIS with live data...');
+        JarvisLogger.stage('Step 6', 'Initializing JARVIS with live data...');
         await initializeJarvis();
         
         if (!isMounted) return; // Check if component is still mounted
         
         setAppReady(true);
-        console.log('[App] ✅ JARVIS initialized and ready');
-        console.log('[App] 🎯 App initialization complete - All systems operational');
+        JarvisLogger.success('JARVIS initialized and ready');
+        JarvisLogger.success('App initialization complete - All systems operational');
       } catch (error) {
-        console.error('[App] ❌ App initialization error:', error);
+        JarvisLogger.error('App initialization error:', error);
         // Show sign-in on error
         if (isMounted) {
           setShowSignIn(true);
@@ -340,76 +348,77 @@ export default function RootLayout() {
 
   const initializeJarvis = useCallback(async () => {
     try {
-      console.log('[Jarvis] 🤖 Initializing JARVIS core systems...');
+      JarvisLogger.stage('JARVIS', 'Initializing JARVIS core systems...');
       
       // Initialize core JARVIS services (NO voice services yet)
       await JarvisInitializationService.initialize();
-      console.log('[Jarvis] ✅ Core JARVIS services initialized');
+      JarvisLogger.success('Core JARVIS services initialized');
       
       // Initialize backend connectivity with error handling
       try {
-        console.log('[Jarvis] Connecting to backend services...');
+        JarvisLogger.info('Connecting to backend services...');
         await PlugAndPlayService.initialize();
-        console.log('[Jarvis] ✅ Backend services connected');
+        JarvisLogger.success('Backend services connected');
       } catch (error) {
-        console.warn('[Jarvis] ⚠️  Backend connectivity initialization failed (will retry later):', error);
+        JarvisLogger.warn('Backend connectivity initialization failed (will retry later):', error);
         // Continue - app can work without backend
       }
       
       // NOW initialize speech services (lazy-loaded post-OAuth)
       try {
-        console.log('[Jarvis] Initializing speech recognition services...');
+        JarvisLogger.info('Initializing speech recognition services...');
         await VoiceService.initialize();
-        console.log('[Jarvis] ✅ VoiceService initialized');
+        JarvisLogger.success('VoiceService initialized');
         
         // JarvisVoiceService and JarvisListenerService auto-initialize in their constructors
         // Access them to ensure they're loaded (they're singleton instances)
         const speechServices = [JarvisVoiceService, JarvisListenerService];
-        console.log('[Jarvis] ✅ Speech services initialized:', speechServices.length);
+        JarvisLogger.success('Speech services initialized: ' + speechServices.length);
       } catch (error) {
-        console.error('[Jarvis] ❌ Speech recognition error:', error);
-        console.warn('[Jarvis] ⚠️  Speech services unavailable, continuing without voice features');
+        JarvisLogger.error('Speech recognition error:', error);
+        JarvisLogger.warn('Speech services unavailable, continuing without voice features');
         // Continue without voice - other features still work
       }
       
       // Start always-listening service for wake word detection (lazy-loaded)
       try {
-        console.log('[Jarvis] Starting always-listening service...');
+        JarvisLogger.info('Starting always-listening service...');
         const alwaysListeningStarted = await JarvisAlwaysListeningService.start();
         if (alwaysListeningStarted) {
-          console.log('[Jarvis] ✅ Always-listening service started - JARVIS is now listening for wake word');
+          JarvisLogger.success('Always-listening service started - JARVIS is now listening for wake word');
         } else {
-          console.warn('[Jarvis] ⚠️  Always-listening service could not be started');
+          JarvisLogger.warn('Always-listening service could not be started');
         }
       } catch (error) {
-        console.error('[Jarvis] ❌ Failed to start always-listening service:', error);
-        console.warn('[Jarvis] ⚠️  Continuing without wake word detection');
+        JarvisLogger.error('Failed to start always-listening service:', error);
+        JarvisLogger.warn('Continuing without wake word detection');
         // Continue - wake word is optional
       }
       
       // Start scheduler for automated tasks
       SchedulerService.start();
-      console.log('[Jarvis] ✅ Scheduler service started');
+      JarvisLogger.success('Scheduler service started');
       
       // Connect WebSocket for real-time updates with error handling
       try {
-        console.log('[Jarvis] Connecting WebSocket...');
+        JarvisLogger.info('Connecting WebSocket...');
         await WebSocketService.connect();
-        console.log('[Jarvis] ✅ WebSocket connected');
+        JarvisLogger.success('WebSocket connected');
       } catch (error) {
-        console.warn('[Jarvis] ⚠️  WebSocket connection failed (will retry automatically):', error);
+        JarvisLogger.warn('WebSocket connection failed (will retry automatically):', error);
         // Continue - app can work without WebSocket
       }
       
       // Start system monitoring
       MonitoringService.startMonitoring();
-      console.log('[Jarvis] ✅ Monitoring service started');
+      JarvisLogger.success('Monitoring service started');
       
-      console.log('[Jarvis] 🎉 JARVIS initialization complete - All systems operational!');
+      JarvisLogger.success('JARVIS initialization complete - All systems operational!');
+      JarvisLogger.success('Navigation: Dashboard');
     } catch (error) {
-      console.error('[Jarvis] ❌ JARVIS initialization error:', error);
+      JarvisLogger.error('JARVIS initialization error:', error);
       // Don't throw - allow app to continue with reduced functionality
-      console.warn('[Jarvis] ⚠️  Continuing with reduced functionality');
+      JarvisLogger.warn('Continuing with reduced functionality');
     }
   }, []);
 

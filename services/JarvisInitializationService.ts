@@ -4,6 +4,7 @@ import JarvisListenerService from './JarvisListenerService';
 import JarvisVoiceService from './JarvisVoiceService';
 import JarvisPersonality from './personality/JarvisPersonality';
 import FreeAIService from './ai/FreeAIService';
+import JarvisLogger from './JarvisLoggerService';
 
 const INITIALIZATION_KEY = '@jarvis_initialized';
 
@@ -61,7 +62,7 @@ class JarvisInitializationService {
 
     // If already initialized, return immediately
     if (this.initialized) {
-      console.log('[JarvisInit] Already initialized');
+      JarvisLogger.info('Already initialized');
       return;
     }
 
@@ -71,25 +72,25 @@ class JarvisInitializationService {
     try {
       await this.initializationPromise;
       this.initialized = true;
-      console.log('[JarvisInit] ✅ Initialization complete');
+      JarvisLogger.success('Initialization complete');
     } catch (error) {
-      console.error('[JarvisInit] ❌ Initialization failed:', error);
+      JarvisLogger.error('Initialization failed:', error);
       this.initializationPromise = null;
       throw error;
     }
   }
 
   private async performInitialization(): Promise<void> {
-    console.log('[JarvisInit] 🚀 Starting Jarvis initialization...');
+    JarvisLogger.stage('JarvisInit', 'Starting Jarvis initialization...');
 
     try {
       // Step 1: Skip loading API keys from config (lazy-load later)
       // API keys will be loaded only when user adds them in Settings
-      console.log('[JarvisInit] Skipping API key loading - clean slate mode');
+      JarvisLogger.info('Skipping API key loading - clean slate mode');
 
       // Step 2: Skip initializing Free AI Service (lazy-load later)
       // AI service will be initialized only when user provides keys
-      console.log('[JarvisInit] Skipping AI service initialization - will initialize when keys provided');
+      JarvisLogger.info('Skipping AI service initialization - will initialize when keys provided');
 
       // Step 3: Initialize Jarvis Personality
       await this.initializePersonality();
@@ -109,9 +110,9 @@ class JarvisInitializationService {
       // Mark as initialized
       await AsyncStorage.setItem(INITIALIZATION_KEY, 'true');
 
-      console.log('[JarvisInit] ✅ All systems operational (local mode)');
+      JarvisLogger.success('All systems operational (local mode)');
     } catch (error) {
-      console.error('[JarvisInit] Initialization error:', error);
+      JarvisLogger.error('Initialization error:', error);
       throw error;
     }
   }
