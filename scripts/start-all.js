@@ -106,8 +106,8 @@ setTimeout(() => {
   try {
     frontend = spawn(
       isWindows ? 'npx.cmd' : 'npx',
-      ['expo', 'start', '-c', '--config', 'metro.config.proxy.js'],
-      { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
+      ['expo', 'start', '-c'],
+      { stdio: 'pipe', shell: isWindows, cwd: process.cwd(), env: { ...process.env, FORCE_COLOR: '1' } }
     );
   } catch (error) {
     console.error('❌ Failed to start frontend (Metro bundler):', error.message);
@@ -120,6 +120,8 @@ setTimeout(() => {
   }
 
   frontendRunning = true;
+  
+  console.log('✅ Expo Metro running in Safe Termux CJS mode\n');
 
   frontend.stdout.on('data', (data) => {
     const message = data.toString().trim();
