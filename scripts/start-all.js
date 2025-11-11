@@ -106,7 +106,7 @@ setTimeout(() => {
   try {
     frontend = spawn(
       isWindows ? 'npx.cmd' : 'npx',
-      ['expo', 'start', '-c'],
+      ['expo', 'start', '-c', '--config', 'metro.config.proxy.js'],
       { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
     );
   } catch (error) {

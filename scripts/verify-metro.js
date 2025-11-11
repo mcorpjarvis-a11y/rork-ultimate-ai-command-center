@@ -91,7 +91,7 @@ try {
 
   // Run expo export to test bundling
   execSync(
-    `npx expo export --platform android --output-dir ${TEMP_OUTPUT}`,
+    `npx expo export --platform android --output-dir ${TEMP_OUTPUT} --config metro.config.proxy.js`,
     {
       cwd: PROJECT_ROOT,
       stdio: 'inherit',

@@ -14,6 +14,33 @@
 
 ---
 
+## 📋 Recent Updates (2025-11-11)
+
+### ✅ Metro Config ESM Bridge for Node 22 + Termux (PR: fix-metro-config-loading)
+
+**Status: COMPLETE - Metro Config Compatible with Node 22 and ESM**
+
+#### Summary
+Fixed Metro config loading for Node 22 and Termux environments by creating an ESM-safe bridge. The setup now supports both CommonJS and ESM module systems, ensuring compatibility with Node 22+ and future ESM adoption.
+
+#### Key Changes
+- **✅ CommonJS Config**: Renamed `metro.config.js` → `metro.config.cjs` for explicit CommonJS support
+- **✅ ESM Bridge**: Created `metro.config.proxy.js` using `createRequire` to bridge ESM → CJS
+- **✅ Updated Scripts**: All expo start commands now use `--config metro.config.proxy.js`
+- **✅ Test Updates**: Updated all test scripts to validate both .cjs and .proxy.js files
+- **✅ Future-Proof**: Setup works with or without `"type": "module"` in package.json
+
+#### Technical Implementation
+- `metro.config.cjs`: Pure CommonJS config file (unchanged logic)
+- `metro.config.proxy.js`: ESM wrapper using Node's `createRequire` API
+- Package.json scripts updated: `start`, `start:frontend`, `start-web`, `start-web-dev`
+- Test files updated: `test-metro-config.js`, `test-metro-commonjs.js`, integration tests
+
+#### Metro Configuration
+> **Node 22 Compatibility**: Metro config now uses a hybrid ESM/CJS approach. The .cjs file maintains CommonJS compatibility while the .proxy.js file provides ESM bridge for Node 22+. Expo CLI loads the proxy, which safely imports the CJS config. Both files must be kept in sync for future changes.
+
+---
+
 ## 📋 Recent Updates (2025-11-10)
 
 ### ✅ Splash Screen Hang Fix (PR: fix-splash-screen-hang)
@@ -1119,7 +1146,8 @@ rork-ultimate-ai-command-center/
 ├── docs/                       # Archived documentation
 ├── .env.example                # Environment template
 ├── app.json                    # Expo configuration
-├── metro.config.js             # Metro bundler config
+├── metro.config.cjs            # Metro bundler config (CommonJS)
+├── metro.config.proxy.js       # Metro config ESM bridge (for Node 22+)
 ├── babel.config.js             # Babel configuration
 ├── jest.config.js              # Jest test configuration
 ├── jest.setup.js               # Jest mocks
