@@ -182,6 +182,21 @@ After installation, your system should report:
 
 ## 🐛 Troubleshooting
 
+### "TurboModuleRegistry.getEnforcing(...): 'PlatformConstants' could not be found"
+
+This error indicates React Native TurboModules are not properly linked or caches are stale.
+
+```bash
+# Automated fix (recommended)
+npm run reset:cache
+
+# Or diagnose first, then fix
+npm run check:native-mods
+npm run reset:cache
+```
+
+See [TURBOMODULE_FIX.md](./TURBOMODULE_FIX.md) for detailed information.
+
 ### "Metro bundler won't start"
 
 ```bash

@@ -27,7 +27,8 @@
         "MICROPHONE",
         "RECORD_AUDIO",
         "POST_NOTIFICATIONS"
-      ]
+      ],
+      "jsEngine": "hermes"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"

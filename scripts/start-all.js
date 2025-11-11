@@ -112,9 +112,10 @@ setTimeout(() => {
   } catch (error) {
     console.error('❌ Failed to start frontend (Metro bundler):', error.message);
     console.error('\nTroubleshooting:');
-    console.error('  1. Run: npm run verify:metro');
-    console.error('  2. Clear Metro cache: npm start -- --clear');
-    console.error('  3. Check MASTER_CHECKLIST.md Metro Troubleshooting section');
+    console.error('  1. Run: ./scripts/reset-cache.sh (clears all caches and rebuilds)');
+    console.error('  2. Run: npm run verify:metro');
+    console.error('  3. Clear Metro cache: npm start -- --clear');
+    console.error('  4. Check MASTER_CHECKLIST.md Metro Troubleshooting section');
     if (backend && backend.pid) backend.kill('SIGTERM');
     process.exit(1);
   }
@@ -127,6 +128,29 @@ setTimeout(() => {
     const message = data.toString().trim();
     if (message) {
       log('FRONTEND', colors.magenta, message);
+      
+      // Check for TurboModule errors
+      if (message.includes('TurboModuleRegistry') || message.includes('PlatformConstants')) {
+        console.error('\n❌ ════════════════════════════════════════════════════════════');
+        console.error('❌   TURBOMODULE ERROR DETECTED');
+        console.error('❌   React Native TurboModules are not properly linked');
+        console.error('❌ ════════════════════════════════════════════════════════════\n');
+        console.error('💡 This usually means caches need to be cleared or versions misaligned.\n');
+        console.error('🔧 To fix this, run:');
+        console.error('   ./scripts/reset-cache.sh');
+        console.error('\n   Or manually:');
+        console.error('   1. rm -rf node_modules .expo .expo-shared');
+        console.error('   2. npm install');
+        console.error('   3. npx expo prebuild --clean');
+        console.error('   4. npx expo start -c\n');
+        
+        // Shutdown gracefully
+        if (backend && backend.pid) backend.kill('SIGTERM');
+        if (frontend && frontend.pid) frontend.kill('SIGTERM');
+        setTimeout(() => process.exit(1), 1000);
+        return;
+      }
+      
       if (message.includes('Metro') || message.includes('Waiting')) {
         frontendReady = true;
         checkAllReady();
@@ -138,6 +162,28 @@ setTimeout(() => {
     const message = data.toString().trim();
     if (message && !message.includes('ExperimentalWarning')) {
       log('FRONTEND', colors.yellow, message);
+      
+      // Check for TurboModule errors in stderr as well
+      if (message.includes('TurboModuleRegistry') || message.includes('PlatformConstants')) {
+        console.error('\n❌ ════════════════════════════════════════════════════════════');
+        console.error('❌   TURBOMODULE ERROR DETECTED');
+        console.error('❌   React Native TurboModules are not properly linked');
+        console.error('❌ ════════════════════════════════════════════════════════════\n');
+        console.error('💡 This usually means caches need to be cleared or versions misaligned.\n');
+        console.error('🔧 To fix this, run:');
+        console.error('   ./scripts/reset-cache.sh');
+        console.error('\n   Or manually:');
+        console.error('   1. rm -rf node_modules .expo .expo-shared');
+        console.error('   2. npm install');
+        console.error('   3. npx expo prebuild --clean');
+        console.error('   4. npx expo start -c\n');
+        
+        // Shutdown gracefully
+        if (backend && backend.pid) backend.kill('SIGTERM');
+        if (frontend && frontend.pid) frontend.kill('SIGTERM');
+        setTimeout(() => process.exit(1), 1000);
+        return;
+      }
     }
   });
 
