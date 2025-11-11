@@ -42,7 +42,6 @@
           "microphonePermission": "Allow ${PRODUCT_NAME} to access your microphone"
         }
       ],
-      "expo-speech",
       [
         "expo-image-picker",
         {

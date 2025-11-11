@@ -21,6 +21,7 @@ const config = withExpoRouter({
         inlineRequires: true,
       },
     }),
+    unstable_disableModuleTypeStripping: true,
   },
   resolver: {
     ...baseConfig.resolver,
