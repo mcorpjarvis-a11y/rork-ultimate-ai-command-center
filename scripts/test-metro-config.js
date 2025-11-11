@@ -2,7 +2,7 @@
 
 /**
  * Metro Config Validation Script
- * Validates that metro.config.js exists and has proper structure
+ * Validates that metro.config.cjs and metro.config.proxy.js exist and have proper structure
  */
 
 const fs = require('fs');
@@ -11,35 +11,44 @@ const path = require('path');
 console.log('🔍 Validating Metro Configuration...\n');
 
 const projectRoot = path.resolve(__dirname, '..');
-const metroConfigPath = path.join(projectRoot, 'metro.config.js');
+const metroConfigCjsPath = path.join(projectRoot, 'metro.config.cjs');
+const metroConfigProxyPath = path.join(projectRoot, 'metro.config.proxy.js');
 
 let hasErrors = false;
 
-// Check 1: Metro config file exists
-console.log('✓ Checking if metro.config.js exists...');
-if (!fs.existsSync(metroConfigPath)) {
-  console.error('✗ ERROR: metro.config.js not found!');
+// Check 1: Metro config files exist
+console.log('✓ Checking if metro.config.cjs exists...');
+if (!fs.existsSync(metroConfigCjsPath)) {
+  console.error('✗ ERROR: metro.config.cjs not found!');
   hasErrors = true;
 } else {
-  console.log('  ✓ metro.config.js exists');
+  console.log('  ✓ metro.config.cjs exists');
+}
+
+console.log('✓ Checking if metro.config.proxy.js exists...');
+if (!fs.existsSync(metroConfigProxyPath)) {
+  console.error('✗ ERROR: metro.config.proxy.js not found!');
+  hasErrors = true;
+} else {
+  console.log('  ✓ metro.config.proxy.js exists');
 }
 
 // Check 2: Load and validate metro config structure
 if (!hasErrors) {
-  console.log('\n✓ Validating metro.config.js structure...');
+  console.log('\n✓ Validating metro.config.cjs structure...');
   try {
-    const config = require(metroConfigPath);
+    const config = require(metroConfigCjsPath);
     
     // Check for resolver configuration
     if (!config.resolver) {
-      console.error('✗ ERROR: metro.config.js missing resolver configuration');
+      console.error('✗ ERROR: metro.config.cjs missing resolver configuration');
       hasErrors = true;
     } else {
       console.log('  ✓ Resolver configuration found');
       
       // Check for extraNodeModules
       if (!config.resolver.extraNodeModules) {
-        console.error('✗ ERROR: metro.config.js missing extraNodeModules');
+        console.error('✗ ERROR: metro.config.cjs missing extraNodeModules');
         hasErrors = true;
       } else {
         console.log('  ✓ extraNodeModules configuration found');
@@ -67,7 +76,7 @@ if (!hasErrors) {
       }
     }
   } catch (error) {
-    console.error('✗ ERROR: Failed to load metro.config.js:', error.message);
+    console.error('✗ ERROR: Failed to load metro.config.cjs:', error.message);
     hasErrors = true;
   }
 }

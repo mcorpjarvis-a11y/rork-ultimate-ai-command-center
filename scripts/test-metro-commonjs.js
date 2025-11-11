@@ -2,7 +2,7 @@
 
 /**
  * Metro Config CommonJS Validation Script
- * Validates that metro.config.js is pure CommonJS and compatible with Termux/Node.js
+ * Validates that metro.config.cjs is pure CommonJS and compatible with Termux/Node.js
  */
 
 const fs = require('fs');
@@ -11,13 +11,13 @@ const path = require('path');
 console.log('🔍 Testing Metro Config CommonJS Validation...\n');
 
 const projectRoot = path.resolve(__dirname, '..');
-const metroConfigPath = path.join(projectRoot, 'metro.config.js');
+const metroConfigPath = path.join(projectRoot, 'metro.config.cjs');
 const metroConfigContent = fs.readFileSync(metroConfigPath, 'utf8');
 
 let allPass = true;
 
 // Test 1: File exists
-console.log('✓ Test 1: metro.config.js exists');
+console.log('✓ Test 1: metro.config.cjs exists');
 
 // Test 2: Uses require() instead of import
 const hasRequire = metroConfigContent.includes('require(');

@@ -1,7 +1,7 @@
 /**
  * Metro Config CommonJS Validation Test
  * 
- * This test verifies that metro.config.js is pure CommonJS
+ * This test verifies that metro.config.cjs is pure CommonJS
  * and compatible with Node.js environments like Termux.
  */
 
@@ -9,18 +9,23 @@ const fs = require('fs');
 const path = require('path');
 
 describe('Metro Config CommonJS Validation', () => {
-  const metroConfigPath = path.join(__dirname, '..', 'metro.config.js');
+  const metroConfigPath = path.join(__dirname, '..', 'metro.config.cjs');
+  const metroProxyPath = path.join(__dirname, '..', 'metro.config.proxy.js');
   let metroConfigContent;
 
   beforeAll(() => {
     metroConfigContent = fs.readFileSync(metroConfigPath, 'utf8');
   });
 
-  test('metro.config.js exists', () => {
+  test('metro.config.cjs exists', () => {
     expect(fs.existsSync(metroConfigPath)).toBe(true);
   });
 
-  test('metro.config.js uses require() instead of import', () => {
+  test('metro.config.proxy.js exists', () => {
+    expect(fs.existsSync(metroProxyPath)).toBe(true);
+  });
+
+  test('metro.config.cjs uses require() instead of import', () => {
     // Should use require()
     expect(metroConfigContent).toMatch(/require\(/);
     
@@ -29,7 +34,7 @@ describe('Metro Config CommonJS Validation', () => {
     expect(metroConfigContent).not.toMatch(/^\s*import\s*\{/m);
   });
 
-  test('metro.config.js uses module.exports instead of export', () => {
+  test('metro.config.cjs uses module.exports instead of export', () => {
     // Should use module.exports
     expect(metroConfigContent).toMatch(/module\.exports\s*=/);
     
@@ -39,7 +44,7 @@ describe('Metro Config CommonJS Validation', () => {
     expect(metroConfigContent).not.toMatch(/^\s*export\s+\{/m);
   });
 
-  test('metro.config.js exports config object directly', () => {
+  test('metro.config.cjs exports config object directly', () => {
     // Verify it exports the config object, not wrapped in default
     expect(metroConfigContent).toMatch(/module\.exports\s*=\s*config/);
   });
