@@ -324,24 +324,24 @@ export default function RootLayout() {
       const profile = await MasterProfile.getMasterProfile();
       
       if (!profile) {
-        console.log('[App] ❌ No master profile found');
+        JarvisLogger.warn('No master profile found');
         return false;
       }
 
-      console.log('[App] ✅ Master profile found:', profile.email || profile.id);
+      JarvisLogger.success('Master profile found: ' + (profile.email || profile.id));
       
       // Verify OAuth providers are connected
       const hasOAuth = profile.connectedProviders && profile.connectedProviders.length > 0;
       
       if (!hasOAuth) {
-        console.log('[App] ❌ Master profile exists but no OAuth providers connected');
+        JarvisLogger.warn('Master profile exists but no OAuth providers connected');
         return false;
       }
       
-      console.log('[App] ✅ OAuth providers connected:', profile.connectedProviders.join(', '));
+      JarvisLogger.success('OAuth providers connected: ' + profile.connectedProviders.join(', '));
       return true;
     } catch (error) {
-      console.error('[App] ❌ Authentication check error:', error);
+      JarvisLogger.error('Authentication check error:', error);
       return false;
     }
   }, []);

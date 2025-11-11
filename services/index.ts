@@ -26,6 +26,9 @@ export { default as JarvisGuidanceService } from './JarvisGuidanceService';
 export { default as JarvisVoiceService } from './JarvisVoiceService';
 export { default as JarvisListenerService } from './JarvisListenerService';
 export { default as JarvisAlwaysListeningService } from './JarvisAlwaysListeningService';
+export { default as JarvisLoggerService } from './JarvisLoggerService';
+export { JarvisLogger } from './JarvisLoggerService';
+export { requestAllPermissions, hasCriticalPermissions, getPermissionSummary } from './JarvisPermissionsService';
 export { default as IntegrationManager } from './IntegrationManager';
 export { default as AutonomousEngine } from './AutonomousEngine';
 
