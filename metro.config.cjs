@@ -42,9 +42,9 @@ const config = {
       ...(baseConfig.resolver?.assetExts || []),
       'db', 'mp3', 'ttf', 'png'
     ],
+    blockList: [/backend\/dist\/.*/, /\.git\/.*/],
   },
   watchFolders: [path.resolve(__dirname, 'node_modules')],
-  blockList: [/backend\/dist\/.*/, /\.git\/.*/],
 };
 
 module.exports = config;
