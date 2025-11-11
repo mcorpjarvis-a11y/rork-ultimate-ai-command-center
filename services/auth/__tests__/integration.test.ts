@@ -63,16 +63,23 @@ describe('Integration Tests', () => {
   });
 
   describe('Metro Configuration', () => {
-    test('metro.config.js should exist', () => {
+    test('metro.config.cjs should exist', () => {
       const fs = require('fs');
       const path = require('path');
-      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.js');
+      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.cjs');
       expect(fs.existsSync(metroConfigPath)).toBe(true);
     });
 
-    test('metro.config.js should have proper structure', () => {
+    test('metro.config.proxy.js should exist', () => {
+      const fs = require('fs');
       const path = require('path');
-      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.js');
+      const metroProxyPath = path.join(__dirname, '..', '..', '..', 'metro.config.proxy.js');
+      expect(fs.existsSync(metroProxyPath)).toBe(true);
+    });
+
+    test('metro.config.cjs should have proper structure', () => {
+      const path = require('path');
+      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.cjs');
       const config = require(metroConfigPath);
 
       expect(config).toBeDefined();
@@ -81,9 +88,9 @@ describe('Integration Tests', () => {
       expect(config.resolver.extraNodeModules['@']).toBeDefined();
     });
 
-    test('metro.config.js should configure @/ path alias', () => {
+    test('metro.config.cjs should configure @/ path alias', () => {
       const path = require('path');
-      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.js');
+      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.cjs');
       const config = require(metroConfigPath);
 
       const atAlias = config.resolver.extraNodeModules['@'];
@@ -91,9 +98,9 @@ describe('Integration Tests', () => {
       expect(typeof atAlias).toBe('string');
     });
 
-    test('metro.config.js should support TypeScript extensions', () => {
+    test('metro.config.cjs should support TypeScript extensions', () => {
       const path = require('path');
-      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.js');
+      const metroConfigPath = path.join(__dirname, '..', '..', '..', 'metro.config.cjs');
       const config = require(metroConfigPath);
 
       if (config.resolver.sourceExts) {
