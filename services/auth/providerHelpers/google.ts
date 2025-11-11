@@ -18,6 +18,13 @@ const USE_PROXY = true;
 
 const DEFAULT_SCOPES = ['openid', 'profile', 'email'];
 
+// Google OAuth discovery endpoints
+const GOOGLE_DISCOVERY = {
+  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+};
+
 /**
  * Start Google OAuth authentication flow
  * Uses Expo's proxy - NO manual configuration needed!
@@ -30,9 +37,6 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
     if (Platform.OS === 'ios') {
       throw new Error('iOS is not supported. Please use Android.');
     }
-
-    // Google's discovery document - called inside function to avoid React hook at module level
-    const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
 
     const scopes = [...DEFAULT_SCOPES, ...additionalScopes];
 
@@ -62,9 +66,8 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
       },
     });
 
-    const result = discovery 
-      ? await request.promptAsync(discovery, {})
-      : await request.promptAsync({} as any, {});
+    // Use static discovery endpoints instead of useAutoDiscovery hook
+    const result = await request.promptAsync(GOOGLE_DISCOVERY, {});
 
     console.log('[GoogleProvider] Auth result:', result?.type);
 

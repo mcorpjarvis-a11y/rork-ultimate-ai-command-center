@@ -24,6 +24,13 @@ const YOUTUBE_SCOPES = [
   'https://www.googleapis.com/auth/youtubepartner',
 ];
 
+// Google OAuth discovery endpoints (same as Google provider)
+const GOOGLE_DISCOVERY = {
+  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenEndpoint: 'https://oauth2.googleapis.com/token',
+  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+};
+
 /**
  * Start YouTube OAuth authentication flow
  */
@@ -39,9 +46,6 @@ export async function startAuth(): Promise<AuthResponse> {
     // Use Expo proxy client ID
     const clientId = USE_PROXY ? 'EXPO_PROXY' : (process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID || '');
 
-    // Get Google's discovery document
-    const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
-
     const request = new AuthSession.AuthRequest({
       clientId,
       scopes: YOUTUBE_SCOPES,
@@ -50,9 +54,8 @@ export async function startAuth(): Promise<AuthResponse> {
       usePKCE: USE_PROXY,
     });
 
-    const result = discovery
-      ? await request.promptAsync(discovery, {})
-      : await request.promptAsync({} as any, {});
+    // Use static discovery endpoints instead of useAutoDiscovery hook
+    const result = await request.promptAsync(GOOGLE_DISCOVERY, {});
 
     if (result.type === 'success') {
       const code = result.params.code;
