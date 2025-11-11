@@ -25,6 +25,7 @@
     "test:api-keys": "node scripts/test-api-keys.js",
     "test:metro-config": "node scripts/test-metro-config.js",
     "test:provider-registry": "node scripts/test-provider-registry.js",
+    "test:login-pipeline": "tsx tests/testLoginPipeline.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
