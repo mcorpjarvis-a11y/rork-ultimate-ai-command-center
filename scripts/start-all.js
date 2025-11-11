@@ -21,53 +21,6 @@ console.log('🚀 ════════════════════�
 // Check if --skip-update flag is provided
 const skipUpdate = process.argv.includes('--skip-update');
 
-if (!skipUpdate) {
-  console.log('🔍 Checking dependencies...\n');
-
-  try {
-    // Check for outdated packages (display info)
-    try {
-      console.log('📊 Running npm outdated to check for updates...\n');
-      execSync('npm outdated || true', { stdio: 'inherit' });
-    } catch (e) {
-      // npm outdated exits with 1 if there are outdated packages, which is fine
-    }
-    
-    console.log('\n📦 Updating dependencies...\n');
-    
-    // Run npm update to update dependencies within semver ranges
-    try {
-      execSync('npm update', { stdio: 'inherit', env: { ...process.env, CI: 'true' } });
-      console.log('✓ npm update completed');
-    } catch (error) {
-      console.warn('⚠️  npm update completed with warnings (non-blocking)');
-    }
-    
-    // Run npm install to ensure all dependencies are installed
-    try {
-      execSync('npm install', { stdio: 'inherit', env: { ...process.env, CI: 'true' } });
-      console.log('✓ npm install completed');
-    } catch (error) {
-      console.warn('⚠️  npm install completed with warnings (non-blocking)');
-    }
-    
-    // Align Expo and React Native versions
-    try {
-      execSync('npx expo install --fix', { stdio: 'inherit', env: { ...process.env, CI: 'true' } });
-      console.log('✓ Expo dependencies aligned');
-    } catch (error) {
-      console.warn('⚠️  expo install --fix completed with warnings (non-blocking)');
-    }
-    
-    console.log('\n✅ Dependencies updated successfully!\n');
-  } catch (error) {
-    console.error('⚠️  Warning: Failed to update dependencies:', error.message);
-    console.log('Continuing with current dependencies...\n');
-  }
-} else {
-  console.log('⏭️  Skipping dependency update (--skip-update flag provided)\n');
-}
-
 let backendRunning = false;
 let frontendRunning = false;
 let backendReady = false;

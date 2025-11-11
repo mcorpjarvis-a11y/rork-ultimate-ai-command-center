@@ -1,45 +1,43 @@
 /**
- * Metro configuration for React Native with Expo
- * Configures path alias resolution (@/) and proper TypeScript support
- * This fixes module resolution issues for the project structure
+ * Metro configuration for React Native with Expo + Expo Router
+ * Compatible with CommonJS environments (like Termux)
  */
 
 const { getDefaultConfig } = require('expo/metro-config');
+const { withExpoRouter } = require('expo-router/metro');
 const path = require('path');
 
-// Get default Expo Metro configuration
-const config = getDefaultConfig(__dirname);
+// Get base config
+const baseConfig = getDefaultConfig(__dirname);
 
-config.maxWorkers = 2;
-
-config.transformer = {
-  ...config.transformer,
-  getTransformOptions: async () => ({
-    transform: {
-      experimentalImportSupport: false,
-      inlineRequires: true,
-    },
-  }),
-};
-
-const defaultSourceExts = config.resolver?.sourceExts || [];
-const defaultAssetExts = config.resolver?.assetExts || [];
-
-// Configure resolver to support @/ path alias
-config.resolver = {
-  ...config.resolver,
-  extraNodeModules: {
-    '@': path.resolve(__dirname, './'),
+// Extend for router
+const config = withExpoRouter({
+  ...baseConfig,
+  transformer: {
+    ...baseConfig.transformer,
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
   },
-  // Ensure TypeScript files and other extensions are resolved
-  sourceExts: Array.from(new Set([...defaultSourceExts, 'ts', 'tsx', 'mjs', 'cjs'])),
-  assetExts: Array.from(new Set([...defaultAssetExts, 'db', 'mp3', 'ttf', 'obj', 'png', 'jpg'])),
-  // Block only build artifacts and cache directories from being watched
-  // Don't block nested node_modules as some packages need them
-  blockList: [
-    /backend\/dist\/.*/,
-    /\.git\/.*/,
-  ].map((re) => new RegExp(re)),
-};
+  resolver: {
+    ...baseConfig.resolver,
+    extraNodeModules: {
+      '@': path.resolve(__dirname, './'),
+    },
+    sourceExts: [
+      ...(baseConfig.resolver?.sourceExts || []),
+      'ts', 'tsx', 'js', 'jsx', 'json'
+    ],
+    assetExts: [
+      ...(baseConfig.resolver?.assetExts || []),
+      'db', 'mp3', 'ttf', 'png'
+    ],
+  },
+  watchFolders: [path.resolve(__dirname, 'node_modules')],
+  blockList: [/backend\/dist\/.*/, /\.git\/.*/],
+});
 
 module.exports = config;
