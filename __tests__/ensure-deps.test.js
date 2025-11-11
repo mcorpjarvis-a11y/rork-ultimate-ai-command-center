@@ -1,6 +1,6 @@
 /**
  * Test for scripts/ensure-deps.js
- * Validates that React-related packages are protected from auto-upgrade
+ * Validates that React-related packages are correctly pinned to exact versions
  */
 
 const fs = require('fs');
@@ -16,24 +16,28 @@ describe('ensure-deps.js', () => {
     expect(content).toBeTruthy();
   });
 
-  test('PROTECTED_PACKAGES list includes all required React packages', () => {
+  test('script validates required React packages', () => {
     const content = fs.readFileSync(ensureDepsPath, 'utf8');
     
-    // Check that PROTECTED_PACKAGES is defined and includes all required packages
-    expect(content).toContain('PROTECTED_PACKAGES');
-    expect(content).toContain("'react'");
-    expect(content).toContain("'react-dom'");
-    expect(content).toContain("'react-native'");
-    expect(content).toContain("'react-native-renderer'");
-    expect(content).toContain("'react-test-renderer'");
+    // Check that required packages are defined and includes all required packages
+    expect(content).toContain('required');
+    expect(content).toContain('"react"');
+    expect(content).toContain('"react-dom"');
+    expect(content).toContain('"react-test-renderer"');
+    expect(content).toContain('19.0.0');
   });
 
-  test('script filters out protected packages before npm update', () => {
+  test('script validates versions instead of updating', () => {
     const content = fs.readFileSync(ensureDepsPath, 'utf8');
     
-    // Check that the script filters packages
-    expect(content).toContain('filter');
-    expect(content).toContain('PROTECTED_PACKAGES.includes');
+    // Check that the script validates packages
+    expect(content).toContain('Validating');
+    expect(content).toContain('mismatch');
+    expect(content).toContain('expected');
+    
+    // Ensure it doesn't use execSync to update
+    expect(content).not.toContain('execSync');
+    expect(content).not.toContain('npm update');
   });
 
   test('package.json has correct React versions pinned', () => {
@@ -48,6 +52,26 @@ describe('ensure-deps.js', () => {
     
     // Check react-test-renderer is pinned to 19.0.0
     expect(packageJson.devDependencies['react-test-renderer']).toBe('19.0.0');
+  });
+
+  test('package.json has overrides for React packages', () => {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    
+    expect(packageJson.overrides).toBeDefined();
+    expect(packageJson.overrides.react).toBe('19.0.0');
+    expect(packageJson.overrides['react-dom']).toBe('19.0.0');
+    expect(packageJson.overrides['react-native-renderer']).toBe('19.0.0');
+    expect(packageJson.overrides['react-test-renderer']).toBe('19.0.0');
+  });
+
+  test('package.json has resolutions for React packages', () => {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    
+    expect(packageJson.resolutions).toBeDefined();
+    expect(packageJson.resolutions.react).toBe('19.0.0');
+    expect(packageJson.resolutions['react-dom']).toBe('19.0.0');
+    expect(packageJson.resolutions['react-native-renderer']).toBe('19.0.0');
+    expect(packageJson.resolutions['react-test-renderer']).toBe('19.0.0');
   });
 
   test('package.json expo.install.exclude includes all React packages', () => {
