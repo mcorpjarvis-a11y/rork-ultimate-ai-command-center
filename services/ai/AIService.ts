@@ -93,11 +93,12 @@ class AIService {
     console.log('[AIService] Generating structured object with AI...');
     
     try {
-      const result = await generateObject({
+      const messages = [{ role: 'user' as const, content: prompt }];
+      const result = await (generateObject as any)({
         model: groq(options.model || FREE_AI_MODELS.groq.models.text['llama-3.1-8b']),
-        messages: [{ role: 'user', content: prompt }],
+        messages: messages,
         schema,
-        temperature: options.temperature,
+        ...(options.temperature !== undefined && { temperature: options.temperature }),
       });
       
       return result.object as z.infer<T>;
