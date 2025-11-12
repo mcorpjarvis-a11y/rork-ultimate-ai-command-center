@@ -57,6 +57,14 @@ export default function OAuthSetupWizard() {
       testEndpoint: 'https://graph.facebook.com/v18.0/me',
     },
     {
+      id: 'youtube',
+      name: 'YouTube',
+      description: 'Upload videos and manage channel',
+      icon: '🔴',
+      status: 'not_connected',
+      testEndpoint: 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true',
+    },
+    {
       id: 'discord',
       name: 'Discord',
       description: 'Server management and messaging',
@@ -87,14 +95,6 @@ export default function OAuthSetupWizard() {
       icon: '⚪',
       status: 'not_connected',
       testEndpoint: 'https://api.twitter.com/2/users/me',
-    },
-    {
-      id: 'youtube',
-      name: 'YouTube',
-      description: 'Upload videos and manage channel',
-      icon: '🔴',
-      status: 'not_connected',
-      testEndpoint: 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true',
     },
     {
       id: 'instagram',
