@@ -13,6 +13,7 @@ import JarvisVoiceService from '../JarvisVoiceService';
 // Static imports for Metro bundler compatibility
 import * as googleProvider from './providerHelpers/google';
 import * as githubProvider from './providerHelpers/github';
+import * as facebookProvider from './providerHelpers/facebook';
 import * as discordProvider from './providerHelpers/discord';
 import * as redditProvider from './providerHelpers/reddit';
 import * as spotifyProvider from './providerHelpers/spotify';
@@ -28,6 +29,7 @@ class AuthManager {
   private readonly PROVIDER_REGISTRY: Record<string, any> = {
     google: googleProvider,
     github: githubProvider,
+    facebook: facebookProvider,
     discord: discordProvider,
     reddit: redditProvider,
     spotify: spotifyProvider,

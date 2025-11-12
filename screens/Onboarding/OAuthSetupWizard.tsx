@@ -49,6 +49,14 @@ export default function OAuthSetupWizard() {
       testEndpoint: 'https://api.github.com/user',
     },
     {
+      id: 'facebook',
+      name: 'Facebook',
+      description: 'Social networking and page management',
+      icon: '🔵',
+      status: 'not_connected',
+      testEndpoint: 'https://graph.facebook.com/v18.0/me',
+    },
+    {
       id: 'discord',
       name: 'Discord',
       description: 'Server management and messaging',
