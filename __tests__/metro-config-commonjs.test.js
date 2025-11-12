@@ -10,7 +10,7 @@ const path = require('path');
 
 describe('Metro Config CommonJS Validation', () => {
   const metroConfigPath = path.join(__dirname, '..', 'metro.config.cjs');
-  const metroProxyPath = path.join(__dirname, '..', 'metro.config.proxy.js');
+  const metroProxyPath = path.join(__dirname, '..', 'metro.config.js');
   let metroConfigContent;
 
   beforeAll(() => {
@@ -21,7 +21,7 @@ describe('Metro Config CommonJS Validation', () => {
     expect(fs.existsSync(metroConfigPath)).toBe(true);
   });
 
-  test('metro.config.proxy.js exists', () => {
+  test('metro.config.js exists', () => {
     expect(fs.existsSync(metroProxyPath)).toBe(true);
   });
 

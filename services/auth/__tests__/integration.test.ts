@@ -70,10 +70,10 @@ describe('Integration Tests', () => {
       expect(fs.existsSync(metroConfigPath)).toBe(true);
     });
 
-    test('metro.config.proxy.js should exist', () => {
+    test('metro.config.js should exist', () => {
       const fs = require('fs');
       const path = require('path');
-      const metroProxyPath = path.join(__dirname, '..', '..', '..', 'metro.config.proxy.js');
+      const metroProxyPath = path.join(__dirname, '..', '..', '..', 'metro.config.js');
       expect(fs.existsSync(metroProxyPath)).toBe(true);
     });
 

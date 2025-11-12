@@ -2,7 +2,7 @@
 
 /**
  * Metro Config Validation Script
- * Validates that metro.config.cjs and metro.config.proxy.js exist and have proper structure
+ * Validates that metro.config.cjs and metro.config.js exist and have proper structure
  */
 
 const fs = require('fs');
@@ -12,7 +12,7 @@ console.log('🔍 Validating Metro Configuration...\n');
 
 const projectRoot = path.resolve(__dirname, '..');
 const metroConfigCjsPath = path.join(projectRoot, 'metro.config.cjs');
-const metroConfigProxyPath = path.join(projectRoot, 'metro.config.proxy.js');
+const metroConfigProxyPath = path.join(projectRoot, 'metro.config.js');
 
 let hasErrors = false;
 
@@ -25,12 +25,12 @@ if (!fs.existsSync(metroConfigCjsPath)) {
   console.log('  ✓ metro.config.cjs exists');
 }
 
-console.log('✓ Checking if metro.config.proxy.js exists...');
+console.log('✓ Checking if metro.config.js exists...');
 if (!fs.existsSync(metroConfigProxyPath)) {
-  console.error('✗ ERROR: metro.config.proxy.js not found!');
+  console.error('✗ ERROR: metro.config.js not found!');
   hasErrors = true;
 } else {
-  console.log('  ✓ metro.config.proxy.js exists');
+  console.log('  ✓ metro.config.js exists');
 }
 
 // Check 2: Load and validate metro config structure
