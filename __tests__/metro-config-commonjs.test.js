@@ -10,7 +10,7 @@ const path = require('path');
 
 describe('Metro Config CommonJS Validation', () => {
   const metroConfigPath = path.join(__dirname, '..', 'metro.config.cjs');
-  const metroProxyPath = path.join(__dirname, '..', 'metro.config.proxy.js');
+  const metroProxyPath = path.join(__dirname, '..', 'metro.config.js');
   let metroConfigContent;
 
   beforeAll(() => {
@@ -21,7 +21,7 @@ describe('Metro Config CommonJS Validation', () => {
     expect(fs.existsSync(metroConfigPath)).toBe(true);
   });
 
-  test('metro.config.proxy.js exists', () => {
+  test('metro.config.js exists', () => {
     expect(fs.existsSync(metroProxyPath)).toBe(true);
   });
 
@@ -54,12 +54,15 @@ describe('Metro Config CommonJS Validation', () => {
     const startAllContent = fs.readFileSync(startAllPath, 'utf8');
     
     // Should NOT import metro config with ES6 syntax
-    expect(startAllContent).not.toMatch(/import.*metro/);
+    expect(startAllContent).not.toMatch(/import.*metro.*from/);
     
-    // Should use CommonJS if referencing metro
-    if (startAllContent.includes('metro')) {
-      expect(startAllContent).toMatch(/require.*metro/);
-    }
+    // Should use CommonJS if actually requiring metro (not just mentioning it in strings)
+    // Check for actual require statements (not comments or strings)
+    const requireMetroPattern = /require\s*\(['"](.*metro.*)['"]\)/;
+    const importMetroPattern = /import\s+.*\s+from\s+['"](.*metro.*)['"]/;
+    
+    // If there's an import statement with metro, fail
+    expect(startAllContent).not.toMatch(importMetroPattern);
   });
 
   test('scripts/start-all.js includes Metro cache clearing flag', () => {

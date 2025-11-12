@@ -40,9 +40,6 @@ jest.mock('expo-web-browser', () => ({
   maybeCompleteAuthSession: jest.fn(),
 }));
 
-// Mock React Native modules
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-
 // Mock lucide-react-native icons
 jest.mock('lucide-react-native', () => ({
   Camera: () => 'Camera',
