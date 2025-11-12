@@ -1,6 +1,50 @@
 // Jest setup file
 // This runs before all tests
 
+// CRITICAL: Mock NativeModules FIRST to prevent jest-expo setup errors
+// React Native 0.76 changed the export structure, but jest-expo still expects .default
+const mockNativeModulesObject = {
+  ImageLoader: {
+    prefetchImage: jest.fn(),
+    getSize: jest.fn((uri, success) => process.nextTick(() => success(320, 240))),
+  },
+  ImageViewManager: {
+    prefetchImage: jest.fn(),
+    getSize: jest.fn((uri, success) => process.nextTick(() => success(320, 240))),
+  },
+  LinkingManager: {},
+  Linking: {},
+  PlatformConstants: {
+    getConstants: jest.fn(() => ({
+      isTesting: true,
+      reactNativeVersion: {
+        major: 0,
+        minor: 76,
+        patch: 3,
+        prerelease: null,
+      },
+      Version: 34,
+      Release: '14',
+      Serial: 'unknown',
+      Fingerprint: 'test-fingerprint',
+      Model: 'Test Device',
+      ServerHost: undefined,
+      uiMode: 'normal',
+      Brand: 'generic',
+      Manufacturer: 'test',
+    })),
+    getAndroidID: jest.fn(() => 'test-android-id'),
+  },
+};
+
+jest.mock('react-native/Libraries/BatchedBridge/NativeModules', () => {
+  // Return a mock that works with both old and new export styles
+  const mock = mockNativeModulesObject;
+  // Add .default for jest-expo compatibility
+  mock.default = mockNativeModulesObject;
+  return mock;
+});
+
 // Mock expo modules that aren't available in test environment
 jest.mock('expo-constants', () => ({
   __esModule: true,
@@ -29,6 +73,23 @@ jest.mock('expo-auth-session', () => ({
 jest.mock('expo-web-browser', () => ({
   maybeCompleteAuthSession: jest.fn(),
   openBrowserAsync: jest.fn(),
+}));
+
+jest.mock('expo-crypto', () => ({
+  randomUUID: jest.fn(() => 'mock-uuid-1234-5678'),
+  getRandomBytes: jest.fn((size) => new Uint8Array(size)),
+  getRandomBytesAsync: jest.fn(async (size) => new Uint8Array(size)),
+  digest: jest.fn(async () => 'mock-digest-hash'),
+  digestStringAsync: jest.fn(async () => 'mock-digest-hash'),
+  CryptoDigestAlgorithm: {
+    SHA1: 'SHA-1',
+    SHA256: 'SHA-256',
+    SHA384: 'SHA-384',
+    SHA512: 'SHA-512',
+    MD2: 'MD2',
+    MD4: 'MD4',
+    MD5: 'MD5',
+  },
 }));
 
 // Create in-memory storage for tests
@@ -78,15 +139,42 @@ jest.mock('@react-native-async-storage/async-storage', () => {
   };
 });
 
-jest.mock('react-native', () => ({
-  Platform: {
-    OS: 'android',
-    select: jest.fn(obj => obj.android || obj.default),
-  },
-  Dimensions: {
-    get: jest.fn(() => ({ width: 375, height: 812 })),
-  },
-}));
+// Mock TurboModuleRegistry to handle PlatformConstants TurboModule
+jest.mock('react-native/Libraries/TurboModule/TurboModuleRegistry', () => {
+  const originalModule = jest.requireActual('react-native/Libraries/TurboModule/TurboModuleRegistry');
+  
+  return {
+    ...originalModule,
+    getEnforcing: jest.fn((moduleName) => {
+      if (moduleName === 'PlatformConstants') {
+        return {
+          getConstants: jest.fn(() => ({
+            isTesting: true,
+            reactNativeVersion: {
+              major: 0,
+              minor: 76,
+              patch: 3,
+              prerelease: null,
+            },
+            Version: 34,
+            Release: '14',
+            Serial: 'unknown',
+            Fingerprint: 'test-fingerprint',
+            Model: 'Test Device',
+            ServerHost: undefined,
+            uiMode: 'normal',
+            Brand: 'generic',
+            Manufacturer: 'test',
+          })),
+          getAndroidID: jest.fn(() => 'test-android-id'),
+        };
+      }
+      // Fall back to original for other modules
+      return originalModule.getEnforcing?.(moduleName) || {};
+    }),
+    get: originalModule.get || jest.fn((moduleName) => null),
+  };
+});
 
 // Mock expo-image-picker
 jest.mock('expo-image-picker', () => ({
@@ -315,9 +403,3 @@ global.clearTestStorage = () => {
   mockSecureStore.clear();
   mockAsyncStore.clear();
 };
-
-// Clear storage before each test
-beforeEach(() => {
-  mockSecureStore.clear();
-  mockAsyncStore.clear();
-});
