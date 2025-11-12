@@ -1286,6 +1286,20 @@ rork-ultimate-ai-command-center/
 
 ## Quick Start Guide
 
+### 🆘 Reverted Branches? Getting TurboModule Error?
+
+**If you just went back a few branches/merges and now have the TurboModule error**, run this ONE command:
+
+```bash
+npm run quickstart
+```
+
+This will automatically detect and fix everything! 
+
+📚 **See:** [TURBOMODULE_QUICK_REFERENCE.md](./TURBOMODULE_QUICK_REFERENCE.md) for more details.
+
+---
+
 ### For New Users
 
 1. **Clone the Repository**
@@ -1546,6 +1560,28 @@ rm -rf .expo
 rm -rf node_modules/.cache
 npm start -- --clear
 ```
+
+#### Issue: TurboModule PlatformConstants Error
+
+**Symptoms:**
+```
+Invariant Violation: TurboModuleRegistry.getEnforcing(...):
+'PlatformConstants' could not be found.
+```
+
+**Solution (Quickest):**
+```bash
+# If you just reverted branches/merges
+npm run quickstart
+
+# Or for comprehensive fix
+npm run fix:turbomodule
+
+# Or just clear caches
+npm run reset:cache
+```
+
+**📚 See:** [TURBOMODULE_QUICK_REFERENCE.md](./TURBOMODULE_QUICK_REFERENCE.md) for complete guide.
 
 #### Issue: Changes not reflecting in Expo Go
 
