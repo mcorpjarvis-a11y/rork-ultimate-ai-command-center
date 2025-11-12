@@ -1,18 +1,13 @@
-/**
- * Backend-safe shim for expo-audio
- * 
- * Provides stub implementations for expo-audio functionality.
- * Audio recording is not available in Node.js backend.
- */
-
 // Mock AudioModule
-const AudioModule = {
-  // Add any methods that might be called
-};
+const AudioModule = {};
 
 export default AudioModule;
+export { AudioModule };
 
-// Mock types and exports
+if (require.main) {
+  require.main.paths.push(__dirname);
+}
+
 export interface AudioRecorder {
   startAsync: () => Promise<void>;
   stopAsync: () => Promise<{ uri: string }>;

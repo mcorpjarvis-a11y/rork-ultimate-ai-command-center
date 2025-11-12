@@ -73,6 +73,7 @@ async function build() {
         'expo-crypto': path.resolve(__dirname, '../backend/shims/expo-crypto.ts'),
         'expo-modules-core': path.resolve(__dirname, '../backend/shims/expo-modules-core.ts'),
         'expo-audio': path.resolve(__dirname, '../backend/shims/expo-audio.ts'),
+        'expo-audio/build/AudioModule': path.resolve(__dirname, '../backend/shims/expo-audio.ts'),
       },
       external: reactNativePackages,
       sourcemap: true,
