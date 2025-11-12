@@ -11,10 +11,10 @@
 const esbuild = require('esbuild');
 const path = require('path');
 
+// Packages that should be marked as external (not bundled)
+// We DO NOT include packages with shims here because they need to be bundled with the shims
 const reactNativePackages = [
-  'react-native',
   'react-native-web',
-  '@react-native-async-storage/async-storage',
   '@react-native/virtualized-lists',
   'react-native-gesture-handler',
   'react-native-safe-area-context',
@@ -23,12 +23,8 @@ const reactNativePackages = [
   'expo',
   'expo-router',
   'expo-asset',
-  'expo-audio',
-  'expo-auth-session',
   'expo-blur',
   'expo-clipboard',
-  'expo-constants',
-  'expo-crypto',
   'expo-document-picker',
   'expo-file-system',
   'expo-font',
@@ -39,15 +35,12 @@ const reactNativePackages = [
   'expo-linking',
   'expo-location',
   'expo-media-library',
-  'expo-modules-core',
-  'expo-secure-store',
-  'expo-speech',
+  'expo-notifications',
   'expo-speech-recognition',
   'expo-splash-screen',
   'expo-status-bar',
   'expo-symbols',
   'expo-system-ui',
-  'expo-web-browser',
   'react',
   'react-dom'
 ];
@@ -63,7 +56,7 @@ async function build() {
       // ✅ Target Node 22 for Termux compatibility
       target: 'node22',
       outfile: 'backend/dist/server.express.js',
-      // ✅ Alias expo-secure-store to backend shim BEFORE external check
+      // ✅ Alias expo and react-native packages to backend shims
       alias: {
         'expo-secure-store': path.resolve(__dirname, '../backend/shims/expo-secure-store.ts'),
         'react-native': path.resolve(__dirname, '../backend/shims/react-native.ts'),
@@ -74,6 +67,8 @@ async function build() {
         'expo-modules-core': path.resolve(__dirname, '../backend/shims/expo-modules-core.ts'),
         'expo-audio': path.resolve(__dirname, '../backend/shims/expo-audio.ts'),
         'expo-audio/build/AudioModule': path.resolve(__dirname, '../backend/shims/expo-audio.ts'),
+        'expo-speech': path.resolve(__dirname, '../backend/shims/expo-speech.ts'),
+        'expo-constants': path.resolve(__dirname, '../backend/shims/expo-constants.ts'),
       },
       external: reactNativePackages,
       sourcemap: true,
