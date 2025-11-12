@@ -6,11 +6,12 @@
  */
 
 import * as Notifications from 'expo-notifications';
-import * as Audio from 'expo-av';
+import * as Audio from 'expo-audio';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
+import { Platform } from 'react-native';
 import JarvisLogger from './JarvisLoggerService';
 
 export interface PermissionResults {
@@ -58,7 +59,7 @@ export async function requestAllPermissions(): Promise<PermissionResults> {
 
     // 2. Audio recording permission
     try {
-      const audioResult = await Audio.requestPermissionsAsync();
+      const audioResult = await Audio.requestRecordingPermissionsAsync();
       results.audio.granted = audioResult.granted;
       results.audio.status = audioResult.status;
       
@@ -67,8 +68,8 @@ export async function requestAllPermissions(): Promise<PermissionResults> {
         
         // Also set audio mode for recording
         await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
+          allowsRecording: true,
+          playsInSilentMode: true,
         });
       } else {
         JarvisLogger.warn('Audio permission denied');
@@ -83,7 +84,8 @@ export async function requestAllPermissions(): Promise<PermissionResults> {
     
     // 4. File system access
     try {
-      const fileInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory || '');
+      const dirPath = FileSystem.Paths.document?.uri || FileSystem.Paths.cache.uri;
+      const fileInfo = await FileSystem.getInfoAsync(dirPath);
       results.files.available = fileInfo.exists;
       results.files.granted = true; // File system is always available on modern Android
       

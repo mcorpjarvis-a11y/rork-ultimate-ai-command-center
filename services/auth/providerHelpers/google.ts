@@ -47,7 +47,7 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
 
     // Create redirect URI using Expo proxy for better compatibility
     const redirectUri = AuthSession.makeRedirectUri({ 
-      useProxy: true,
+      preferLocalhost: false,
     });
 
     console.log('[GoogleProvider] Using Expo proxy:', USE_PROXY);
@@ -75,7 +75,7 @@ export async function startAuth(additionalScopes: string[] = []): Promise<AuthRe
     });
 
     // Use static discovery endpoints instead of useAutoDiscovery hook
-    const result = await request.promptAsync(GOOGLE_DISCOVERY, { useProxy: USE_PROXY });
+    const result = await request.promptAsync(GOOGLE_DISCOVERY);
 
     console.log('[GoogleProvider] Auth result:', result?.type);
 
