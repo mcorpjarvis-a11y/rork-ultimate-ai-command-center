@@ -1,10 +1,3 @@
-// Node.js 22 Compatibility Patch
-// Prevents ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING error in ts-node
-if (!process.env.TS_NODE_COMPAT_MODE) {
-  process.env.TS_NODE_COMPAT_MODE = "true";
-  process.env.TS_NODE_TYPE_STRIP_INTERNALS = "true";
-}
-
 /**
  * JARVIS Backend Server (Express)
  * 
