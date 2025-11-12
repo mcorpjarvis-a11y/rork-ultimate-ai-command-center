@@ -5,11 +5,5 @@
     "paths": {
       "@/*": ["./*"]
     }
-  },
-  "ts-node": {
-    "transpileOnly": true,
-    "compilerOptions": {
-      "module": "commonjs"
-    }
   }
 }
