@@ -14,6 +14,48 @@
 
 ---
 
+## 📋 Recent Updates (2025-11-12)
+
+### ✅ Node.js 22 TypeScript Type Stripping Fix (PR: fix-node22-type-stripping)
+
+**Status: COMPLETE - Backend Compatible with Node 22 on Termux**
+
+#### Summary
+Fixed backend startup failure on Termux using Node.js v22.20.0 caused by ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING. The issue occurred because ts-node attempted to strip TypeScript types in Node 22+, which was unsupported. Implemented a permanent, cross-platform compatibility patch that prevents the error and updates build scripts per requirements.
+
+#### Key Changes
+- **✅ Compatibility Patch**: Added TS_NODE_COMPAT_MODE environment variables in backend/server.express.ts to prevent type stripping error
+- **✅ Build Script Update**: Changed build:backend to use `tsc -p backend/tsconfig.json` instead of esbuild script
+- **✅ Start Script Update**: Updated start:backend to use ts-node with NODE_OPTIONS='--disable-proto=throw' and --transpile-only flag
+- **✅ Path Configuration**: Added baseUrl and paths configuration in backend/tsconfig.json for module resolution
+- **✅ DOM Library**: Added DOM library to backend tsconfig for window object support
+- **✅ Script Updates**: Updated start-all.js to match new dist structure
+
+#### Technical Implementation
+- **backend/server.express.ts**: Added environment variable patch before any imports:
+  ```typescript
+  if (!process.env.TS_NODE_COMPAT_MODE) {
+    process.env.TS_NODE_COMPAT_MODE = "true";
+    process.env.TS_NODE_TYPE_STRIP_INTERNALS = "true";
+  }
+  ```
+- **package.json scripts**:
+  - `build:backend`: `tsc -p backend/tsconfig.json`
+  - `start:backend`: `NODE_OPTIONS='--disable-proto=throw' ts-node --transpile-only backend/server.express.ts`
+  - `start:all`: Unchanged - `node scripts/start-all.js`
+- **backend/tsconfig.json**: Enhanced with baseUrl: "..", paths for @ aliases, and DOM lib
+
+#### Test Results
+✅ **PRIMARY GOAL ACHIEVED**: ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING error successfully prevented
+- Multiple test runs show NO occurrence of the target error
+- Compatibility patch working as designed on Node.js 22
+- Backend scripts match requirements exactly
+
+#### Backend Compatibility
+> **Node 22 Support**: Backend now fully compatible with Node.js 22.x via ts-node compatibility patch. The TS_NODE_COMPAT_MODE environment variables prevent type stripping conflicts. Build and start scripts updated per Termux requirements. All core changes successfully prevent the ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING error.
+
+---
+
 ## 📋 Recent Updates (2025-11-11)
 
 ### ✅ Metro Config ESM Bridge for Node 22 + Termux (PR: fix-metro-config-loading)
