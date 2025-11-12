@@ -60,14 +60,14 @@ let backend;
 try {
   backend = spawn(
     'node',
-    ['backend/dist/backend/server.express.js'],
+    ['backend/dist/server.express.js'],
     { stdio: 'pipe', shell: isWindows, env: { ...process.env, FORCE_COLOR: '1' } }
   );
 } catch (error) {
   console.error('❌ Failed to start backend server:', error.message);
   console.error('\nTroubleshooting:');
   console.error('  1. Run: npm run build:backend');
-  console.error('  2. Verify backend/dist/backend/server.express.js exists');
+  console.error('  2. Verify backend/dist/server.express.js exists');
   console.error('  3. Check Node version is compatible (Node 22.x supported)');
   process.exit(1);
 }
