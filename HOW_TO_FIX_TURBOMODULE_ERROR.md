@@ -1,5 +1,16 @@
 # How to Fix TurboModule PlatformConstants Error
 
+## 🔄 Just Reverted Branches?
+
+If you just went back a few branches/merges and now have this error, **[see AFTER_REVERT_RECOVERY.md](./AFTER_REVERT_RECOVERY.md)** for the quickest fix!
+
+**TL;DR:** Run this command:
+```bash
+npm run quickstart
+```
+
+---
+
 ## The Error
 
 If you're seeing this error:
@@ -13,13 +24,23 @@ Invariant Violation: TurboModuleRegistry.getEnforcing(...):
 
 ## Quick Fix (Takes 2-5 minutes)
 
-Run this single command:
+### After Reverting Branches
+If you just reverted branches, use the smart recovery script:
+
+```bash
+npm run quickstart
+```
+
+This automatically detects and fixes only what's needed.
+
+### General TurboModule Errors
+For general TurboModule errors, run:
 
 ```bash
 npm run reset:cache
 ```
 
-This will automatically:
+Both commands will automatically:
 1. Clear all caches (Metro, Expo, node_modules)
 2. Reinstall dependencies
 3. Rebuild native modules

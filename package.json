@@ -17,6 +17,8 @@
     "check:node": "node scripts/check-node-version.js",
     "check:native-mods": "node scripts/check-native-mods.js",
     "reset:cache": "./scripts/reset-cache.sh",
+    "fix:turbomodule": "./scripts/fix-turbomodule.sh",
+    "quickstart": "./scripts/quickstart-after-revert.sh",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
