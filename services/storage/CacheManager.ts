@@ -24,7 +24,10 @@ class CacheManager {
       cleanupInterval: config.cleanupInterval || 60 * 1000,
     };
 
-    this.startCleanup();
+    // Don't start cleanup timer in test environment to prevent hanging tests
+    if (process.env.NODE_ENV !== 'test') {
+      this.startCleanup();
+    }
   }
 
   set<T>(key: string, data: T, ttl?: number): void {
