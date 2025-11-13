@@ -4,23 +4,23 @@
  * Android/Expo/Termux only - NO iOS support
  */
 
-import TokenVault from './TokenVault.js';
-import MasterProfile from './MasterProfile.js';
-import { TokenData, AuthEvent, AuthEventListener, ProviderStatus } from './types.js';
-import JarvisListenerService from '../JarvisListenerService.js';
-import JarvisVoiceService from '../JarvisVoiceService.js';
+import TokenVault from './TokenVault.ts';
+import MasterProfile from './MasterProfile.ts';
+import { TokenData, AuthEvent, AuthEventListener, ProviderStatus } from './types.ts';
+import JarvisListenerService from '../JarvisListenerService.ts';
+import JarvisVoiceService from '../JarvisVoiceService.ts';
 
 // Static imports for Metro bundler compatibility
-import * as googleProvider from './providerHelpers/google.js';
-import * as githubProvider from './providerHelpers/github.js';
-import * as facebookProvider from './providerHelpers/facebook.js';
-import * as discordProvider from './providerHelpers/discord.js';
-import * as redditProvider from './providerHelpers/reddit.js';
-import * as spotifyProvider from './providerHelpers/spotify.js';
-import * as homeassistantProvider from './providerHelpers/homeassistant.js';
-import * as youtubeProvider from './providerHelpers/youtube.js';
-import * as instagramProvider from './providerHelpers/instagram.js';
-import * as twitterProvider from './providerHelpers/twitter.js';
+import * as googleProvider from './providerHelpers/google.ts';
+import * as githubProvider from './providerHelpers/github.ts';
+import * as facebookProvider from './providerHelpers/facebook.ts';
+import * as discordProvider from './providerHelpers/discord.ts';
+import * as redditProvider from './providerHelpers/reddit.ts';
+import * as spotifyProvider from './providerHelpers/spotify.ts';
+import * as homeassistantProvider from './providerHelpers/homeassistant.ts';
+import * as youtubeProvider from './providerHelpers/youtube.ts';
+import * as instagramProvider from './providerHelpers/instagram.ts';
+import * as twitterProvider from './providerHelpers/twitter.ts';
 
 class AuthManager {
   private eventListeners: Map<AuthEvent, Set<AuthEventListener>> = new Map();
