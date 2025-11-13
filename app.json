@@ -8,7 +8,7 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "ultimate-ai-command-center",
-    "newArchitecture": true,
+    "newArchitecture": false,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
