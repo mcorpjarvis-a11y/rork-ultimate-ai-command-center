@@ -111,15 +111,14 @@ describe('Integration Tests', () => {
   });
 
   describe('Startup Script', () => {
-    test('start-all.js should include dependency update logic', () => {
+    test('start-all.js should build backend before starting', () => {
       const fs = require('fs');
       const path = require('path');
       const startAllPath = path.join(__dirname, '..', '..', '..', 'scripts', 'start-all.js');
       const content = fs.readFileSync(startAllPath, 'utf8');
 
-      expect(content).toContain('npm install');
-      expect(content).toContain('npm outdated');
-      expect(content).toContain('--skip-update');
+      expect(content).toContain('npm run build:backend');
+      expect(content).toContain('Building Backend Server');
     });
 
     test('start-all.js should check dependencies before starting', () => {
@@ -128,18 +127,18 @@ describe('Integration Tests', () => {
       const startAllPath = path.join(__dirname, '..', '..', '..', 'scripts', 'start-all.js');
       const content = fs.readFileSync(startAllPath, 'utf8');
 
-      expect(content).toContain('Checking dependencies');
+      expect(content).toContain('check-node-version');
       expect(content).toContain('execSync');
     });
 
-    test('start-all.js should handle update failures gracefully', () => {
+    test('start-all.js should handle build failures gracefully', () => {
       const fs = require('fs');
       const path = require('path');
       const startAllPath = path.join(__dirname, '..', '..', '..', 'scripts', 'start-all.js');
       const content = fs.readFileSync(startAllPath, 'utf8');
 
       expect(content).toContain('catch');
-      expect(content).toContain('Continuing with current dependencies');
+      expect(content).toContain('Failed to build backend');
     });
   });
 

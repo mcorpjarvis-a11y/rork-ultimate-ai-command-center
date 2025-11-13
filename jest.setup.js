@@ -169,10 +169,63 @@ jest.mock('react-native/Libraries/TurboModule/TurboModuleRegistry', () => {
           getAndroidID: jest.fn(() => 'test-android-id'),
         };
       }
-      // Fall back to original for other modules
-      return originalModule.getEnforcing?.(moduleName) || {};
+      if (moduleName === 'SourceCode') {
+        return {
+          getConstants: jest.fn(() => ({
+            scriptURL: 'http://localhost:8081/index.bundle?platform=android&dev=true',
+          })),
+        };
+      }
+      if (moduleName === 'NativeDeviceInfo') {
+        return {
+          getConstants: jest.fn(() => ({
+            Dimensions: {
+              windowPhysicalPixels: {
+                width: 1080,
+                height: 1920,
+                scale: 2,
+                fontScale: 1,
+              },
+              screenPhysicalPixels: {
+                width: 1080,
+                height: 1920,
+                scale: 2,
+                fontScale: 1,
+              },
+            },
+          })),
+        };
+      }
+      if (moduleName === 'DeviceInfo') {
+        return {
+          getConstants: jest.fn(() => ({
+            Dimensions: {
+              windowPhysicalPixels: {
+                width: 1080,
+                height: 1920,
+                scale: 2,
+                fontScale: 1,
+              },
+              screenPhysicalPixels: {
+                width: 1080,
+                height: 1920,
+                scale: 2,
+                fontScale: 1,
+              },
+            },
+          })),
+        };
+      }
+      // Return empty object for unhandled modules to prevent crashes
+      console.warn(`TurboModuleRegistry.getEnforcing called with unhandled module: ${moduleName}`);
+      return {
+        getConstants: jest.fn(() => ({})),
+      };
     }),
-    get: originalModule.get || jest.fn((moduleName) => null),
+    get: jest.fn((moduleName) => {
+      // Return null for get() to indicate module not found
+      return null;
+    }),
   };
 });
 
@@ -225,6 +278,35 @@ jest.mock('expo-media-library', () => ({
 // Mock expo-file-system
 jest.mock('expo-file-system', () => ({
   readAsStringAsync: jest.fn(),
+  writeAsStringAsync: jest.fn(),
+  deleteAsync: jest.fn(),
+  getInfoAsync: jest.fn(),
+  makeDirectoryAsync: jest.fn(),
+  copyAsync: jest.fn(),
+  readDirectoryAsync: jest.fn(),
+  getFreeDiskStorageAsync: jest.fn(() => Promise.resolve(1000000)),
+  getTotalDiskCapacityAsync: jest.fn(() => Promise.resolve(10000000)),
+  documentDirectory: 'file:///mock/documents/',
+  cacheDirectory: 'file:///mock/cache/',
+  EncodingType: {
+    UTF8: 'utf8',
+    Base64: 'base64',
+  },
+}));
+
+// Mock expo-file-system/legacy
+jest.mock('expo-file-system/legacy', () => ({
+  documentDirectory: 'file:///mock/documents/',
+  cacheDirectory: 'file:///mock/cache/',
+  readAsStringAsync: jest.fn(),
+  writeAsStringAsync: jest.fn(),
+  deleteAsync: jest.fn(),
+  getInfoAsync: jest.fn(),
+  makeDirectoryAsync: jest.fn(),
+  copyAsync: jest.fn(),
+  readDirectoryAsync: jest.fn(),
+  getFreeDiskStorageAsync: jest.fn(() => Promise.resolve(1000000)),
+  getTotalDiskCapacityAsync: jest.fn(() => Promise.resolve(10000000)),
   EncodingType: {
     UTF8: 'utf8',
     Base64: 'base64',
@@ -238,6 +320,52 @@ jest.mock('expo-speech', () => ({
   isSpeakingAsync: jest.fn(() => Promise.resolve(false)),
   getAvailableVoicesAsync: jest.fn(() => Promise.resolve([])),
   maxSpeechInputLength: 4000,
+}));
+
+// Mock expo-modules-core EventEmitter
+jest.mock('expo-modules-core', () => ({
+  ...jest.requireActual('expo-modules-core'),
+  EventEmitter: class MockEventEmitter {
+    addListener = jest.fn();
+    removeListener = jest.fn();
+    removeAllListeners = jest.fn();
+    emit = jest.fn();
+  },
+  NativeModulesProxy: {},
+  requireNativeModule: jest.fn(() => ({})),
+  requireOptionalNativeModule: jest.fn(() => null),
+}));
+
+// Mock expo-notifications
+jest.mock('expo-notifications', () => ({
+  setNotificationHandler: jest.fn(),
+  getPermissionsAsync: jest.fn(() => Promise.resolve({ 
+    status: 'granted',
+    granted: true,
+    canAskAgain: true,
+    expires: 'never',
+  })),
+  requestPermissionsAsync: jest.fn(() => Promise.resolve({ 
+    status: 'granted',
+    granted: true,
+    canAskAgain: true,
+    expires: 'never',
+  })),
+  scheduleNotificationAsync: jest.fn(() => Promise.resolve('mock-notification-id')),
+  cancelScheduledNotificationAsync: jest.fn(),
+  cancelAllScheduledNotificationsAsync: jest.fn(),
+  dismissNotificationAsync: jest.fn(),
+  dismissAllNotificationsAsync: jest.fn(),
+  getPresentedNotificationsAsync: jest.fn(() => Promise.resolve([])),
+  setBadgeCountAsync: jest.fn(),
+  getBadgeCountAsync: jest.fn(() => Promise.resolve(0)),
+  AndroidImportance: {
+    MIN: 1,
+    LOW: 2,
+    DEFAULT: 3,
+    HIGH: 4,
+    MAX: 5,
+  },
 }));
 
 // Mock expo-audio
