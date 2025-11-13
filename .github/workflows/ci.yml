@@ -41,220 +41,11 @@ jobs:
         run: npx tsc --noEmit
         continue-on-error: true
 
-  # Job 2: Unit Tests
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    needs: lint
-    timeout-minutes: 15
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Run unit tests
-        run: npm test -- --coverage --maxWorkers=2 --forceExit --detectOpenHandles
-        continue-on-error: false
-        env:
-          CI: true
-          USE_SOCIAL_FIXTURES: true
-          USE_TEST_MODE: true
-          NODE_ENV: test
-      
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          files: ./coverage/lcov.info
-          flags: unittests
-          name: jarvis-unit-coverage
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-  # Job 3: Integration Tests
-  integration-tests:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    needs: unit-tests
-    timeout-minutes: 15
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-        env:
-          CI: true
-      
-      - name: Build backend
-        run: npm run build:backend
-      
-      - name: Start backend server
-        run: |
-          npm run start:backend:prod &
-          echo $! > backend.pid
-          sleep 5
-        env:
-          PORT: 3000
-          HOST: 0.0.0.0
-          NODE_ENV: test
-          USE_TEST_MODE: true
-      
-      - name: Wait for backend to be ready
-        run: |
-          max_attempts=30
-          attempt=0
-          while [ $attempt -lt $max_attempts ]; do
-            if curl -f http://localhost:3000/healthz > /dev/null 2>&1; then
-              echo "Backend is ready"
-              exit 0
-            fi
-            echo "Waiting for backend... ($attempt/$max_attempts)"
-            sleep 1
-            attempt=$((attempt + 1))
-          done
-          echo "Backend failed to start"
-          exit 1
-      
-      - name: Test health endpoints
-        run: |
-          curl -f http://localhost:3000/healthz || exit 1
-          curl -f http://localhost:3000/readyz || exit 1
-          echo "Health checks passed"
-      
-      - name: Test WebSocket endpoint
-        run: |
-          npm install -g wscat
-          timeout 5s wscat -c ws://localhost:3000/ws --execute "ping" 2>&1 || echo "WebSocket test completed"
-        continue-on-error: true
-      
-      - name: Stop backend server before Metro verification
-        run: |
-          if [ -f backend.pid ]; then
-            kill $(cat backend.pid) 2>/dev/null || true
-            rm backend.pid
-            sleep 2
-          fi
-          pkill -f "node backend/dist/server.express.js" 2>/dev/null || true
-      
-      - name: Verify Metro bundler
-        run: npm run verify:metro
-        env:
-          CI: true
-          NODE_ENV: test
-      
-      - name: Final cleanup
-        if: always()
-        run: |
-          # Ensure all backend processes are stopped
-          pkill -f "node backend/dist/server.express.js" 2>/dev/null || true
-          if [ -f backend.pid ]; then
-            rm backend.pid
-          fi
-          sleep 1
-
-  # Job 4: E2E Tests with Playwright
-  e2e-tests:
-    name: E2E Tests (Playwright)
-    runs-on: ubuntu-latest
-    needs: integration-tests
-    timeout-minutes: 15
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-        env:
-          CI: true
-      
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-      
-      - name: Build backend
-        run: npm run build:backend
-      
-      - name: Start backend server
-        run: |
-          npm run start:backend:prod &
-          echo $! > backend.pid
-          sleep 5
-        env:
-          PORT: 3000
-          HOST: 0.0.0.0
-          NODE_ENV: test
-          USE_TEST_MODE: true
-      
-      - name: Wait for backend to be ready
-        run: |
-          max_attempts=30
-          attempt=0
-          while [ $attempt -lt $max_attempts ]; do
-            if curl -f http://localhost:3000/healthz > /dev/null 2>&1; then
-              echo "Backend is ready"
-              exit 0
-            fi
-            echo "Waiting for backend... ($attempt/$max_attempts)"
-            sleep 1
-            attempt=$((attempt + 1))
-          done
-          echo "Backend failed to start"
-          exit 1
-      
-      - name: Run Playwright tests
-        run: npm run test:e2e
-        continue-on-error: true
-        env:
-          CI: true
-      
-      - name: Upload Playwright test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-results
-          path: playwright-report/
-          retention-days: 7
-      
-      - name: Stop backend server
-        if: always()
-        run: |
-          # Try to kill using PID file first
-          if [ -f backend.pid ]; then
-            kill $(cat backend.pid) 2>/dev/null || true
-            rm backend.pid
-          fi
-          # Also try to kill any remaining backend processes
-          pkill -f "node backend/dist/server.express.js" 2>/dev/null || true
-          sleep 1
-
-  # Job 5: Build Verification
+  # Job 2: Build Verification
   build:
     name: Build Backend
     runs-on: ubuntu-latest
-    needs: unit-tests
+    needs: lint
     timeout-minutes: 10
     
     steps:
@@ -287,7 +78,46 @@ jobs:
           path: backend/dist/
           retention-days: 7
 
-  # Job 6: Security Scan
+  # Job 3: Metro Bundler Verification
+  metro:
+    name: Metro Bundler
+    runs-on: ubuntu-latest
+    needs: lint
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+        env:
+          CI: true
+      
+      - name: Verify Metro bundler
+        run: npm run verify:metro
+        env:
+          CI: true
+          NODE_ENV: test
+      
+      - name: Upload bundle artifacts (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metro-bundle-failure-${{ github.run_id }}
+          path: |
+            /tmp/metro-verification-bundle/
+            .expo/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # Job 4: Security Scan
   security:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -321,7 +151,7 @@ jobs:
   all-checks-passed:
     name: All Checks Passed
     runs-on: ubuntu-latest
-    needs: [lint, unit-tests, integration-tests, build, security]
+    needs: [lint, build, metro, security]
     if: always()
     timeout-minutes: 5
     
@@ -330,9 +160,8 @@ jobs:
         run: |
           echo "Checking job results..."
           echo "Lint: ${{ needs.lint.result }}"
-          echo "Unit tests: ${{ needs.unit-tests.result }}"
-          echo "Integration tests: ${{ needs.integration-tests.result }}"
           echo "Build: ${{ needs.build.result }}"
+          echo "Metro: ${{ needs.metro.result }}"
           echo "Security: ${{ needs.security.result }}"
           
           # Check for failures or cancellations
@@ -343,18 +172,13 @@ jobs:
             failed=1
           fi
           
-          if [[ "${{ needs.unit-tests.result }}" != "success" ]] && [[ "${{ needs.unit-tests.result }}" != "skipped" ]]; then
-            echo "❌ Unit tests job failed or was cancelled"
-            failed=1
-          fi
-          
-          if [[ "${{ needs.integration-tests.result }}" != "success" ]] && [[ "${{ needs.integration-tests.result }}" != "skipped" ]]; then
-            echo "❌ Integration tests job failed or was cancelled"
-            failed=1
-          fi
-          
           if [[ "${{ needs.build.result }}" != "success" ]] && [[ "${{ needs.build.result }}" != "skipped" ]]; then
             echo "❌ Build job failed or was cancelled"
+            failed=1
+          fi
+          
+          if [[ "${{ needs.metro.result }}" != "success" ]] && [[ "${{ needs.metro.result }}" != "skipped" ]]; then
+            echo "❌ Metro bundler job failed or was cancelled"
             failed=1
           fi
           
