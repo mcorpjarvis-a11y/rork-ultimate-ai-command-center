@@ -40,12 +40,14 @@ console.log('');
 // Check Expo configuration
 try {
   const appJson = require('../app.json');
-  const newArchEnabled = appJson.expo?.newArchEnabled;
-  const jsEngine = appJson.expo?.android?.jsEngine;
+  // Support both newArchEnabled and newArchitecture naming conventions
+  const newArchEnabled = appJson.expo?.newArchEnabled || appJson.expo?.newArchitecture;
+  // Check for jsEngine at root level or in android section
+  const jsEngine = appJson.expo?.jsEngine || appJson.expo?.android?.jsEngine;
   
   console.log('📱 Expo Configuration:');
   console.log(`   New Architecture: ${newArchEnabled ? '✅ Enabled' : '❌ Disabled'}`);
-  console.log(`   JS Engine (Android): ${jsEngine || '⚠️  Not specified (should be "hermes")'}`);
+  console.log(`   JS Engine: ${jsEngine || '⚠️  Not specified (should be "hermes")'}`);
   
   if (!newArchEnabled) {
     console.error('❌ New Architecture is not enabled in app.json');
@@ -95,9 +97,10 @@ if (hasError) {
   console.error('1. Update app.json to enable New Architecture:');
   console.error('   {');
   console.error('     "expo": {');
-  console.error('       "newArchEnabled": true,');
+  console.error('       "newArchitecture": true,');
+  console.error('       "jsEngine": "hermes",');
   console.error('       "android": {');
-  console.error('         "jsEngine": "hermes"');
+  console.error('         "package": "com.jarvis.rork"');
   console.error('       }');
   console.error('     }');
   console.error('   }');
