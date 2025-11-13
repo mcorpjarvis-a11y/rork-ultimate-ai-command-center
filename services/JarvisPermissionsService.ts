@@ -12,7 +12,7 @@ import * as MediaLibrary from 'expo-media-library';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
-import JarvisLogger from './JarvisLoggerService.js';
+import JarvisLogger from './JarvisLoggerService.ts';
 
 export interface PermissionResults {
   notifications: { granted: boolean; status: string };

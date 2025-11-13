@@ -11,10 +11,10 @@
  */
 
 import { Platform } from 'react-native';
-import JarvisVoiceService from './JarvisVoiceService.js';
-import JarvisPersonality from './personality/JarvisPersonality.js';
-import AIService from './ai/AIService.js';
-import FreeAIService from './ai/FreeAIService.js';
+import JarvisVoiceService from './JarvisVoiceService.ts';
+import JarvisPersonality from './personality/JarvisPersonality.ts';
+import AIService from './ai/AIService.ts';
+import FreeAIService from './ai/FreeAIService.ts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import expo-speech-recognition for native platforms

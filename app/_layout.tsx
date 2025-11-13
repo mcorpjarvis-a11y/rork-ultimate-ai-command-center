@@ -7,17 +7,17 @@ import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { trpc, trpcClient } from "@/lib/trpc";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import SignInScreen from "@/screens/Onboarding/SignInScreen";
-import JarvisInitializationService from "@/services/JarvisInitializationService.js";
-import MasterProfile from "@/services/auth/MasterProfile.js";
-import AuthManager from "@/services/auth/AuthManager.js";
-import SecureKeyStorage from "@/services/security/SecureKeyStorage.js";
-import ConfigValidator from "@/services/config/ConfigValidator.js";
-import OnboardingStatus from "@/services/onboarding/OnboardingStatus.js";
-import OAuthRequirementService from "@/services/onboarding/OAuthRequirementService.js";
-import MasterProfileValidator from "@/services/onboarding/MasterProfileValidator.js";
-import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService.js";
-import JarvisLogger from "@/services/JarvisLoggerService.js";
-import { requestAllPermissions } from "@/services/JarvisPermissionsService.js";
+import JarvisInitializationService from "@/services/JarvisInitializationService.ts";
+import MasterProfile from "@/services/auth/MasterProfile.ts";
+import AuthManager from "@/services/auth/AuthManager.ts";
+import SecureKeyStorage from "@/services/security/SecureKeyStorage.ts";
+import ConfigValidator from "@/services/config/ConfigValidator.ts";
+import OnboardingStatus from "@/services/onboarding/OnboardingStatus.ts";
+import OAuthRequirementService from "@/services/onboarding/OAuthRequirementService.ts";
+import MasterProfileValidator from "@/services/onboarding/MasterProfileValidator.ts";
+import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService.ts";
+import JarvisLogger from "@/services/JarvisLoggerService.ts";
+import { requestAllPermissions } from "@/services/JarvisPermissionsService.ts";
 import { 
   SchedulerService, 
   WebSocketService, 
@@ -26,7 +26,7 @@ import {
   JarvisVoiceService,
   JarvisListenerService,
   VoiceService
-} from "@/services/index.js";
+} from "@/services/index.ts";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // Wrap in try-catch to handle cases where it's already been called
