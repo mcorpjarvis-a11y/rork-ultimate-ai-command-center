@@ -55,8 +55,8 @@ async function testLoginPipeline(): Promise<void> {
     JarvisLogger.stage('Step 4', 'Checking voice system availability...');
     try {
       // Import voice services dynamically to avoid errors if not available
-      const { VoiceService } = await import('../services/voice/VoiceService');
-      await VoiceService.initialize();
+      const voiceService = await import('../services/voice/VoiceService');
+      await voiceService.default.initialize();
       JarvisLogger.success('Voice system online');
     } catch (error) {
       JarvisLogger.warn('Voice system not available in test environment (expected)');

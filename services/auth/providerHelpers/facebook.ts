@@ -65,7 +65,7 @@ export async function startAuth(): Promise<AuthResponse> {
         expires_in: tokens.expires_in,
         token_type: 'Bearer',
         scope: FACEBOOK_SCOPES.join(' '),
-        user: profile,
+        profile: profile,
       };
     } else if (result.type === 'cancel') {
       throw new Error('Authentication cancelled by user');
