@@ -1,16 +1,50 @@
 {
   "expo": {
-    "name": "rork-ultimate-ai-command-center",
-    "slug": "rork-ultimate-ai-command-center",
+    "name": "Ultimate AI Command Center",
+    "slug": "ultimate-ai-command-center",
     "version": "1.0.0",
-    "sdkVersion": "54.0.0",
     "platforms": ["android"],
-    "jsEngine": "hermes",
-    "newArchitecture": true,
-    "android": {
-      "package": "com.jarvis.rork",
-      "permissions": []
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "ultimate-ai-command-center",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a1a1a"
     },
+    "android": {
+      "package": "com.mcorpjarvis.aicommandcenter",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#1a1a1a"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "newArchEnabled": true
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "jsEngine": "hermes",
     "updates": {
       "fallbackToCacheTimeout": 0
     }
