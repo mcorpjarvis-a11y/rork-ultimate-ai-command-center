@@ -4,23 +4,23 @@
  * Android/Expo/Termux only - NO iOS support
  */
 
-import TokenVault from './TokenVault';
-import MasterProfile from './MasterProfile';
-import { TokenData, AuthEvent, AuthEventListener, ProviderStatus } from './types';
-import JarvisListenerService from '../JarvisListenerService';
-import JarvisVoiceService from '../JarvisVoiceService';
+import TokenVault from './TokenVault.js';
+import MasterProfile from './MasterProfile.js';
+import { TokenData, AuthEvent, AuthEventListener, ProviderStatus } from './types.js';
+import JarvisListenerService from '../JarvisListenerService.js';
+import JarvisVoiceService from '../JarvisVoiceService.js';
 
 // Static imports for Metro bundler compatibility
-import * as googleProvider from './providerHelpers/google';
-import * as githubProvider from './providerHelpers/github';
-import * as facebookProvider from './providerHelpers/facebook';
-import * as discordProvider from './providerHelpers/discord';
-import * as redditProvider from './providerHelpers/reddit';
-import * as spotifyProvider from './providerHelpers/spotify';
-import * as homeassistantProvider from './providerHelpers/homeassistant';
-import * as youtubeProvider from './providerHelpers/youtube';
-import * as instagramProvider from './providerHelpers/instagram';
-import * as twitterProvider from './providerHelpers/twitter';
+import * as googleProvider from './providerHelpers/google.js';
+import * as githubProvider from './providerHelpers/github.js';
+import * as facebookProvider from './providerHelpers/facebook.js';
+import * as discordProvider from './providerHelpers/discord.js';
+import * as redditProvider from './providerHelpers/reddit.js';
+import * as spotifyProvider from './providerHelpers/spotify.js';
+import * as homeassistantProvider from './providerHelpers/homeassistant.js';
+import * as youtubeProvider from './providerHelpers/youtube.js';
+import * as instagramProvider from './providerHelpers/instagram.js';
+import * as twitterProvider from './providerHelpers/twitter.js';
 
 class AuthManager {
   private eventListeners: Map<AuthEvent, Set<AuthEventListener>> = new Map();

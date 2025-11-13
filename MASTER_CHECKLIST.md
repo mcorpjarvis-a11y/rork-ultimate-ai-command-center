@@ -20,6 +20,74 @@
 
 ## 📋 Recent Updates (2025-11-13)
 
+### ✅ White Screen Startup Crash Fix - ESM Import Extensions (2025-11-13)
+
+**Status: COMPLETE - All Service Imports Fixed (47 imports across 9 files)**
+
+#### Problem
+The app was experiencing a white screen crash on startup in Expo Go, blocking the React Native dev menu. The Metro bundler CI was failing because:
+1. Service imports in `app/_layout.tsx` were missing `.js` extensions
+2. Relative imports within service files were also missing `.js` extensions
+3. This created a cascading import failure through the entire service dependency tree
+
+#### Solution - Phase 1: Fix Path Alias Imports
+Added `.js` extensions to all service imports in `app/_layout.tsx` using `@/` path alias:
+
+**Fixed Imports in app/_layout.tsx (12 total)**:
+- ✅ `@/services/JarvisLoggerService.js` (primary issue)
+- ✅ `@/services/JarvisInitializationService.js`
+- ✅ `@/services/auth/MasterProfile.js`
+- ✅ `@/services/auth/AuthManager.js`
+- ✅ `@/services/security/SecureKeyStorage.js`
+- ✅ `@/services/config/ConfigValidator.js`
+- ✅ `@/services/onboarding/OnboardingStatus.js`
+- ✅ `@/services/onboarding/OAuthRequirementService.js`
+- ✅ `@/services/onboarding/MasterProfileValidator.js`
+- ✅ `@/services/JarvisAlwaysListeningService.js`
+- ✅ `@/services/JarvisPermissionsService.js`
+- ✅ `@/services/index.js`
+
+#### Solution - Phase 2: Fix Relative Imports in Service Files
+Fixed relative imports (`./ServiceName`) in the service dependency chain:
+
+**Fixed Service Files (35 imports across 8 files)**:
+- ✅ `services/JarvisInitializationService.ts` - 5 relative imports fixed
+- ✅ `services/JarvisListenerService.ts` - 5 relative imports fixed  
+- ✅ `services/JarvisAlwaysListeningService.ts` - 4 relative imports fixed
+- ✅ `services/JarvisGuidanceService.ts` - 1 relative import fixed
+- ✅ `services/JarvisPermissionsService.ts` - 1 relative import fixed
+- ✅ `services/auth/AuthManager.ts` - 14 imports fixed (including all provider helpers)
+- ✅ `services/auth/MasterProfile.ts` - 2 imports fixed
+- ✅ `services/auth/TokenVault.ts` - 2 imports fixed
+
+#### Technical Details
+**Root Cause**: Metro bundler with ESM requires explicit `.js` extensions for:
+1. Path alias imports (`@/services/*`)
+2. Relative imports within services (`./ServiceName`)
+
+**Impact**: Missing extensions caused cascading import failures through the dependency tree:
+- `_layout.tsx` imports `JarvisInitializationService`
+- `JarvisInitializationService` imports `JarvisListenerService`, `JarvisVoiceService`, etc.
+- Each of those imports other services
+- All these relative imports also needed `.js` extensions
+
+**Solution**: Systematically added `.js` extensions to:
+- All path alias imports in startup files
+- All relative imports in the service dependency chain
+- Total: 47 imports fixed across 9 files
+
+#### Expected Outcome
+- ✅ Metro bundler resolves all modules correctly
+- ✅ CI passes Metro bundler verification stage
+- ✅ App successfully mounts on startup
+- ✅ White screen resolved
+- ✅ Expo Go renders UI normally
+- ✅ React Native dev menu accessible
+- ✅ Jarvis initialization sequence runs properly
+- ✅ Full system boots cleanly
+
+---
+
 ### ✅ CI Pipeline Cleanup & Documentation Consolidation - TRIPLE VERIFICATION COMPLETE
 
 **Status: COMPLETE - All CI Jobs Verified Multiple Times, No Issues Found**

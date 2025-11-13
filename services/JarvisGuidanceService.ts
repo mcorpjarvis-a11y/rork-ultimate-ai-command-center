@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { queryJarvis } from './JarvisAPIRouter'; // <-- IMPORT THE NEW ROUTER
+import { queryJarvis } from './JarvisAPIRouter.js'; // <-- IMPORT THE NEW ROUTER
 
 const GUIDANCE_MODEL_PROVIDER = 'groq'; // Use a fast model for guidance
 
