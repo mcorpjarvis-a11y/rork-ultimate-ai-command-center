@@ -4,8 +4,8 @@
  * Android/Expo/Termux only - NO iOS support
  */
 
-import SecureKeyStorage from '@/services/security/SecureKeyStorage.ts';
-import { MasterProfile } from './types.ts';
+import SecureKeyStorage from '@/services/security/SecureKeyStorage';
+import { MasterProfile } from './types';
 
 const PROFILE_KEY = 'master_profile';
 

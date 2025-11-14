@@ -1,10 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FREE_AI_MODELS, AI_CONFIG } from '@/config/api.config';
-import JarvisListenerService from './JarvisListenerService.ts';
-import JarvisVoiceService from './JarvisVoiceService.ts';
-import JarvisPersonality from './personality/JarvisPersonality.ts';
-import FreeAIService from './ai/FreeAIService.ts';
-import JarvisLogger from './JarvisLoggerService.ts';
+import JarvisListenerService from './JarvisListenerService';
+import JarvisVoiceService from './JarvisVoiceService';
+import JarvisPersonality from './personality/JarvisPersonality';
+import FreeAIService from './ai/FreeAIService';
+import JarvisLogger from './JarvisLoggerService';
 
 const INITIALIZATION_KEY = '@jarvis_initialized';
 
