@@ -4,8 +4,8 @@
  * Android/Expo/Termux only - NO iOS support
  */
 
-import SecureKeyStorage from '@/services/security/SecureKeyStorage.ts';
-import { TokenData } from './types.ts';
+import SecureKeyStorage from '@/services/security/SecureKeyStorage';
+import { TokenData } from './types';
 
 const TOKEN_PREFIX = 'auth_token_';
 

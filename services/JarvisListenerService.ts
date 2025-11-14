@@ -2,11 +2,11 @@ import AudioModule from 'expo-audio/build/AudioModule';
 import type { AudioRecorder } from 'expo-audio';
 import { RecordingPresets } from 'expo-audio';
 import { Platform } from 'react-native';
-import JarvisVoiceService from './JarvisVoiceService.ts';
-import JarvisGuidanceService from './JarvisGuidanceService.ts';
-import JarvisPersonality from './personality/JarvisPersonality.ts';
-import AIService from './ai/AIService.ts';
-import FreeAIService from './ai/FreeAIService.ts';
+import JarvisVoiceService from './JarvisVoiceService';
+import JarvisGuidanceService from './JarvisGuidanceService';
+import JarvisPersonality from './personality/JarvisPersonality';
+import AIService from './ai/AIService';
+import FreeAIService from './ai/FreeAIService';
 import { AI_CONFIG } from '@/config/api.config';
 
 export interface ListenerConfig {

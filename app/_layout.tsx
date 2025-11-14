@@ -7,17 +7,17 @@ import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
 import { trpc, trpcClient } from "@/lib/trpc";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import SignInScreen from "@/screens/Onboarding/SignInScreen";
-import JarvisInitializationService from "@/services/JarvisInitializationService.ts";
-import MasterProfile from "@/services/auth/MasterProfile.ts";
-import AuthManager from "@/services/auth/AuthManager.ts";
-import SecureKeyStorage from "@/services/security/SecureKeyStorage.ts";
-import ConfigValidator from "@/services/config/ConfigValidator.ts";
-import OnboardingStatus from "@/services/onboarding/OnboardingStatus.ts";
-import OAuthRequirementService from "@/services/onboarding/OAuthRequirementService.ts";
-import MasterProfileValidator from "@/services/onboarding/MasterProfileValidator.ts";
-import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService.ts";
-import JarvisLogger from "@/services/JarvisLoggerService.ts";
-import { requestAllPermissions } from "@/services/JarvisPermissionsService.ts";
+import JarvisInitializationService from "@/services/JarvisInitializationService";
+import MasterProfile from "@/services/auth/MasterProfile";
+import AuthManager from "@/services/auth/AuthManager";
+import SecureKeyStorage from "@/services/security/SecureKeyStorage";
+import ConfigValidator from "@/services/config/ConfigValidator";
+import OnboardingStatus from "@/services/onboarding/OnboardingStatus";
+import OAuthRequirementService from "@/services/onboarding/OAuthRequirementService";
+import MasterProfileValidator from "@/services/onboarding/MasterProfileValidator";
+import JarvisAlwaysListeningService from "@/services/JarvisAlwaysListeningService";
+import JarvisLogger from "@/services/JarvisLoggerService";
+import { requestAllPermissions } from "@/services/JarvisPermissionsService";
 import { 
   SchedulerService, 
   WebSocketService, 
@@ -26,7 +26,7 @@ import {
   JarvisVoiceService,
   JarvisListenerService,
   VoiceService
-} from "@/services/index.ts";
+} from "@/services/index";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 // Wrap in try-catch to handle cases where it's already been called
